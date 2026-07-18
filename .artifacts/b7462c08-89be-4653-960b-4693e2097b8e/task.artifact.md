@@ -1,5 +1,7 @@
-- [ ] Backend serverni ishga tushirish (8000)
-- [ ] Hisobot xizmatini ishga tushirish (8001)
-- [ ] WebSocket serverni ishga tushirish (8080)
-- [ ] Queue workerni ishga tushirish
-- [ ] Xizmatlar holatini tekshirish
+- [x] Backend serverni ishga tushirish (8000)
+- [x] Hisobot xizmatini ishga tushirish (8001)
+- [x] WebSocket serverni ishga tushirish (8080)
+- [x] Queue workerni ishga tushirish
+- [x] Xizmatlar holatini tekshirish
+- [x] Flutter SDK tekshirish va sozlash
+- [/] Mobil ilovani emulatorda ishga tushirish
