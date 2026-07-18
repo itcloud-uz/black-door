@@ -1,0 +1,5 @@
+- [ ] Backend serverni ishga tushirish (8000)
+- [ ] Hisobot xizmatini ishga tushirish (8001)
+- [ ] WebSocket serverni ishga tushirish (8080)
+- [ ] Queue workerni ishga tushirish
+- [ ] Xizmatlar holatini tekshirish
