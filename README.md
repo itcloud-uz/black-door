@@ -34,6 +34,26 @@ Seyf metaforasi o'rniga doiraviy tugmachalardan iborat Neumorphic klaviatura va 
 
 ---
 
+## ⚙️ Demo / Test Rejimida Ishlatish (Demo Credentials)
+
+Tizimda sinovdan o'tkazish (testing/demo) uchun tayyor foydalanuvchi ma'lumotlari mavjud. Dasturni ishga tushirganingizdan so'ng, quyidagi rollar orqali kirib test qilishingiz mumkin.
+
+> [!IMPORTANT]
+> Barcha foydalanuvchilar uchun umumiy parol: **`password123`**
+> 
+> Moliya (Qora daftar) bo'limini blokdan chiqarish uchun umumiy PIN kod: **`1234`**
+
+| Rol | F.I.Sh | Kirish Emaili | Parol | Moliya PIN kodi |
+| :--- | :--- | :--- | :--- | :--- |
+| **Super Admin** | Abdullayev Sardor | `admin@blackdoor.uz` | `password123` | `1234` |
+| **Finansist (Moliya)** | Karimova Nilufar | `moliyachi@blackdoor.uz` | `password123` | `1234` |
+| **Obyekt Menejeri (Zavod)** | Toshmatov Jamshid | `zavod.menejer@blackdoor.uz` | `password123` | *Mavjud emas* |
+| **Obyekt Menejeri (Ombor)** | Rahimov Bekzod | `ombor.menejer@blackdoor.uz` | `password123` | *Mavjud emas* |
+| **Xodim 1** | Aliyev Oybek | `oybek@blackdoor.uz` | `password123` | *Mavjud emas* |
+| **Xodim 2** | Saidova Mohira | `mohira@blackdoor.uz` | `password123` | *Mavjud emas* |
+
+---
+
 ## 🚀 Tizim Imkoniyatlari va Funksionallik
 
 Tizimda 4 ta asosiy foydalanuvchi roli mavjud va har bir rol uchun alohida boshqaruv panellari (Dashboard) va ruxsatnomalar ajratilgan:
