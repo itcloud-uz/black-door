@@ -1,6 +1,6 @@
 # Black Door — Enterprise Financial Management System
 
-**Black Door** — bu ko'p obyektli korxonalar (zavodlar, qurilish maydonlari, omborlar) uchun mo'ljallangan moliyaviy buxgalteriya va operatsion boshqaruv tizimi (ERP). Loyihada yaqinda amalga oshirilgan to'liq UI/UX yangilanishidan so'ng interfeys zamonaviy **Neumorphism (Soft UI / yumshoq skeuomorfizm)** uslubiga o'tkazildi.
+**Black Door** — bu ko'p obyektli korxonalar (zavodlar, qurilish maydonlari, omborlar) uchun mo'ljallangan moliyaviy buxgalteriya va operatsion boshqaruv tizimi (ERP). Tizim interfeysi zamonaviy **Neumorphism (Soft UI / yumshoq skeuomorfizm)** uslubiga ega.
 
 ---
 
@@ -11,8 +11,26 @@ Tizimning barcha sahifalari och rangli, silikon/plastik yuzadan bo'rtib chiqqan 
 * **Soyalar orqali Ajratish:** Elementlar fondan faqat yumshoq ikki tomonlama soyalar (chap-yuqoridan oq va o'ng-pastdan kulrang) yordamida ajralib turadi.
 * **Tugmalar:** Bo'rtgan (extruded) tugmalar bosilganda silliq animatsiya bilan botgan (pressed/inset) holatga o'tadi.
 * **Inputlar:** Barcha matn kiritish maydonlari va select menyulari botgan (inset) shaklga keltirilgan.
-* **Aksentlar:** Ortiqcha ranglar butunlay olib tashlanib, ijobiy summalar va faol holatlar uchun **yumshoq yashil**, salbiy/xavfli amallar uchun **marjon-qizil** ranglar tanlangan.
+* **Aksentlar:** Ortiqcha ranglar butunlay olib tashlanib, ijobiy balans va summalar uchun **yumshoq yashil**, salbiy/xavfli amallar uchun **marjon-qizil** ranglar tanlangan.
 * **Shrift:** Tizimdagi yagona shrift sifatida zamonaviy va doiraviy shaklga ega **Nunito** shrifti o'rnatildi.
+
+---
+
+## 📸 Dastur Interfeysidan Namunalar (UI Mockups)
+
+Quyida tizimning yangilangan Neumorphic sahifalaridan namunalar va ularning afzalliklari keltirilgan:
+
+### 1. Tizimga Kirish Sahifasi (Login Page)
+Yumshoq fonga ega bo'lgan sodda va minimalistik kirish sahifasi. Karta yuza ustida suzib turgandek ko'rinadi, inputlar esa botgan holatda bo'lib foydalanuvchiga e'tiborni qaratishda yordam beradi.
+![Kirish Sahifasi](public/images/mockups/login.jpg)
+
+### 2. Moliyaviy Boshqaruv Paneli (Financial Dashboard)
+Hisobot kartalari, yon menyu (sidebar) va valyuta kursini aks ettiruvchi inset capsule displey. Har bir element ranglar orqali emas, yumshoq soyalar yordamida nafis ajratilgan.
+![Boshqaruv Paneli](public/images/mockups/dashboard.jpg)
+
+### 3. PIN-kod Himoya Oynasi (PIN Lockscreen)
+Seyf metaforasi o'rniga doiraviy tugmachalardan iborat Neumorphic klaviatura va botgan PIN-kod indikatorlari o'rnatildi. PIN xato kiritilganda klaviatura qizil tus oladi va titraydi.
+![PIN Tasdiqlash](public/images/mockups/pin.jpg)
 
 ---
 
@@ -23,14 +41,14 @@ Tizimda 4 ta asosiy foydalanuvchi roli mavjud va har bir rol uchun alohida boshq
 ### 1. Foydalanuvchilar va Obyektlar Boshqaruvi (Super Admin)
 * **Xodimlar boshqaruvi:** Yangi foydalanuvchilar yaratish, ularni faollashtirish/bloklash va rollarini belgilash.
 * **Obyektlar reyestri:** Korxonaga qarashli ishlab chiqarish obyekti, qurilish yoki omborlarni qo'shish va ularga menejerlarni biriktirish.
-* **Valyuta Kursi:** Markazlashtirilgan joriy kursni boshqarish (1 USD = ? UZS). LED displey o'rniga Neumorphic inset tabloda aks etadi.
+* **Valyuta Kursi:** Markazlashtirilgan joriy kursni boshqarish (1 USD = ? UZS).
 * **Audit Jurnali:** Tizimdagi har bir muhim amalni (tranzaksiyalar, o'zgarishlar, o'chirishlar) vaqt va foydalanuvchi kesimida jurnalga qayd etish.
 
 ### 2. Moliya va Xazina moduli (Finansist & Admin)
 * **Kassalar:** USD va UZS balanslariga ega bo'lgan bir nechta xazina va kassa hisobvaraqlarini yuritish.
 * **Kirim-Chiqim Tranzaksiyalari:** Tranzaksiya toifalarini belgilash, turlarini (kirim, chiqim, o'tkazma, valyuta ayirboshlash) ko'rsatgan holda hisob-kitob qilish.
 * **Kontragentlar va Qarzlar:** Hamkorlar (kontragentlar) bilan hisob-kitoblar tarixi hamda qarzlar reyestri (outstanding debt).
-* **Moliya PIN verification:** Maxfiy "Qora daftar" (moliya bo'limi)ga kirish uchun maxsus 4 xonali PIN kodli himoya tizimi o'rnatilgan. Xato kod kiritilganda klaviatura yumshoq qizil tusda titraydi.
+* **Moliya PIN verification:** Maxfiy "Qora daftar" (moliya bo'limi)ga kirish uchun maxsus 4 xonali PIN kodli himoya tizimi o'rnatilgan.
 
 ### 3. Obyekt va Xodimlar Boshqaruvi (Menejer)
 * **Mini-Kassa:** Menejer o'ziga biriktirilgan obyekt uchun ajratilgan kassa balansini boshqaradi.
