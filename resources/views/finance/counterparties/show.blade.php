@@ -27,21 +27,17 @@
         <h4 class="handwriting-title" style="font-size: 1.25rem; margin-bottom: 4px;">Balans</h4>
         <div class="d-flex justify-between items-center">
             <span>Balans (USD):</span>
-            <strong class="text-lg {{ $counterparty->getBalanceUsd() >= 0 ? 'text-green' : 'text-red' }}">
-                {{ $counterparty->balance_usd_formatted }}
-            </strong>
+            <x-amount-display :amount="$counterparty->getBalanceUsd()" currency="USD" size="lg" />
         </div>
         <div class="d-flex justify-between items-center">
             <span>Balans (UZS):</span>
-            <strong class="text-lg {{ $counterparty->getBalanceUzs() >= 0 ? 'text-green' : 'text-red' }}">
-                {{ $counterparty->balance_uzs_formatted }}
-            </strong>
+            <x-amount-display :amount="$counterparty->getBalanceUzs()" currency="UZS" size="lg" />
         </div>
     </div>
 </div>
 
 <div class="skeuo-card-paper">
-    <h3 class="handwriting-title" style="font-size: 1.4rem; border-bottom: 1px dashed var(--paper-line); padding-bottom: 6px; margin-bottom: 12px;">📜 Tranzaksiyalar tarixi</h3>
+    <h3 class="handwriting-title" style="font-size: 1.4rem; border-bottom: 1px dashed var(--paper-line); padding-bottom: 6px; margin-bottom: 12px;"><i class="bi bi-clock-history"></i> Tranzaksiyalar tarixi</h3>
     
     <div class="skeuo-table-wrapper">
         <table class="skeuo-table skeuo-table-paper">

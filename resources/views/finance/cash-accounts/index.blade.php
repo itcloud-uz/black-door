@@ -41,16 +41,16 @@
                 $usdAmount = $usdBalance ? $usdBalance->amount : 0;
                 $uzsAmount = $uzsBalance ? $uzsBalance->amount : 0;
             @endphp
-            <div class="d-flex justify-between items-center mb-sm align-center" style="gap: 12px;">
-                <x-currency-badge currency="USD" style="flex-shrink: 0;" />
-                <div class="register-display" style="font-size: 1.3rem; padding: 8px 16px; flex: 1; display: flex; justify-content: flex-end; align-items: center; min-height: 42px;">
-                    <x-amount-display :amount="$usdAmount" currency="USD" size="md" />
+            <div class="d-flex justify-between items-center mb-sm align-center" style="gap: 12px; width: 100%; min-width: 0;">
+                <x-currency-badge currency="USD" style="flex-shrink: 0; width: 90px; display: inline-block; text-align: center;" />
+                <div class="register-display-sm">
+                    <x-amount-display :amount="$usdAmount" currency="USD" scale="true" />
                 </div>
             </div>
-            <div class="d-flex justify-between items-center mb-sm align-center" style="gap: 12px;">
-                <x-currency-badge currency="UZS" style="flex-shrink: 0;" />
-                <div class="register-display" style="font-size: 1.3rem; padding: 8px 16px; flex: 1; display: flex; justify-content: flex-end; align-items: center; min-height: 42px;">
-                    <x-amount-display :amount="$uzsAmount" currency="UZS" size="md" />
+            <div class="d-flex justify-between items-center mb-sm align-center" style="gap: 12px; width: 100%; min-width: 0;">
+                <x-currency-badge currency="UZS" style="flex-shrink: 0; width: 90px; display: inline-block; text-align: center;" />
+                <div class="register-display-sm">
+                    <x-amount-display :amount="$uzsAmount" currency="UZS" scale="true" />
                 </div>
             </div>
 

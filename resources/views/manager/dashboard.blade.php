@@ -46,8 +46,8 @@
             <div class="stat-card-icon stat-card-icon-green"><i class="bi bi-currency-dollar"></i></div>
             <div class="stat-card-content">
                 <div class="stat-card-label">Oylik to'lov (USD)</div>
-                <div class="stat-card-value">
-                    <x-amount-display :amount="$totalSalaryPaidUsd" currency="USD" />
+                <div class="stat-card-value" style="min-width: 0; overflow: hidden; width: 100%;">
+                    <x-amount-display :amount="$totalSalaryPaidUsd" currency="USD" scale="true" />
                 </div>
             </div>
         </div>
@@ -56,8 +56,8 @@
             <div class="stat-card-icon stat-card-icon-copper"><i class="bi bi-cash-coin"></i></div>
             <div class="stat-card-content">
                 <div class="stat-card-label">Oylik to'lov (UZS)</div>
-                <div class="stat-card-value">
-                    <x-amount-display :amount="$totalSalaryPaidUzs" currency="UZS" />
+                <div class="stat-card-value" style="min-width: 0; overflow: hidden; width: 100%;">
+                    <x-amount-display :amount="$totalSalaryPaidUzs" currency="UZS" scale="true" />
                 </div>
             </div>
         </div>
@@ -84,14 +84,20 @@
             </div>
 
             @forelse($cashAccounts ?? [] as $account)
-                <div class="d-flex justify-between items-center p-sm" style="border-bottom: 1px solid rgba(184,115,51,0.08);">
-                    <div>
-                        <strong>{{ $account->name }}</strong>
+                @php
+                    $usdBalance = ($account->balances ?? collect())->firstWhere('currency.value', 'USD');
+                    $uzsBalance = ($account->balances ?? collect())->firstWhere('currency.value', 'UZS');
+                    $usdAmount = $usdBalance ? $usdBalance->amount : 0;
+                    $uzsAmount = $uzsBalance ? $uzsBalance->amount : 0;
+                @endphp
+                <div class="d-flex justify-between items-center p-sm" style="border-bottom: 1px solid rgba(184,115,51,0.08); gap: 12px;">
+                    <div style="flex: 1; min-width: 0;">
+                        <strong class="ellipsis" title="{{ $account->name }}">{{ $account->name }}</strong>
                     </div>
-                    <div class="d-flex gap-md">
-                        @foreach($account->balances ?? [] as $balance)
-                            <x-amount-display :amount="$balance->amount" :currency="$balance->currency->value" size="sm" />
-                        @endforeach
+                    <div class="d-flex gap-md" style="flex-shrink: 0; align-items: center;">
+                        <x-amount-display :amount="$usdAmount" currency="USD" size="sm" />
+                        <span class="text-muted text-xs">|</span>
+                        <x-amount-display :amount="$uzsAmount" currency="UZS" size="sm" />
                     </div>
                 </div>
             @empty

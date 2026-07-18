@@ -80,16 +80,10 @@
                             <td><span class="skeuo-badge skeuo-badge-steel">{{ $cp->category->label() }}</span></td>
                             <td class="text-sm">{{ $cp->phone ?? '—' }}</td>
                             <td>
-                                @php $balUsd = $cp->getBalanceUsd(); @endphp
-                                <span class="{{ $balUsd > 0 ? 'text-green' : ($balUsd < 0 ? 'text-red' : 'text-muted') }}">
-                                    {{ $cp->balance_usd_formatted }}
-                                </span>
+                                <x-amount-display :amount="$cp->getBalanceUsd()" currency="USD" />
                             </td>
                             <td>
-                                @php $balUzs = $cp->getBalanceUzs(); @endphp
-                                <span class="{{ $balUzs > 0 ? 'text-green' : ($balUzs < 0 ? 'text-red' : 'text-muted') }}">
-                                    {{ $cp->balance_uzs_formatted }}
-                                </span>
+                                <x-amount-display :amount="$cp->getBalanceUzs()" currency="UZS" />
                             </td>
                             <td>
                                 <a href="{{ route('finance.counterparties.show', $cp->id) }}" class="skeuo-btn skeuo-btn-sm">📜 Jurnal</a>

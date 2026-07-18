@@ -481,6 +481,30 @@ h6 { font-size: 0.875rem; }
     color: var(--text-primary) !important;
 }
 
+.register-display-sm {
+    background: var(--surface) !important;
+    box-shadow: var(--shadow-pressed-sm) !important;
+    border: none !important;
+    border-radius: 20px !important;
+    font-family: var(--font-body) !important;
+    font-size: 1.25rem !important;
+    font-weight: 800 !important;
+    color: var(--text-primary) !important;
+    text-shadow: none !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    padding: 6px 16px !important;
+    min-height: 42px !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
+.amount-neutral {
+    color: #7f8c8d !important;
+}
+
 .bill-slot {
     display: none !important;
 }

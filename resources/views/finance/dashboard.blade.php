@@ -11,38 +11,44 @@
 
 {{-- Total Balances --}}
 <div class="grid-2 mb-xl">
-    <div class="cash-register" style="padding: 20px;">
+    <div class="cash-register" style="padding: 20px; min-width: 0;">
         <div class="text-sm text-muted mb-xs"><i class="bi bi-currency-dollar"></i> Jami USD Balans</div>
-        <div class="register-display register-display-amber" style="font-size: 2.2rem; padding: 12px;">
-            <x-amount-display :amount="$totalUsd" currency="USD" />
+        <div class="register-display register-display-amber" style="font-size: 2.2rem; padding: 12px; display: flex; justify-content: center; align-items: center; min-width: 0; overflow: hidden; min-height: 70px;">
+            <x-amount-display :amount="$totalUsd" currency="USD" scale="true" />
         </div>
     </div>
-    <div class="cash-register" style="padding: 20px;">
+    <div class="cash-register" style="padding: 20px; min-width: 0;">
         <div class="text-sm text-muted mb-xs"><i class="bi bi-cash-coin"></i> Jami UZS Balans</div>
-        <div class="register-display register-display-amber" style="font-size: 2.2rem; padding: 12px;">
-            <x-amount-display :amount="$totalUzs" currency="UZS" />
+        <div class="register-display register-display-amber" style="font-size: 2.2rem; padding: 12px; display: flex; justify-content: center; align-items: center; min-width: 0; overflow: hidden; min-height: 70px;">
+            <x-amount-display :amount="$totalUzs" currency="UZS" scale="true" />
         </div>
     </div>
 </div>
 
 <div class="grid-2">
     {{-- Kassalar --}}
-    <div class="skeuo-card-paper">
+    <div class="skeuo-card-paper" style="min-width: 0;">
         <div class="d-flex justify-between items-center mb-md" style="border-bottom: 1px dashed var(--paper-line); padding-bottom: 8px;">
             <h3 class="handwriting-title" style="font-size: 1.5rem; margin: 0;"><i class="bi bi-bank"></i> Kassalar</h3>
             <a href="{{ route('finance.cash-accounts.index') }}" class="skeuo-btn skeuo-btn-sm">Barchasi</a>
         </div>
         
         @forelse($cashAccounts ?? [] as $account)
-            <div class="d-flex justify-between items-center p-sm" style="border-bottom: 1px dashed var(--paper-line);">
-                <div>
-                    <strong>{{ $account->name }}</strong>
-                    <span class="text-muted text-xs">  {{ $account->type->label() }}</span>
+            @php
+                $usdBalance = ($account->balances ?? collect())->firstWhere('currency.value', 'USD');
+                $uzsBalance = ($account->balances ?? collect())->firstWhere('currency.value', 'UZS');
+                $usdAmount = $usdBalance ? $usdBalance->amount : 0;
+                $uzsAmount = $uzsBalance ? $uzsBalance->amount : 0;
+            @endphp
+            <div class="d-flex justify-between items-center p-sm" style="border-bottom: 1px dashed var(--paper-line); gap: 12px;">
+                <div style="flex: 1; min-width: 0;">
+                    <strong class="ellipsis" title="{{ $account->name }}">{{ $account->name }}</strong>
+                    <span class="text-muted text-xs">{{ $account->type->label() }}</span>
                 </div>
-                <div class="d-flex gap-md">
-                    @foreach($account->balances ?? [] as $balance)
-                        <x-amount-display :amount="$balance->amount" :currency="$balance->currency->value" size="sm" />
-                    @endforeach
+                <div class="d-flex gap-md" style="flex-shrink: 0; align-items: center;">
+                    <x-amount-display :amount="$usdAmount" currency="USD" size="sm" />
+                    <span class="text-muted text-xs">|</span>
+                    <x-amount-display :amount="$uzsAmount" currency="UZS" size="sm" />
                 </div>
             </div>
         @empty
