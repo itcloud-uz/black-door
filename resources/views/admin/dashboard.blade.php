@@ -3,7 +3,7 @@
 @section('title', 'Admin — Bosh sahifa')
 
 @section('breadcrumb')
-    <li><span class="current">📊 Bosh sahifa</span></li>
+    <li><span class="current"><i class="bi bi-grid-1x2"></i> Bosh sahifa</span></li>
 @endsection
 
 @section('content')
@@ -11,7 +11,7 @@
 {{-- Stats Cards --}}
 <div class="grid-4 mb-xl">
     <div class="stat-card">
-        <div class="stat-card-icon stat-card-icon-green">💵</div>
+        <div class="stat-card-icon stat-card-icon-green"><i class="bi bi-currency-dollar"></i></div>
         <div class="stat-card-content">
             <div class="stat-card-label">Jami USD</div>
             <div class="stat-card-value">
@@ -21,7 +21,7 @@
     </div>
 
     <div class="stat-card">
-        <div class="stat-card-icon stat-card-icon-copper">💴</div>
+        <div class="stat-card-icon stat-card-icon-copper"><i class="bi bi-cash-coin"></i></div>
         <div class="stat-card-content">
             <div class="stat-card-label">Jami UZS</div>
             <div class="stat-card-value">
@@ -31,7 +31,7 @@
     </div>
 
     <div class="stat-card">
-        <div class="stat-card-icon stat-card-icon-gold">🏢</div>
+        <div class="stat-card-icon stat-card-icon-gold"><i class="bi bi-building"></i></div>
         <div class="stat-card-content">
             <div class="stat-card-label">Obyektlar</div>
             <div class="stat-card-value">{{ $objectsCount ?? 0 }}</div>
@@ -39,7 +39,7 @@
     </div>
 
     <div class="stat-card">
-        <div class="stat-card-icon stat-card-icon-steel">👥</div>
+        <div class="stat-card-icon stat-card-icon-steel"><i class="bi bi-people"></i></div>
         <div class="stat-card-content">
             <div class="stat-card-label">Foydalanuvchilar</div>
             <div class="stat-card-value">{{ $usersCount ?? 0 }}</div>
@@ -51,7 +51,7 @@
     {{-- Cash Accounts --}}
     <div class="skeuo-card">
         <div class="skeuo-card-header">
-            <h3 class="skeuo-card-title">🏦 Kassalar va balanslar</h3>
+            <h3 class="skeuo-card-title"><i class="bi bi-bank"></i> Kassalar va balanslar</h3>
             <a href="{{ route('finance.cash-accounts.index') }}" class="skeuo-btn skeuo-btn-sm">Barchasini ko'rish</a>
         </div>
 
@@ -77,7 +77,7 @@
     {{-- Objects Overview --}}
     <div class="skeuo-card">
         <div class="skeuo-card-header">
-            <h3 class="skeuo-card-title">🏢 Obyektlar</h3>
+            <h3 class="skeuo-card-title"><i class="bi bi-building"></i> Obyektlar</h3>
             <a href="{{ route('admin.objects.index') }}" class="skeuo-btn skeuo-btn-sm">Barchasini ko'rish</a>
         </div>
 
@@ -86,9 +86,9 @@
                 <div>
                     <span>
                         @switch($object->type->value)
-                            @case('factory') 🏭 @break
-                            @case('construction') 🏗️ @break
-                            @case('warehouse') 🏪 @break
+                            @case('factory') <i class="bi bi-building-gear"></i> @break
+                            @case('construction') <i class="bi bi-cone-striped"></i> @break
+                            @case('warehouse') <i class="bi bi-shop"></i> @break
                         @endswitch
                     </span>
                     <strong>{{ $object->name }}</strong>
@@ -114,7 +114,7 @@
     {{-- Recent Transactions --}}
     <div class="skeuo-card">
         <div class="skeuo-card-header">
-            <h3 class="skeuo-card-title">💰 So'nggi tranzaksiyalar</h3>
+            <h3 class="skeuo-card-title"><i class="bi bi-cash-stack"></i> So'nggi tranzaksiyalar</h3>
             <a href="{{ route('finance.transactions.index') }}" class="skeuo-btn skeuo-btn-sm">Barchasini ko'rish</a>
         </div>
 
@@ -155,7 +155,7 @@
         {{-- Exchange Rate --}}
         <div class="skeuo-card mb-lg">
             <div class="skeuo-card-header">
-                <h3 class="skeuo-card-title">💱 Joriy valyuta kursi</h3>
+                <h3 class="skeuo-card-title"><i class="bi bi-currency-exchange"></i> Joriy valyuta kursi</h3>
                 <a href="{{ route('admin.currency-rates') }}" class="skeuo-btn skeuo-btn-sm">Boshqarish</a>
             </div>
             <div class="cash-register" style="padding: 16px;">
@@ -168,7 +168,7 @@
         {{-- Recent Audit --}}
         <div class="skeuo-card">
             <div class="skeuo-card-header">
-                <h3 class="skeuo-card-title">📋 So'nggi audit yozuvlari</h3>
+                <h3 class="skeuo-card-title"><i class="bi bi-journal-text"></i> So'nggi audit yozuvlari</h3>
                 <a href="{{ route('admin.audit-log') }}" class="skeuo-btn skeuo-btn-sm">Barchasini ko'rish</a>
             </div>
 

@@ -10,13 +10,13 @@
 @section('finance-content')
 
 <div class="d-flex justify-between items-center mb-lg">
-    <h2 class="handwriting-title">📂 Kategoriyalar Daraxti</h2>
+    <h2 class="handwriting-title"><i class="bi bi-folder2-open"></i> Kategoriyalar Daraxti</h2>
 </div>
 
 <div class="grid-3mb" style="display: grid; grid-template-columns: 1fr 2fr; gap: var(--space-lg); margin-bottom: var(--space-xl);">
     {{-- Form --}}
     <div class="skeuo-card-paper">
-        <h3 class="handwriting-title" style="font-size: 1.4rem; border-bottom: 1px dashed var(--paper-line); padding-bottom: 6px; margin-bottom: 12px;">📂 Yangi Kategoriya</h3>
+        <h3 class="handwriting-title" style="font-size: 1.4rem; border-bottom: 1px dashed var(--paper-line); padding-bottom: 6px; margin-bottom: 12px;"><i class="bi bi-folder2-open"></i> Yangi Kategoriya</h3>
         
         <form method="POST" action="{{ route('finance.categories.store') }}">
             @csrf
@@ -49,7 +49,7 @@
                 @error('parent_id') <span class="form-error">{{ $message }}</span> @enderror
             </div>
 
-            <button type="submit" class="skeuo-btn skeuo-btn-primary" style="width: 100%;">💾 Saqlash</button>
+            <button type="submit" class="skeuo-btn skeuo-btn-primary" style="width: 100%;"><i class="bi bi-save"></i> Saqlash</button>
         </form>
     </div>
 
@@ -62,7 +62,7 @@
                 <div style="margin-bottom: var(--space-md); border-bottom: 1px dashed var(--paper-line); padding-bottom: 8px;">
                     <div class="d-flex justify-between items-center">
                         <div>
-                            <span>{{ $cat->type === 'income' ? '📈 Kirim' : '📉 Chiqim' }} — <strong>{{ $cat->name }}</strong></span>
+                            <span>{{ $cat->type === 'income' ? '<i class="bi bi-graph-up-arrow"></i> Kirim' : '<i class="bi bi-graph-down-arrow"></i> Chiqim' }} — <strong>{{ $cat->name }}</strong></span>
                         </div>
                         <div>
                             <form method="POST" action="{{ route('finance.categories.destroy', $cat->id) }}" onsubmit="return confirm('Kategoriyani o'chirishni xohlaysizmi?');" style="display: inline;">

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.manager')
 
 @section('title', 'Ombor boshqaruvi')
 
@@ -7,10 +7,10 @@
     <li><span class="current">Ombor</span></li>
 @endsection
 
-@section('content')
+@section('manager-content')
 
 <div class="page-header">
-    <h1 class="page-title">📦 Obyekt Omborxona boshqaruvi</h1>
+    <h1 class="page-title"><i class="bi bi-box-seam"></i> Obyekt Omborxona boshqaruvi</h1>
 </div>
 
 <div class="grid-2 mb-xl">
@@ -40,7 +40,7 @@
                             <td class="mono-number text-muted">{{ $stock->product->min_stock_level }}</td>
                             <td>
                                 @if($stock->isLow())
-                                    <span class="skeuo-badge skeuo-badge-red">⚠️ Kamaygan</span>
+                                    <span class="skeuo-badge skeuo-badge-red"><i class="bi bi-exclamation-triangle"></i> Kamaygan</span>
                                 @else
                                     <span class="skeuo-badge skeuo-badge-green">✅ Yetarli</span>
                                 @endif
@@ -57,7 +57,7 @@
     {{-- Movement Log Form --}}
     <div class="skeuo-card" x-data="{ mvtType: 'incoming' }">
         <div class="skeuo-card-header">
-            <h3 class="skeuo-card-title">✍️ Ombor harakatini yozish</h3>
+            <h3 class="skeuo-card-title"><i class="bi bi-pencil-square"></i> Ombor harakatini yozish</h3>
         </div>
 
         <form method="POST" action="{{ route('manager.warehouse.movement') }}">
@@ -109,7 +109,7 @@
                 <textarea name="note" class="skeuo-input" placeholder="Izoh yozing..."></textarea>
             </div>
 
-            <button type="submit" class="skeuo-btn skeuo-btn-primary" style="width: 100%;">💾 Saqlash</button>
+            <button type="submit" class="skeuo-btn skeuo-btn-primary" style="width: 100%;"><i class="bi bi-save"></i> Saqlash</button>
         </form>
     </div>
 </div>
@@ -117,7 +117,7 @@
 {{-- Inventory Check Form --}}
 <div class="skeuo-card mb-xl">
     <div class="skeuo-card-header">
-        <h3 class="skeuo-card-title">🔍 Inventarizatsiya (Zaxirani solishtirish va to'g'rilash)</h3>
+        <h3 class="skeuo-card-title"><i class="bi bi-search"></i> Inventarizatsiya (Zaxirani solishtirish va to'g'rilash)</h3>
     </div>
 
     <form method="POST" action="{{ route('manager.warehouse.check') }}">

@@ -11,7 +11,7 @@
 @section('content')
 
 <div class="page-header">
-    <h1 class="page-title">➕ Yangi obyekt</h1>
+    <h1 class="page-title"><i class="bi bi-plus-lg"></i> Yangi obyekt</h1>
     <a href="{{ route('admin.objects.index') }}" class="skeuo-btn skeuo-btn-sm">← Ortga</a>
 </div>
 
@@ -30,9 +30,9 @@
             <label class="form-label" for="type">Turi</label>
             <select id="type" name="type" class="skeuo-select" required x-model="selectedType">
                 <option value="">— Tanlang —</option>
-                <option value="factory" {{ old('type') === 'factory' ? 'selected' : '' }}>🏭 Zavod</option>
-                <option value="construction" {{ old('type') === 'construction' ? 'selected' : '' }}>🏗️ Qurilish</option>
-                <option value="warehouse" {{ old('type') === 'warehouse' ? 'selected' : '' }}>🏪 Ombor</option>
+                <option value="factory" {{ old('type') === 'factory' ? 'selected' : '' }}><i class="bi bi-building-gear"></i> Zavod</option>
+                <option value="construction" {{ old('type') === 'construction' ? 'selected' : '' }}><i class="bi bi-cone-striped"></i> Qurilish</option>
+                <option value="warehouse" {{ old('type') === 'warehouse' ? 'selected' : '' }}><i class="bi bi-shop"></i> Ombor</option>
             </select>
             @error('type') <span class="form-error">{{ $message }}</span> @enderror
         </div>
@@ -65,7 +65,7 @@
 
         <div style="border-top: 1px solid rgba(184,115,51,0.1); padding-top: var(--space-lg); margin-top: var(--space-lg);">
             <button type="submit" class="skeuo-btn skeuo-btn-primary skeuo-btn-lg">
-                💾 Saqlash
+                <i class="bi bi-save"></i> Saqlash
             </button>
         </div>
     </form>

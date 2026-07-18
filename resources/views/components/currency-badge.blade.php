@@ -7,7 +7,7 @@
 
 @php
     $badgeClass = $currency === 'USD' ? 'skeuo-badge-usd' : 'skeuo-badge-uzs';
-    $label = $currency === 'USD' ? '$ USD' : 'сўм UZS';
+    $label = $currency === 'USD' ? '$ USD' : 'so\'m UZS';
 @endphp
 
 <span class="skeuo-badge {{ $badgeClass }}" {{ $attributes }}>

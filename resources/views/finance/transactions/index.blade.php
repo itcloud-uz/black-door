@@ -10,14 +10,14 @@
 @section('finance-content')
 
 <div class="d-flex justify-between items-center mb-lg" style="flex-wrap: wrap; gap: 12px;">
-    <h2 class="handwriting-title">💰 Tranzaksiyalar Jurnali</h2>
+    <h2 class="handwriting-title"><i class="bi bi-cash-stack"></i> Tranzaksiyalar Jurnali</h2>
 </div>
 
 {{-- Add Transaction Form & List --}}
 <div class="grid-3mb" style="display: grid; grid-template-columns: 1fr 2fr; gap: var(--space-lg); margin-bottom: var(--space-xl);">
     {{-- Form --}}
     <div class="skeuo-card-paper" x-data="{ txType: 'income' }">
-        <h3 class="handwriting-title" style="font-size: 1.4rem; border-bottom: 1px dashed var(--paper-line); padding-bottom: 6px; margin-bottom: 12px;">✍️ Yangi Qayd</h3>
+        <h3 class="handwriting-title" style="font-size: 1.4rem; border-bottom: 1px dashed var(--paper-line); padding-bottom: 6px; margin-bottom: 12px;"><i class="bi bi-pencil-square"></i> Yangi Qayd</h3>
         
         <form method="POST" action="{{ route('finance.transactions.store') }}">
             @csrf
@@ -82,7 +82,7 @@
                     <option value="">— Tanlang (ixtiyoriy) —</option>
                     @foreach($categories ?? [] as $cat)
                         <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>
-                            {{ $cat->type === 'income' ? '📈' : '📉' }} {{ $cat->name }}
+                            {{ $cat->type === 'income' ? '<i class="bi bi-graph-up-arrow"></i>' : '<i class="bi bi-graph-down-arrow"></i>' }} {{ $cat->name }}
                         </option>
                     @endforeach
                 </select>
@@ -95,7 +95,7 @@
                     <option value="">— Tanlang (ixtiyoriy) —</option>
                     @foreach($counterparties ?? [] as $cp)
                         <option value="{{ $cp->id }}" {{ old('counterparty_id') == $cp->id ? 'selected' : '' }}>
-                            👤 {{ $cp->name }} ({{ $cp->category->label() }})
+                            <i class="bi bi-person"></i> {{ $cp->name }} ({{ $cp->category->label() }})
                         </option>
                     @endforeach
                 </select>
@@ -107,7 +107,7 @@
                 <textarea name="note" class="skeuo-input skeuo-input-paper" placeholder="Tranzaksiya tafsilotlari...">{{ old('note') }}</textarea>
             </div>
 
-            <button type="submit" class="skeuo-btn skeuo-btn-primary" style="width: 100%;">💾 Qayd etish</button>
+            <button type="submit" class="skeuo-btn skeuo-btn-primary" style="width: 100%;"><i class="bi bi-save"></i> Qayd etish</button>
         </form>
     </div>
 
@@ -149,7 +149,7 @@
                             <td>
                                 <form method="POST" action="{{ route('finance.transactions.storno', $tx->id) }}" onsubmit="return confirm('Tranzaksiyani storno qilmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi!');">
                                     @csrf
-                                    <button type="submit" class="skeuo-btn skeuo-btn-sm skeuo-btn-danger" title="Bekor qilish (Storno)">🔄 Storno</button>
+                                    <button type="submit" class="skeuo-btn skeuo-btn-sm skeuo-btn-danger" title="Bekor qilish (Storno)"><i class="bi bi-arrow-counterclockwise"></i> Storno</button>
                                 </form>
                             </td>
                         </tr>

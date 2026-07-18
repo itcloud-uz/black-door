@@ -349,11 +349,13 @@ Alpine.data('amountFormatter', () => ({
         const main = Math.floor(Math.abs(amountInSubunits) / 100);
         const sub = Math.abs(amountInSubunits) % 100;
         const sign = amountInSubunits < 0 ? '-' : '';
+        const mainFormatted = main.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        const subFormatted = sub.toString().padStart(2, '0');
 
         if (currency === 'USD') {
-            return sign + '$' + main.toLocaleString('en-US') + '.' + sub.toString().padStart(2, '0');
+            return sign + '$' + mainFormatted + '.' + subFormatted;
         }
-        return sign + main.toLocaleString('uz-UZ') + '.' + sub.toString().padStart(2, '0') + ' сўм';
+        return sign + mainFormatted + '.' + subFormatted + ' so\'m';
     },
 
     formatNumber(value) {

@@ -11,7 +11,7 @@
 @section('content')
 
 <div class="page-header">
-    <h1 class="page-title">➕ Yangi foydalanuvchi</h1>
+    <h1 class="page-title"><i class="bi bi-plus-lg"></i> Yangi foydalanuvchi</h1>
     <a href="{{ route('admin.users.index') }}" class="skeuo-btn skeuo-btn-sm">← Ortga</a>
 </div>
 
@@ -91,7 +91,7 @@
 
         <div style="border-top: 1px solid rgba(184,115,51,0.1); padding-top: var(--space-lg); margin-top: var(--space-lg);">
             <button type="submit" class="skeuo-btn skeuo-btn-primary skeuo-btn-lg">
-                💾 Saqlash
+                <i class="bi bi-save"></i> Saqlash
             </button>
         </div>
     </form>

@@ -28,6 +28,7 @@ class ObjectEmployee extends Model
         'monthly_rate_currency',
         'monthly_rate',
         'hired_at',
+        'permissions',
         'is_active',
     ];
 
@@ -42,6 +43,7 @@ class ObjectEmployee extends Model
             'monthly_rate_currency' => Currency::class,
             'monthly_rate' => 'integer',
             'hired_at' => 'date',
+            'permissions' => 'array',
             'is_active' => 'boolean',
         ];
     }

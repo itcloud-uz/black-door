@@ -10,7 +10,7 @@
 @section('content')
 
 <div class="page-header">
-    <h1 class="page-title">💱 Valyuta kurslari</h1>
+    <h1 class="page-title"><i class="bi bi-currency-exchange"></i> Valyuta kurslari</h1>
 </div>
 
 <div class="grid-2">
@@ -25,7 +25,7 @@
                 {{ number_format($currentRate->rate ?? 12500, 0, '.', ' ') }}
             </div>
             <div class="text-center mt-md">
-                <span class="text-lg" style="color: var(--paper-aged);">1 USD = <strong class="mono-number">{{ number_format($currentRate->rate ?? 12500, 0, '.', ' ') }}</strong> UZS</span>
+                <span class="text-lg" style="color: var(--paper-aged);">1 USD = <strong class="mono-number">{{ number_format($currentRate->rate ?? 12500, 0, '.', ' ') }}</strong> so'm</span>
             </div>
             @if(isset($currentRate))
                 <div class="text-center mt-sm">
@@ -46,7 +46,7 @@
             @csrf
 
             <div class="form-group">
-                <label class="form-label" for="rate">Kurs (1 USD = ? UZS)</label>
+                <label class="form-label" for="rate">Kurs (1 USD = ? so'm)</label>
                 <input type="number" id="rate" name="rate" class="skeuo-input"
                        value="{{ old('rate') }}"
                        placeholder="12500"
@@ -62,7 +62,7 @@
             </div>
 
             <button type="submit" class="skeuo-btn skeuo-btn-primary">
-                💾 Saqlash
+                <i class="bi bi-save"></i> Saqlash
             </button>
         </form>
     </div>
@@ -71,7 +71,7 @@
 {{-- Rate History --}}
 <div class="skeuo-card mt-xl">
     <div class="skeuo-card-header">
-        <h3 class="skeuo-card-title">📜 Kurs tarixi</h3>
+        <h3 class="skeuo-card-title"><i class="bi bi-clock-history"></i> Kurs tarixi</h3>
     </div>
 
     <div class="skeuo-table-wrapper">
@@ -92,7 +92,7 @@
                         <td>{{ $rate->created_at->format('d.m.Y H:i') }}</td>
                         <td>
                             <span class="mono-number text-gold">
-                                {{ number_format($rate->rate, 0, '.', ' ') }} UZS
+                                {{ number_format($rate->rate, 0, '.', ' ') }} so'm
                             </span>
                         </td>
                         <td class="text-sm">{{ $rate->user->name ?? 'Tizim' }}</td>

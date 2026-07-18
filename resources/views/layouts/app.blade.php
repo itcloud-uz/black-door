@@ -12,6 +12,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+    {{-- Bootstrap Icons CDN --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
     {{-- App CSS --}}
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
@@ -22,7 +25,7 @@
     {{-- Mobile Sidebar Overlay --}}
     <div class="sidebar-overlay"
          :class="{ 'show': open }"
-         @click="close()"></div>
+         @click="open = false"></div>
 
     <div class="app-layout">
 
@@ -35,9 +38,9 @@
             {{-- Top Bar --}}
             <header class="top-bar">
                 <div class="top-bar-left">
-                    <button class="mobile-menu-btn" @click="toggle()">
-                        <span x-show="!open">☰</span>
-                        <span x-show="open">✕</span>
+                    <button class="mobile-menu-btn" @click="open = !open">
+                        <span x-show="!open"><i class="bi bi-list"></i></span>
+                        <span x-show="open"><i class="bi bi-x-lg"></i></span>
                     </button>
 
                     @hasSection('breadcrumb')
@@ -58,7 +61,7 @@
                         <form action="{{ route('logout') }}" method="POST" style="display:inline;">
                             @csrf
                             <button type="submit" class="skeuo-btn skeuo-btn-sm" title="Chiqish">
-                                🚪
+                                <i class="bi bi-box-arrow-right"></i>
                             </button>
                         </form>
                     @endauth
@@ -150,8 +153,10 @@
                     const main = Math.floor(Math.abs(subunits) / 100);
                     const sub = Math.abs(subunits) % 100;
                     const sign = subunits < 0 ? '-' : '';
-                    if (currency === 'USD') return sign + '$' + main.toLocaleString('en-US') + '.' + sub.toString().padStart(2, '0');
-                    return sign + main.toLocaleString('uz-UZ') + '.' + sub.toString().padStart(2, '0') + ' сўм';
+                    const mainFormatted = main.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+                    const subFormatted = sub.toString().padStart(2, '0');
+                    if (currency === 'USD') return sign + '$' + mainFormatted + '.' + subFormatted;
+                    return sign + mainFormatted + '.' + subFormatted + ' so\'m';
                 },
                 isPositive(amount) { return amount >= 0; }
             }));
@@ -176,7 +181,7 @@
                 get showObjectSelector() { return this.selectedRole === 'manager'; },
                 get showPinField() { return this.selectedRole === 'financier'; },
                 get objectTypeIcon() {
-                    return { factory: '🏭', construction: '🏗️', warehouse: '🏪' }[this.selectedType] || '🏢';
+                    return { factory: '<i class="bi bi-building-gear"></i>', construction: '<i class="bi bi-cone-striped"></i>', warehouse: '<i class="bi bi-shop"></i>' }[this.selectedType] || '<i class="bi bi-building"></i>';
                 }
             }));
 

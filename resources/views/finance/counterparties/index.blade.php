@@ -10,13 +10,13 @@
 @section('finance-content')
 
 <div class="d-flex justify-between items-center mb-lg">
-    <h2 class="handwriting-title">👥 Kontragentlar Reyestri</h2>
+    <h2 class="handwriting-title"><i class="bi bi-people"></i> Kontragentlar Reyestri</h2>
 </div>
 
 <div class="grid-3mb" style="display: grid; grid-template-columns: 1fr 2fr; gap: var(--space-lg); margin-bottom: var(--space-xl);">
     {{-- Form --}}
     <div class="skeuo-card-paper">
-        <h3 class="handwriting-title" style="font-size: 1.4rem; border-bottom: 1px dashed var(--paper-line); padding-bottom: 6px; margin-bottom: 12px;">👤 Yangi Kontragent</h3>
+        <h3 class="handwriting-title" style="font-size: 1.4rem; border-bottom: 1px dashed var(--paper-line); padding-bottom: 6px; margin-bottom: 12px;"><i class="bi bi-person"></i> Yangi Kontragent</h3>
         
         <form method="POST" action="{{ route('finance.counterparties.store') }}">
             @csrf
@@ -49,7 +49,7 @@
                 <textarea name="note" class="skeuo-input skeuo-input-paper" placeholder="Kontragent haqida qo'shimcha ma'lumot...">{{ old('note') }}</textarea>
             </div>
 
-            <button type="submit" class="skeuo-btn skeuo-btn-primary" style="width: 100%;">💾 Saqlash</button>
+            <button type="submit" class="skeuo-btn skeuo-btn-primary" style="width: 100%;"><i class="bi bi-save"></i> Saqlash</button>
         </form>
     </div>
 

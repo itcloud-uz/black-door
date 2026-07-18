@@ -10,9 +10,9 @@
 @section('content')
 
 <div class="page-header">
-    <h1 class="page-title">👥 Foydalanuvchilar</h1>
+    <h1 class="page-title"><i class="bi bi-people"></i> Foydalanuvchilar</h1>
     <a href="{{ route('admin.users.create') }}" class="skeuo-btn skeuo-btn-primary">
-        ➕ Yangi foydalanuvchi
+        <i class="bi bi-plus-lg"></i> Yangi foydalanuvchi
     </a>
 </div>
 
@@ -70,9 +70,9 @@
                         </td>
                         <td>
                             <div class="d-flex gap-xs">
-                                <a href="#" class="skeuo-btn skeuo-btn-sm" title="Tahrirlash">✏️</a>
+                                <a href="#" class="skeuo-btn skeuo-btn-sm" title="Tahrirlash"><i class="bi bi-pencil"></i></a>
                                 @if($user->is_active)
-                                    <button class="skeuo-btn skeuo-btn-sm skeuo-btn-danger" title="O'chirish">🚫</button>
+                                    <button class="skeuo-btn skeuo-btn-sm skeuo-btn-danger" title="O'chirish"><i class="bi bi-slash-circle"></i></button>
                                 @else
                                     <button class="skeuo-btn skeuo-btn-sm skeuo-btn-success" title="Faollashtirish">✅</button>
                                 @endif
@@ -83,7 +83,7 @@
                     <tr>
                         <td colspan="7" class="text-center text-muted p-xl">
                             <div class="empty-state">
-                                <div class="empty-state-icon">👥</div>
+                                <div class="empty-state-icon"><i class="bi bi-people"></i></div>
                                 <p>Foydalanuvchilar topilmadi</p>
                             </div>
                         </td>

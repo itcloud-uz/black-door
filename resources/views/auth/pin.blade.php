@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
     <style>
@@ -62,7 +63,7 @@
             border: none;
         }
         .safe-dial::before {
-            content: '🔒';
+            content: '<i class="bi bi-lock"></i>';
             font-size: 2.2rem;
         }
         .safe-dial div {
@@ -133,7 +134,7 @@
             {{-- Lock Overlay --}}
             <template x-if="isLocked">
                 <div class="pin-locked-overlay">
-                    <span style="font-size: 3rem;">🔒</span>
+                    <span style="font-size: 3rem;"><i class="bi bi-lock"></i></span>
                     <p style="color: var(--danger-red-light); margin-top: 12px;">Kirish bloklangan</p>
                     <div class="pin-locked-timer" x-text="lockTimeFormatted"></div>
                 </div>

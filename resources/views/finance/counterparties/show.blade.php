@@ -11,7 +11,7 @@
 @section('finance-content')
 
 <div class="d-flex justify-between items-center mb-lg" style="border-bottom: 1px dashed var(--paper-line); padding-bottom: 8px;">
-    <h2 class="handwriting-title">👤 {{ $counterparty->name }}</h2>
+    <h2 class="handwriting-title"><i class="bi bi-person"></i> {{ $counterparty->name }}</h2>
     <a href="{{ route('finance.counterparties.index') }}" class="skeuo-btn skeuo-btn-sm">← Ortga</a>
 </div>
 

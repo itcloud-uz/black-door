@@ -35,12 +35,12 @@
     $fontClass = $style === 'handwriting' ? 'amount-handwriting' : 'mono-number';
 
     if ($currency === 'USD') {
-        $formatted = $sign . '$' . number_format($main) . '.' . str_pad((string)$sub, 2, '0', STR_PAD_LEFT);
+        $formatted = $sign . '$' . number_format($main, 0, '.', ' ') . '.' . str_pad((string)$sub, 2, '0', STR_PAD_LEFT);
     } else {
-        $formatted = $sign . number_format($main, 0, '.', ' ') . '.' . str_pad((string)$sub, 2, '0', STR_PAD_LEFT) . ' сўм';
+        $formatted = $sign . number_format($main, 0, '.', ' ') . '.' . str_pad((string)$sub, 2, '0', STR_PAD_LEFT) . ' so\'m';
     }
 @endphp
 
-<span class="amount {{ $fontClass }} {{ $colorClass }} {{ $sizeClass }}" {{ $attributes }}>
+<span class="amount {{ $fontClass }} {{ $colorClass }} {{ $sizeClass }}" style="white-space: nowrap;" {{ $attributes }}>
     {{ $formatted }}
 </span>

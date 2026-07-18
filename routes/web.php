@@ -116,6 +116,7 @@ Route::middleware(['auth', 'role:manager,employee'])->prefix('manager')->name('m
     Route::post('/employees', [ManagerEmployeeController::class, 'store'])->name('employees.store');
     Route::put('/employees/{employee}', [ManagerEmployeeController::class, 'update'])->name('employees.update');
     Route::post('/employees/{employee}/toggle-active', [ManagerEmployeeController::class, 'toggleActive'])->name('employees.toggle-active');
+    Route::post('/employees/{employee}/pay', [ManagerEmployeeController::class, 'paySalary'])->name('employees.pay');
     
     // Object Mini-Cash Transactions
     Route::get('/transactions', [ManagerTransactionController::class, 'index'])->name('transactions.index');

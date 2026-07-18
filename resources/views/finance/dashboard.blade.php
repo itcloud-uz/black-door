@@ -12,13 +12,13 @@
 {{-- Total Balances --}}
 <div class="grid-2 mb-xl">
     <div class="cash-register" style="padding: 20px;">
-        <div class="text-sm text-muted mb-xs">💵 Jami USD Balans</div>
+        <div class="text-sm text-muted mb-xs"><i class="bi bi-currency-dollar"></i> Jami USD Balans</div>
         <div class="register-display register-display-amber" style="font-size: 2.2rem; padding: 12px;">
             <x-amount-display :amount="$totalUsd" currency="USD" />
         </div>
     </div>
     <div class="cash-register" style="padding: 20px;">
-        <div class="text-sm text-muted mb-xs">💴 Jami UZS Balans</div>
+        <div class="text-sm text-muted mb-xs"><i class="bi bi-cash-coin"></i> Jami UZS Balans</div>
         <div class="register-display register-display-amber" style="font-size: 2.2rem; padding: 12px;">
             <x-amount-display :amount="$totalUzs" currency="UZS" />
         </div>
@@ -29,7 +29,7 @@
     {{-- Kassalar --}}
     <div class="skeuo-card-paper">
         <div class="d-flex justify-between items-center mb-md" style="border-bottom: 1px dashed var(--paper-line); padding-bottom: 8px;">
-            <h3 class="handwriting-title" style="font-size: 1.5rem; margin: 0;">🏦 Kassalar</h3>
+            <h3 class="handwriting-title" style="font-size: 1.5rem; margin: 0;"><i class="bi bi-bank"></i> Kassalar</h3>
             <a href="{{ route('finance.cash-accounts.index') }}" class="skeuo-btn skeuo-btn-sm">Barchasi</a>
         </div>
         

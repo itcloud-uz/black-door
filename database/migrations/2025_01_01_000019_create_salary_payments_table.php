@@ -19,6 +19,7 @@ return new class extends Migration
             $table->bigInteger('amount'); // sent/tiyinda
             $table->date('period_start');
             $table->date('period_end');
+            $table->string('type')->default('salary'); // 'salary' yoki 'advance'
             $table->text('note')->nullable();
             $table->timestamp('paid_at');
             $table->foreignId('created_by')->constrained('users');

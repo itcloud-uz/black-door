@@ -16,7 +16,7 @@ enum Currency: string
     {
         return match ($this) {
             self::USD => '$',
-            self::UZS => 'сўм',
+            self::UZS => 'so\'m',
         };
     }
 
@@ -48,8 +48,8 @@ enum Currency: string
         $sub = abs($amountInSubunits % $this->subunitMultiplier());
 
         return match ($this) {
-            self::USD => sprintf('$%s.%02d', number_format($main), $sub),
-            self::UZS => sprintf('%s.%02d сўм', number_format($main, 0, '.', ' '), $sub),
+            self::USD => sprintf('$%s.%02d', number_format($main, 0, '.', ' '), $sub),
+            self::UZS => sprintf('%s.%02d so\'m', number_format($main, 0, '.', ' '), $sub),
         };
     }
 }

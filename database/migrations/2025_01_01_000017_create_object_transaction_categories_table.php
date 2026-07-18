@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('object_transaction_categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('object_id')->constrained('objects');
+            $table->foreignId('object_id')->nullable()->constrained('objects')->nullOnDelete();
             $table->foreignId('parent_id')->nullable()->constrained('object_transaction_categories')->nullOnDelete();
             $table->string('name');
             $table->string('type'); // 'income' yoki 'expense'

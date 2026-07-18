@@ -21,6 +21,7 @@ class SalaryPayment extends Model
     protected $fillable = [
         'object_id',
         'employee_id',
+        'type',
         'currency',
         'amount',
         'period_start',

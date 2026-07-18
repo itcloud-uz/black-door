@@ -10,7 +10,7 @@
 @section('content')
 
 <div class="page-header">
-    <h1 class="page-title">📋 Audit jurnal</h1>
+    <h1 class="page-title"><i class="bi bi-journal-text"></i> Audit jurnal</h1>
 </div>
 
 {{-- Filters --}}
@@ -52,7 +52,7 @@
             </div>
 
             <div class="filter-group" style="flex: 0 0 auto; align-self: flex-end;">
-                <button type="submit" class="skeuo-btn skeuo-btn-primary">🔍 Qidirish</button>
+                <button type="submit" class="skeuo-btn skeuo-btn-primary"><i class="bi bi-search"></i> Qidirish</button>
             </div>
         </div>
     </form>
@@ -111,7 +111,7 @@
                     <tr>
                         <td colspan="5" class="text-center text-muted p-xl">
                             <div class="empty-state">
-                                <div class="empty-state-icon">📋</div>
+                                <div class="empty-state-icon"><i class="bi bi-journal-text"></i></div>
                                 <p>Audit yozuvlari topilmadi</p>
                             </div>
                         </td>

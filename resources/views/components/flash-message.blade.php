@@ -21,7 +21,7 @@
 
 @if(session('warning'))
     <div class="flash-message flash-warning" x-data="{ show: true }" x-show="show" x-transition>
-        <span>⚠️</span>
+        <span><i class="bi bi-exclamation-triangle"></i></span>
         <span>{{ session('warning') }}</span>
         <button class="flash-close" @click="show = false">&times;</button>
     </div>

@@ -10,7 +10,7 @@
 @section('finance-content')
 
 <div class="d-flex justify-between items-center mb-lg">
-    <h2 class="handwriting-title">📊 Moliyaviy Hisobotlar</h2>
+    <h2 class="handwriting-title"><i class="bi bi-grid-1x2"></i> Moliyaviy Hisobotlar</h2>
 </div>
 
 {{-- Filters --}}
@@ -52,7 +52,7 @@
             @endif
 
             <div class="filter-group" style="flex: 0 0 auto; align-self: flex-end;">
-                <button type="submit" class="skeuo-btn skeuo-btn-primary">🔍 Generatsiya</button>
+                <button type="submit" class="skeuo-btn skeuo-btn-primary"><i class="bi bi-search"></i> Generatsiya</button>
             </div>
         </div>
     </form>
@@ -61,7 +61,7 @@
 {{-- Report Output --}}
 @if(isset($reportData['error']) && $reportData['error'])
     <div style="background: rgba(220,53,69,0.1); border: 1px dashed var(--accent-red); padding: var(--space-md); border-radius: 8px; margin-bottom: var(--space-xl); color: var(--accent-red);">
-        <strong>⚠️ Xizmat xatosi:</strong> {{ $reportData['message'] }}
+        <strong><i class="bi bi-exclamation-triangle"></i> Xizmat xatosi:</strong> {{ $reportData['message'] }}
     </div>
 @elseif(empty($reportData))
     <div class="text-center text-muted py-xl">
@@ -70,7 +70,7 @@
 @else
     <div class="skeuo-card-paper">
         <div class="d-flex justify-between items-center mb-md" style="border-bottom: 1px dashed var(--paper-line); padding-bottom: 8px;">
-            <h3 class="handwriting-title" style="font-size: 1.4rem; margin: 0;">📋 Hisobot natijalari</h3>
+            <h3 class="handwriting-title" style="font-size: 1.4rem; margin: 0;"><i class="bi bi-journal-text"></i> Hisobot natijalari</h3>
             
             {{-- Export Buttons --}}
             <div class="d-flex gap-sm">
@@ -80,7 +80,7 @@
                     <input type="hidden" name="start_date" value="{{ $startDate }}">
                     <input type="hidden" name="end_date" value="{{ $endDate }}">
                     <input type="hidden" name="cash_account_id" value="{{ $cashAccountId }}">
-                    <button type="submit" class="skeuo-btn skeuo-btn-sm" style="background: #217346; color: white;">📥 Excel Yuklab olish</button>
+                    <button type="submit" class="skeuo-btn skeuo-btn-sm" style="background: #217346; color: white;"><i class="bi bi-download"></i> Excel Yuklab olish</button>
                 </form>
                 <form method="POST" action="{{ route('finance.reports.export', 'pdf') }}" style="display: inline;">
                     @csrf
@@ -88,7 +88,7 @@
                     <input type="hidden" name="start_date" value="{{ $startDate }}">
                     <input type="hidden" name="end_date" value="{{ $endDate }}">
                     <input type="hidden" name="cash_account_id" value="{{ $cashAccountId }}">
-                    <button type="submit" class="skeuo-btn skeuo-btn-sm" style="background: #d32f2f; color: white;">📥 PDF Yuklab olish</button>
+                    <button type="submit" class="skeuo-btn skeuo-btn-sm" style="background: #d32f2f; color: white;"><i class="bi bi-download"></i> PDF Yuklab olish</button>
                 </form>
             </div>
         </div>
@@ -96,10 +96,10 @@
         {{-- Dynamic Report Tables depending on Type --}}
         @if($type === 'income_expense')
             <div class="d-flex gap-xl mb-md text-sm" style="font-family: var(--font-handwriting); font-size: 1.25rem;">
-                <div>Kirim USD: <strong class="text-green">${{ number_format($reportData['total_income_usd']/100, 2) }}</strong></div>
-                <div>Chiqim USD: <strong class="text-red">${{ number_format($reportData['total_expense_usd']/100, 2) }}</strong></div>
-                <div>Kirim UZS: <strong class="text-green">{{ number_format($reportData['total_income_uzs']/100, 2) }} UZS</strong></div>
-                <div>Chiqim UZS: <strong class="text-red">{{ number_format($reportData['total_expense_uzs']/100, 2) }} UZS</strong></div>
+                <div>Kirim USD: <x-amount-display :amount="$reportData['total_income_usd']" currency="USD" class="text-green font-bold" /></div>
+                <div>Chiqim USD: <x-amount-display :amount="$reportData['total_expense_usd']" currency="USD" class="text-red font-bold" /></div>
+                <div>Kirim UZS: <x-amount-display :amount="$reportData['total_income_uzs']" currency="UZS" class="text-green font-bold" /></div>
+                <div>Chiqim UZS: <x-amount-display :amount="$reportData['total_expense_uzs']" currency="UZS" class="text-red font-bold" /></div>
             </div>
 
             <div class="skeuo-table-wrapper">
@@ -126,14 +126,14 @@
                                 </td>
                                 <td>
                                     @if(isset($item['amount_usd']) && $item['amount_usd'] > 0)
-                                        ${{ number_format($item['amount_usd']/100, 2) }}
+                                        <x-amount-display :amount="$item['amount_usd']" currency="USD" />
                                     @else
                                         —
                                     @endif
                                 </td>
                                 <td>
                                     @if(isset($item['amount_uzs']) && $item['amount_uzs'] > 0)
-                                        {{ number_format($item['amount_uzs']/100, 2) }} UZS
+                                        <x-amount-display :amount="$item['amount_uzs']" currency="UZS" />
                                     @else
                                         —
                                     @endif
@@ -166,11 +166,7 @@
                                     <td>{{ $acc['currency'] }}</td>
                                     <td>{{ $bal['date'] }}</td>
                                     <td>
-                                        @if($acc['currency'] === 'USD')
-                                            ${{ number_format($bal['balance']/100, 2) }}
-                                        @else
-                                            {{ number_format($bal['balance']/100, 2) }} UZS
-                                        @endif
+                                        <x-amount-display :amount="$bal['balance']" :currency="$acc['currency']" />
                                     </td>
                                 </tr>
                             @endforeach
@@ -198,14 +194,10 @@
                                 <td><strong>{{ $entry['counterparty_name'] }}</strong></td>
                                 <td>{{ $entry['type'] }}</td>
                                 <td>
-                                    <span class="{{ $entry['outstanding_usd'] > 0 ? 'text-green' : ($entry['outstanding_usd'] < 0 ? 'text-red' : 'text-muted') }}">
-                                        ${{ number_format($entry['outstanding_usd']/100, 2) }}
-                                    </span>
+                                    <x-amount-display :amount="$entry['outstanding_usd']" currency="USD" />
                                 </td>
                                 <td>
-                                    <span class="{{ $entry['outstanding_uzs'] > 0 ? 'text-green' : ($entry['outstanding_uzs'] < 0 ? 'text-red' : 'text-muted') }}">
-                                        {{ number_format($entry['outstanding_uzs']/100, 2) }} UZS
-                                    </span>
+                                    <x-amount-display :amount="$entry['outstanding_uzs']" currency="UZS" />
                                 </td>
                             </tr>
                         @empty
@@ -230,8 +222,8 @@
                         @forelse($reportData['categories'] ?? [] as $cat)
                             <tr>
                                 <td><strong>{{ $cat['category'] }}</strong></td>
-                                <td class="text-green">${{ number_format($cat['total_usd']/100, 2) }}</td>
-                                <td class="text-green">{{ number_format($cat['total_uzs']/100, 2) }} UZS</td>
+                                <td><x-amount-display :amount="$cat['total_usd']" currency="USD" /></td>
+                                <td><x-amount-display :amount="$cat['total_uzs']" currency="UZS" /></td>
                                 <td>{{ $cat['transaction_count'] }} ta</td>
                             </tr>
                         @empty

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.manager')
 
 @section('title', 'Kassa tranzaksiyalari')
 
@@ -7,17 +7,17 @@
     <li><span class="current">Mini-kassa amallari</span></li>
 @endsection
 
-@section('content')
+@section('manager-content')
 
 <div class="page-header">
-    <h1 class="page-title">💰 Obyekt Mini-kassa amallari</h1>
+    <h1 class="page-title"><i class="bi bi-cash-stack"></i> Obyekt Mini-kassa amallari</h1>
 </div>
 
 <div class="grid-3mb" style="display: grid; grid-template-columns: 1fr 2fr; gap: var(--space-lg); margin-bottom: var(--space-xl);">
     {{-- Form --}}
     <div class="skeuo-card">
         <div class="skeuo-card-header">
-            <h3 class="skeuo-card-title">➕ Yangi Kassa Qaydi</h3>
+            <h3 class="skeuo-card-title"><i class="bi bi-plus-lg"></i> Yangi Kassa Qaydi</h3>
         </div>
 
         <form method="POST" action="{{ route('manager.transactions.store') }}">
@@ -66,7 +66,7 @@
                     <option value="">— Tanlang —</option>
                     @foreach($categories ?? [] as $cat)
                         <option value="{{ $cat->id }}">
-                            {{ $cat->type === 'income' ? '📈' : '📉' }} {{ $cat->name }}
+                            {{ $cat->type === 'income' ? '<i class="bi bi-graph-up-arrow"></i>' : '<i class="bi bi-graph-down-arrow"></i>' }} {{ $cat->name }}
                         </option>
                     @endforeach
                 </select>
@@ -83,7 +83,7 @@
                 <textarea name="note" class="skeuo-input" placeholder="Batafsil..."></textarea>
             </div>
 
-            <button type="submit" class="skeuo-btn skeuo-btn-primary" style="width: 100%;">💾 Saqlash</button>
+            <button type="submit" class="skeuo-btn skeuo-btn-primary" style="width: 100%;"><i class="bi bi-save"></i> Saqlash</button>
         </form>
     </div>
 

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('monthly_rate_currency', 3)->nullable();
             $table->bigInteger('monthly_rate')->nullable();
             $table->date('hired_at');
+            $table->text('permissions')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();

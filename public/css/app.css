@@ -1689,3 +1689,119 @@ textarea.skeuo-input {
         border: 1px solid #ccc !important;
     }
 }
+
+/* ════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN (MOBILE & TABLET)
+   ════════════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+    /* Main Layout wrappers */
+    .main-wrapper {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+    
+    .top-bar {
+        left: 0 !important;
+        padding: 0 var(--space-md);
+    }
+    
+    /* Sidebar Mobile State */
+    .sidebar {
+        transform: translateX(-100%);
+        box-shadow: 6px 0 20px rgba(0, 0, 0, 0.15) !important;
+        transition: transform 0.3s ease;
+    }
+    
+    /* Slide in sidebar when open */
+    .sidebar.open {
+        transform: translateX(0) !important;
+    }
+    
+    /* Sidebar toggle button */
+    .mobile-menu-btn {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        background: var(--surface);
+        border: none;
+        box-shadow: var(--shadow-raised-sm);
+        color: var(--text-primary);
+        padding: 8px 12px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-size: 1.2rem;
+        transition: all 0.2s ease;
+    }
+    
+    .mobile-menu-btn:active {
+        box-shadow: var(--shadow-pressed-sm);
+    }
+
+    /* Grids */
+    .grid-4, .grid-3 {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Grids to single column */
+    .grid-4, .grid-3, .grid-2, .grid-auto {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .main-content {
+        padding: var(--space-md) !important;
+    }
+    
+    /* Adjust page headers */
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+    
+    .page-header .skeuo-btn {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(4px);
+    z-index: 998;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.show {
+    display: block;
+    opacity: 1;
+}
+
+/* Text ellipsis for long items with popup/expand on hover */
+.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    max-width: 100%;
+}
+.ellipsis:hover {
+    overflow: visible;
+    white-space: normal;
+    background: var(--surface);
+    position: relative;
+    z-index: 10;
+    box-shadow: var(--shadow-raised-sm);
+    border-radius: var(--radius-sm);
+    padding: 2px 6px;
+}

@@ -27,11 +27,11 @@
             <label class="form-label form-label-paper" for="type">Turi</label>
             <select id="type" name="type" class="skeuo-select skeuo-select-paper" required>
                 <option value="">— Tanlang —</option>
-                <option value="cash" {{ old('type') === 'cash' ? 'selected' : '' }}>💵 Naqd pul</option>
-                <option value="bank" {{ old('type') === 'bank' ? 'selected' : '' }}>🏦 Bank hisob</option>
+                <option value="cash" {{ old('type') === 'cash' ? 'selected' : '' }}><i class="bi bi-currency-dollar"></i> Naqd pul</option>
+                <option value="bank" {{ old('type') === 'bank' ? 'selected' : '' }}><i class="bi bi-bank"></i> Bank hisob</option>
                 <option value="card" {{ old('type') === 'card' ? 'selected' : '' }}>💳 Karta</option>
                 <option value="safe" {{ old('type') === 'safe' ? 'selected' : '' }}>🔐 Seyf</option>
-                <option value="other" {{ old('type') === 'other' ? 'selected' : '' }}>💰 Boshqa</option>
+                <option value="other" {{ old('type') === 'other' ? 'selected' : '' }}><i class="bi bi-cash-stack"></i> Boshqa</option>
             </select>
             @error('type') <span class="form-error">{{ $message }}</span> @enderror
         </div>
@@ -43,7 +43,7 @@
 
         <div style="border-top: 1px dashed var(--paper-line); padding-top: 16px; margin-top: 16px;">
             <button type="submit" class="skeuo-btn skeuo-btn-primary">
-                💾 Saqlash
+                <i class="bi bi-save"></i> Saqlash
             </button>
             <a href="{{ route('finance.cash-accounts.index') }}" class="skeuo-btn" style="margin-left: 8px;">
                 Bekor qilish

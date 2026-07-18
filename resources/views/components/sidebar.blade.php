@@ -26,31 +26,31 @@
             <ul class="sidebar-nav">
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'admin.dashboard') ? 'active' : '' }}">
                     <a href="{{ route('admin.dashboard') }}">
-                        <span class="sidebar-icon">📊</span>
+                        <span class="sidebar-icon"><i class="bi bi-grid-1x2"></i></span>
                         Bosh sahifa
                     </a>
                 </li>
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'admin.users') ? 'active' : '' }}">
                     <a href="{{ route('admin.users.index') }}">
-                        <span class="sidebar-icon">👥</span>
+                        <span class="sidebar-icon"><i class="bi bi-people"></i></span>
                         Foydalanuvchilar
                     </a>
                 </li>
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'admin.objects') ? 'active' : '' }}">
                     <a href="{{ route('admin.objects.index') }}">
-                        <span class="sidebar-icon">🏢</span>
+                        <span class="sidebar-icon"><i class="bi bi-building"></i></span>
                         Obyektlar
                     </a>
                 </li>
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'admin.currency') ? 'active' : '' }}">
                     <a href="{{ route('admin.currency-rates') }}">
-                        <span class="sidebar-icon">💱</span>
+                        <span class="sidebar-icon"><i class="bi bi-currency-exchange"></i></span>
                         Valyuta kursi
                     </a>
                 </li>
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'admin.audit') ? 'active' : '' }}">
                     <a href="{{ route('admin.audit-log') }}">
-                        <span class="sidebar-icon">📋</span>
+                        <span class="sidebar-icon"><i class="bi bi-journal-text"></i></span>
                         Audit jurnal
                     </a>
                 </li>
@@ -59,41 +59,41 @@
 
         {{-- Admin Finance Access --}}
         <div class="sidebar-section">
-            <div class="sidebar-section-title">🔒 Moliya (Qora Daftar)</div>
+            <div class="sidebar-section-title"><i class="bi bi-lock"></i> Moliya (Qora Daftar)</div>
             <ul class="sidebar-nav">
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'finance.dashboard') ? 'active' : '' }}">
                     <a href="{{ route('finance.dashboard') }}">
-                        <span class="sidebar-icon">📒</span>
+                        <span class="sidebar-icon"><i class="bi bi-book"></i></span>
                         Moliya sahifasi
                     </a>
                 </li>
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'finance.cash-accounts') ? 'active' : '' }}">
                     <a href="{{ route('finance.cash-accounts.index') }}">
-                        <span class="sidebar-icon">🏦</span>
+                        <span class="sidebar-icon"><i class="bi bi-bank"></i></span>
                         Kassalar
                     </a>
                 </li>
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'finance.transactions') ? 'active' : '' }}">
                     <a href="{{ route('finance.transactions.index') }}">
-                        <span class="sidebar-icon">💰</span>
+                        <span class="sidebar-icon"><i class="bi bi-cash-stack"></i></span>
                         Tranzaksiyalar
                     </a>
                 </li>
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'finance.counterparties') ? 'active' : '' }}">
                     <a href="{{ route('finance.counterparties.index') }}">
-                        <span class="sidebar-icon">🤝</span>
+                        <span class="sidebar-icon"><i class="bi bi-handshake"></i></span>
                         Kontragentlar
                     </a>
                 </li>
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'finance.categories') ? 'active' : '' }}">
                     <a href="{{ route('finance.categories.index') }}">
-                        <span class="sidebar-icon">📂</span>
+                        <span class="sidebar-icon"><i class="bi bi-folder2-open"></i></span>
                         Kategoriyalar
                     </a>
                 </li>
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'finance.reports') ? 'active' : '' }}">
                     <a href="{{ route('finance.reports.index') }}">
-                        <span class="sidebar-icon">📈</span>
+                        <span class="sidebar-icon"><i class="bi bi-graph-up-arrow"></i></span>
                         Hisobotlar
                     </a>
                 </li>
@@ -106,41 +106,41 @@
     {{-- ═══════════════════════════════════════ --}}
     @if($role === 'financier')
         <div class="sidebar-section">
-            <div class="sidebar-section-title">🔒 Moliya moduli</div>
+            <div class="sidebar-section-title"><i class="bi bi-lock"></i> Moliya moduli</div>
             <ul class="sidebar-nav">
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'finance.dashboard') ? 'active' : '' }}">
                     <a href="{{ route('finance.dashboard') }}">
-                        <span class="sidebar-icon">📒</span>
+                        <span class="sidebar-icon"><i class="bi bi-book"></i></span>
                         Bosh sahifa
                     </a>
                 </li>
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'finance.cash-accounts') ? 'active' : '' }}">
                     <a href="{{ route('finance.cash-accounts.index') }}">
-                        <span class="sidebar-icon">🏦</span>
+                        <span class="sidebar-icon"><i class="bi bi-bank"></i></span>
                         Kassalar
                     </a>
                 </li>
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'finance.transactions') ? 'active' : '' }}">
                     <a href="{{ route('finance.transactions.index') }}">
-                        <span class="sidebar-icon">💰</span>
+                        <span class="sidebar-icon"><i class="bi bi-cash-stack"></i></span>
                         Tranzaksiyalar
                     </a>
                 </li>
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'finance.counterparties') ? 'active' : '' }}">
                     <a href="{{ route('finance.counterparties.index') }}">
-                        <span class="sidebar-icon">🤝</span>
+                        <span class="sidebar-icon"><i class="bi bi-handshake"></i></span>
                         Kontragentlar
                     </a>
                 </li>
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'finance.categories') ? 'active' : '' }}">
                     <a href="{{ route('finance.categories.index') }}">
-                        <span class="sidebar-icon">📂</span>
+                        <span class="sidebar-icon"><i class="bi bi-folder2-open"></i></span>
                         Kategoriyalar
                     </a>
                 </li>
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'finance.reports') ? 'active' : '' }}">
                     <a href="{{ route('finance.reports.index') }}">
-                        <span class="sidebar-icon">📈</span>
+                        <span class="sidebar-icon"><i class="bi bi-graph-up-arrow"></i></span>
                         Hisobotlar
                     </a>
                 </li>
@@ -158,25 +158,25 @@
             <ul class="sidebar-nav">
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'manager.dashboard') ? 'active' : '' }}">
                     <a href="{{ route('manager.dashboard') }}">
-                        <span class="sidebar-icon">📊</span>
+                        <span class="sidebar-icon"><i class="bi bi-grid-1x2"></i></span>
                         Bosh sahifa
                     </a>
                 </li>
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'manager.employees') ? 'active' : '' }}">
                     <a href="{{ route('manager.employees.index') }}">
-                        <span class="sidebar-icon">👷</span>
+                        <span class="sidebar-icon"><i class="bi bi-person-workspace"></i></span>
                         Xodimlar
                     </a>
                 </li>
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'manager.transactions') ? 'active' : '' }}">
                     <a href="{{ route('manager.transactions.index') }}">
-                        <span class="sidebar-icon">💰</span>
+                        <span class="sidebar-icon"><i class="bi bi-cash-stack"></i></span>
                         Tranzaksiyalar
                     </a>
                 </li>
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'manager.warehouse') ? 'active' : '' }}">
                     <a href="{{ route('manager.warehouse.index') }}">
-                        <span class="sidebar-icon">📦</span>
+                        <span class="sidebar-icon"><i class="bi bi-box-seam"></i></span>
                         Ombor
                     </a>
                 </li>
@@ -189,15 +189,42 @@
     {{-- CRITICAL: No finance items here --}}
     {{-- ═══════════════════════════════════════ --}}
     @if($role === 'employee')
+        @php
+            $permissions = $user->objectEmployee?->permissions ?? [];
+        @endphp
         <div class="sidebar-section">
             <div class="sidebar-section-title">Mening sahifam</div>
             <ul class="sidebar-nav">
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'manager.dashboard') ? 'active' : '' }}">
                     <a href="{{ route('manager.dashboard') }}">
-                        <span class="sidebar-icon">📊</span>
+                        <span class="sidebar-icon"><i class="bi bi-grid-1x2"></i></span>
                         Bosh sahifa
                     </a>
                 </li>
+                @if(in_array('employees', $permissions, true))
+                    <li class="sidebar-item {{ str_starts_with($currentRoute, 'manager.employees') ? 'active' : '' }}">
+                        <a href="{{ route('manager.employees.index') }}">
+                            <span class="sidebar-icon"><i class="bi bi-person-workspace"></i></span>
+                            Xodimlar
+                        </a>
+                    </li>
+                @endif
+                @if(in_array('transactions', $permissions, true))
+                    <li class="sidebar-item {{ str_starts_with($currentRoute, 'manager.transactions') ? 'active' : '' }}">
+                        <a href="{{ route('manager.transactions.index') }}">
+                            <span class="sidebar-icon"><i class="bi bi-cash-stack"></i></span>
+                            Tranzaksiyalar
+                        </a>
+                    </li>
+                @endif
+                @if(in_array('warehouse', $permissions, true))
+                    <li class="sidebar-item {{ str_starts_with($currentRoute, 'manager.warehouse') ? 'active' : '' }}">
+                        <a href="{{ route('manager.warehouse.index') }}">
+                            <span class="sidebar-icon"><i class="bi bi-box-seam"></i></span>
+                            Ombor
+                        </a>
+                    </li>
+                @endif
             </ul>
         </div>
     @endif
@@ -209,7 +236,7 @@
             <ul class="sidebar-nav">
                 <li class="sidebar-item">
                     <button type="submit">
-                        <span class="sidebar-icon">🚪</span>
+                        <span class="sidebar-icon"><i class="bi bi-box-arrow-right"></i></span>
                         Chiqish
                     </button>
                 </li>

@@ -20,11 +20,17 @@ class RoleAccess
         $user = $request->user();
 
         if (! $user) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Unauthenticated.'], 401);
+            }
             return redirect()->guest(route('login'));
         }
 
         // Check if user is active
         if (! $user->is_active) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Sizning hisobingiz bloklangan.'], 403);
+            }
             auth()->logout();
             return redirect()->route('login')->withErrors(['email' => 'Sizning hisobingiz bloklangan.']);
         }
@@ -33,6 +39,19 @@ class RoleAccess
 
         // If the user's role is in the allowed roles, proceed
         if (in_array($userRole, $roles, true)) {
+            if ($userRole === 'employee') {
+                $permissions = $user->objectEmployee?->permissions ?? [];
+                
+                if ($request->is('manager/employees*') && !in_array('employees', $permissions, true)) {
+                    abort(404);
+                }
+                if ($request->is('manager/transactions*') && !in_array('transactions', $permissions, true)) {
+                    abort(404);
+                }
+                if ($request->is('manager/warehouse*') && !in_array('warehouse', $permissions, true)) {
+                    abort(404);
+                }
+            }
             return $next($request);
         }
 
