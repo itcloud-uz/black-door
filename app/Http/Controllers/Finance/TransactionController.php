@@ -1,0 +1,253 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Finance;
+
+use App\Http\Controllers\Controller;
+use App\Models\Transaction;
+use App\Models\CashAccount;
+use App\Models\CashBalance;
+use App\Models\TransactionCategory;
+use App\Models\Counterparty;
+use App\Enums\TransactionType;
+use App\Enums\Currency;
+use App\Services\AuditLogger;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
+class TransactionController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = Transaction::with(['cashAccount', 'category', 'counterparty']);
+
+        if ($request->filled('cash_account_id')) {
+            $query->where('cash_account_id', $request->cash_account_id);
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $transactions = $query->orderBy('created_at', 'desc')->paginate(30);
+
+        $cashAccounts = CashAccount::where('is_active', true)->orderBy('name')->get();
+        $categories = TransactionCategory::orderBy('name')->get();
+        $counterparties = Counterparty::orderBy('name')->get();
+
+        return view('finance.transactions.index', compact(
+            'transactions',
+            'cashAccounts',
+            'categories',
+            'counterparties'
+        ));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'cash_account_id' => 'required|exists:cash_accounts,id',
+            'type' => 'required|string',
+            'amount' => 'required|numeric|min:0.01',
+            'currency' => 'required|string',
+            'category_id' => 'nullable|exists:transaction_categories,id',
+            'counterparty_id' => 'nullable|exists:counterparties,id',
+            'note' => 'nullable|string',
+            'destination_cash_account_id' => 'nullable|required_if:type,transfer|exists:cash_accounts,id',
+        ]);
+
+        $type = $request->type;
+        $amountDecimal = (float)$request->amount;
+        $amountCents = (int)round($amountDecimal * 100);
+        $currencyVal = $request->currency;
+        $cashAccountId = (int)$request->cash_account_id;
+
+        try {
+            DB::transaction(function () use ($request, $type, $amountCents, $currencyVal, $cashAccountId) {
+                $cashAccount = CashAccount::findOrFail($cashAccountId);
+                $cashBalance = CashBalance::where('cash_account_id', $cashAccountId)
+                    ->where('currency', $currencyVal)
+                    ->firstOrCreate([
+                        'cash_account_id' => $cashAccountId,
+                        'currency' => $currencyVal,
+                    ], ['balance' => 0]);
+
+                if ($type === 'income') {
+                    $newBalance = $cashBalance->balance + $amountCents;
+                    $cashBalance->balance = $newBalance;
+                    $cashBalance->save();
+
+                    $tx = Transaction::create([
+                        'cash_account_id' => $cashAccountId,
+                        'counterparty_id' => $request->counterparty_id,
+                        'category_id' => $request->category_id,
+                        'type' => TransactionType::Income->value,
+                        'currency' => $currencyVal,
+                        'amount' => $amountCents,
+                        'balance_after' => $newBalance,
+                        'note' => $request->note,
+                        'created_by' => Auth::id(),
+                        'transaction_date' => now()->toDateString(),
+                    ]);
+
+                    AuditLogger::log('create_transaction', $tx, null, $tx->toArray());
+
+                } elseif ($type === 'expense') {
+                    if ($cashBalance->balance < $amountCents) {
+                        throw new \Exception('Kassada yetarli mablag\' mavjud emas.');
+                    }
+
+                    $newBalance = $cashBalance->balance - $amountCents;
+                    $cashBalance->balance = $newBalance;
+                    $cashBalance->save();
+
+                    $tx = Transaction::create([
+                        'cash_account_id' => $cashAccountId,
+                        'counterparty_id' => $request->counterparty_id,
+                        'category_id' => $request->category_id,
+                        'type' => TransactionType::Expense->value,
+                        'currency' => $currencyVal,
+                        'amount' => $amountCents,
+                        'balance_after' => $newBalance,
+                        'note' => $request->note,
+                        'created_by' => Auth::id(),
+                        'transaction_date' => now()->toDateString(),
+                    ]);
+
+                    AuditLogger::log('create_transaction', $tx, null, $tx->toArray());
+
+                } elseif ($type === 'transfer') {
+                    $destAccountId = (int)$request->destination_cash_account_id;
+                    if ($cashAccountId === $destAccountId) {
+                        throw new \Exception('Yuboruvchi va qabul qiluvchi kassa bir xil bo\'lmasligi kerak.');
+                    }
+
+                    if ($cashBalance->balance < $amountCents) {
+                        throw new \Exception('Yuboruvchi kassada yetarli mablag\' mavjud emas.');
+                    }
+
+                    $destAccount = CashAccount::findOrFail($destAccountId);
+                    $destBalance = CashBalance::where('cash_account_id', $destAccountId)
+                        ->where('currency', $currencyVal)
+                        ->firstOrCreate([
+                            'cash_account_id' => $destAccountId,
+                            'currency' => $currencyVal,
+                        ], ['balance' => 0]);
+
+                    // Update source balance
+                    $sourceNewBalance = $cashBalance->balance - $amountCents;
+                    $cashBalance->balance = $sourceNewBalance;
+                    $cashBalance->save();
+
+                    // Update destination balance
+                    $destNewBalance = $destBalance->balance + $amountCents;
+                    $destBalance->balance = $destNewBalance;
+                    $destBalance->save();
+
+                    // Create transfer out transaction
+                    $txOut = Transaction::create([
+                        'cash_account_id' => $cashAccountId,
+                        'type' => TransactionType::TransferOut->value,
+                        'currency' => $currencyVal,
+                        'amount' => $amountCents,
+                        'balance_after' => $sourceNewBalance,
+                        'note' => $request->note ?? "O'tkazma: " . $destAccount->name,
+                        'created_by' => Auth::id(),
+                        'transaction_date' => now()->toDateString(),
+                    ]);
+
+                    // Create transfer in transaction
+                    $txIn = Transaction::create([
+                        'cash_account_id' => $destAccountId,
+                        'type' => TransactionType::TransferIn->value,
+                        'currency' => $currencyVal,
+                        'amount' => $amountCents,
+                        'balance_after' => $destNewBalance,
+                        'note' => $request->note ?? "O'tkazma: " . $cashAccount->name,
+                        'created_by' => Auth::id(),
+                        'transaction_date' => now()->toDateString(),
+                        'related_transaction_id' => $txOut->id,
+                    ]);
+
+                    // Link outbound to inbound
+                    $txOut->related_transaction_id = $txIn->id;
+                    $txOut->save();
+
+                    AuditLogger::log('create_transfer', $txOut, null, [
+                        'source_transaction' => $txOut->toArray(),
+                        'destination_transaction' => $txIn->toArray()
+                    ]);
+                }
+            });
+
+            return redirect()->route('finance.transactions.index')->with('success', 'Tranzaksiya muvaffaqiyatli saqlandi.');
+
+        } catch (\Exception $e) {
+            return back()->withErrors(['amount' => $e->getMessage()])->withInput();
+        }
+    }
+
+    public function storno(Transaction $transaction)
+    {
+        try {
+            DB::transaction(function () use ($transaction) {
+                $this->reverseTransaction($transaction);
+
+                // If this is a transfer, also reverse the related transaction
+                if ($transaction->relatedTransaction) {
+                    $this->reverseTransaction($transaction->relatedTransaction);
+                    $transaction->relatedTransaction->delete();
+                }
+
+                $transaction->delete();
+
+                AuditLogger::log('storno_transaction', $transaction, $transaction->toArray(), ['storno' => true]);
+            });
+
+            return redirect()->route('finance.transactions.index')->with('success', 'Tranzaksiya muvaffaqiyatli bekor qilindi (storno).');
+
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => $e->getMessage()]);
+        }
+    }
+
+    protected function reverseTransaction(Transaction $tx)
+    {
+        $cashBalance = CashBalance::where('cash_account_id', $tx->cash_account_id)
+            ->where('currency', $tx->currency->value)
+            ->first();
+
+        if (! $cashBalance) {
+            throw new \Exception('Kassa balansi topilmadi.');
+        }
+
+        $direction = $tx->type->balanceDirection();
+
+        if ($direction === 1) {
+            // It was an addition, so we subtract
+            if ($cashBalance->balance < $tx->amount) {
+                throw new \Exception('Storno qilish mumkin emas: kassa qoldig\'i salbiy bo\'lib ketadi.');
+            }
+            $cashBalance->balance -= $tx->amount;
+        } elseif ($direction === -1) {
+            // It was a subtraction, so we add back
+            $cashBalance->balance += $tx->amount;
+        }
+
+        $cashBalance->save();
+    }
+}
