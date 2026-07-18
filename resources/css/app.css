@@ -494,7 +494,7 @@ h6 { font-size: 0.875rem; }
     display: flex !important;
     justify-content: flex-end !important;
     align-items: center !important;
-    padding: 6px 16px !important;
+    padding: 6px 12px !important;
     min-height: 42px !important;
     flex: 1 !important;
     min-width: 0 !important;
@@ -1412,7 +1412,7 @@ textarea.skeuo-input {
 
 .grid-auto {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: var(--space-lg);
 }
 

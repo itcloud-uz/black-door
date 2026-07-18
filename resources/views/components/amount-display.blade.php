@@ -52,14 +52,22 @@
         $fullFormatted = $sign . number_format($main, 0, '.', ' ') . '.' . str_pad((string)$sub, 2, '0', STR_PAD_LEFT) . ' so\'m';
     }
 
-    // Abbreviated formatted string for extreme amounts (>= 1 billion)
-    if ($main >= 1000000000) {
+    // Abbreviated formatted string for extreme amounts
+    if ($main >= 1000000000) { // >= 1 billion
         $billions = $main / 1000000000;
         $formattedMain = number_format($billions, 2, '.', ' ');
         if ($currency === 'USD') {
             $formatted = $sign . '$' . $formattedMain . ' mlrd';
         } else {
             $formatted = $sign . $formattedMain . ' mlrd so\'m';
+        }
+    } elseif ($main >= 10000000) { // >= 10 million
+        $millions = $main / 1000000;
+        $formattedMain = number_format($millions, 2, '.', ' ');
+        if ($currency === 'USD') {
+            $formatted = $sign . '$' . $formattedMain . ' mln';
+        } else {
+            $formatted = $sign . $formattedMain . ' mln so\'m';
         }
     } else {
         $formatted = $fullFormatted;
@@ -78,7 +86,7 @@
                 let currentFs = parseFloat(window.getComputedStyle(text).fontSize);
                 const maxAttempts = 15;
                 let attempt = 0;
-                while (text.scrollWidth > parent.clientWidth && currentFs > 9 && attempt < maxAttempts) {
+                while (text.scrollWidth > parent.clientWidth && currentFs > 12 && attempt < maxAttempts) {
                     currentFs -= 1;
                     text.style.fontSize = currentFs + 'px';
                     attempt++;
