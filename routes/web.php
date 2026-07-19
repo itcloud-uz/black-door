@@ -65,9 +65,18 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')
     Route::get('/objects', [AdminObjectController::class, 'index'])->name('objects.index');
     Route::get('/objects/create', [AdminObjectController::class, 'create'])->name('objects.create');
     Route::post('/objects', [AdminObjectController::class, 'store'])->name('objects.store');
+    Route::get('/objects/{object}', [AdminObjectController::class, 'show'])->name('objects.show');
     Route::get('/objects/{object}/edit', [AdminObjectController::class, 'edit'])->name('objects.edit');
     Route::put('/objects/{object}', [AdminObjectController::class, 'update'])->name('objects.update');
     Route::delete('/objects/{object}', [AdminObjectController::class, 'destroy'])->name('objects.destroy');
+    
+    // Sub-elements under Objects
+    Route::post('/objects/{object}/cash-accounts', [AdminObjectController::class, 'storeCashAccount'])->name('objects.cash-accounts.store');
+    Route::delete('/objects/{object}/cash-accounts/{cashAccount}', [AdminObjectController::class, 'destroyCashAccount'])->name('objects.cash-accounts.destroy');
+    Route::post('/objects/{object}/warehouse-stocks', [AdminObjectController::class, 'storeWarehouseStock'])->name('objects.warehouse-stocks.store');
+    Route::delete('/objects/{object}/warehouse-stocks/{warehouseStock}', [AdminObjectController::class, 'destroyWarehouseStock'])->name('objects.warehouse-stocks.destroy');
+    Route::post('/objects/{object}/employees', [AdminObjectController::class, 'storeEmployee'])->name('objects.employees.store');
+    Route::delete('/objects/{object}/employees/{employee}', [AdminObjectController::class, 'destroyEmployee'])->name('objects.employees.destroy');
     
     // Currency Rates Management
     Route::get('/currency-rates', [AdminCurrencyController::class, 'index'])->name('currency-rates');
