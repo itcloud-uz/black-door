@@ -463,7 +463,8 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
           ],
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             _buildNavItem(0, Icons.dashboard_outlined, 'Bosh sahifa'),
             _buildNavItem(1, Icons.people_outline, 'Xodimlar'),
@@ -486,32 +487,37 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
 
   Widget _buildNavItem(int index, IconData icon, String label) {
     final isSelected = _selectedIndex == index;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedIndex = index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: isSelected
-            ? NeumorphicDecorations.sunken(radius: 12)
-            : const InsetBoxDecoration(),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? AppColors.success : AppColors.textMuted,
-              size: 24,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? AppColors.textPrimary : AppColors.textMuted,
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _selectedIndex = index),
+        child: Container(
+          color: Colors.transparent,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: isSelected
+                    ? NeumorphicDecorations.sunken(radius: 10)
+                    : const InsetBoxDecoration(),
+                child: Icon(
+                  icon,
+                  color: isSelected ? AppColors.success : AppColors.textMuted,
+                  size: 22,
+                ),
               ),
-            ),
-          ],
+              if (isSelected) ...[
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );

@@ -12,7 +12,7 @@
 <aside class="sidebar" :class="{ 'open': open }">
     {{-- Brand --}}
     <div class="sidebar-brand">
-        <img src="{{ asset('branding/mark.png') }}" alt="Black Door" style="width: 72px; height: 72px; margin-bottom: 8px; object-fit: contain; display: block; margin-left: auto; margin-right: auto;">
+        <img src="{{ file_exists(public_path('branding/custom_mark.png')) ? asset('branding/custom_mark.png') : asset('branding/mark.png') }}" alt="Black Door" style="width: 72px; height: 72px; margin-bottom: 8px; object-fit: contain; display: block; margin-left: auto; margin-right: auto;">
         <h1>{{ \App\Models\Setting::get('company_name', 'Black Door') }}</h1>
         <div class="brand-subtitle">{{ \App\Models\Setting::get('company_tagline', 'Moliyaviy Boshqaruv') }}</div>
     </div>

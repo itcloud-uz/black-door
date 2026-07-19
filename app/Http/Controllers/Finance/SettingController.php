@@ -58,9 +58,9 @@ class SettingController extends Controller
             if ($request->hasFile('logo')) {
                 $file = $request->file('logo');
                 
-                $brandingPath = base_path('branding/mark.png');
-                $publicBrandingPath = public_path('branding/mark.png');
-                $mobileBrandingPath = base_path('mobile/assets/branding/mark.png');
+                $brandingPath = base_path('branding/custom_mark.png');
+                $publicBrandingPath = public_path('branding/custom_mark.png');
+                $mobileBrandingPath = base_path('mobile/assets/branding/custom_mark.png');
 
                 // Ensure directories exist
                 if (!file_exists(dirname($brandingPath))) {
@@ -94,13 +94,13 @@ class SettingController extends Controller
                 }
                 
                 // Copy assembled vertical/horizontal logos to public and mobile assets
-                if (file_exists(base_path('branding/logo_vertical.png'))) {
-                    copy(base_path('branding/logo_vertical.png'), public_path('branding/logo_vertical.png'));
-                    copy(base_path('branding/logo_vertical.png'), base_path('mobile/assets/branding/logo_vertical.png'));
+                if (file_exists(base_path('branding/custom_logo_vertical.png'))) {
+                    copy(base_path('branding/custom_logo_vertical.png'), public_path('branding/custom_logo_vertical.png'));
+                    copy(base_path('branding/custom_logo_vertical.png'), base_path('mobile/assets/branding/custom_logo_vertical.png'));
                 }
-                if (file_exists(base_path('branding/logo_horizontal.png'))) {
-                    copy(base_path('branding/logo_horizontal.png'), public_path('branding/logo_horizontal.png'));
-                    copy(base_path('branding/logo_horizontal.png'), base_path('mobile/assets/branding/logo_horizontal.png'));
+                if (file_exists(base_path('branding/custom_logo_horizontal.png'))) {
+                    copy(base_path('branding/custom_logo_horizontal.png'), public_path('branding/custom_logo_horizontal.png'));
+                    copy(base_path('branding/custom_logo_horizontal.png'), base_path('mobile/assets/branding/custom_logo_horizontal.png'));
                 }
             }
 

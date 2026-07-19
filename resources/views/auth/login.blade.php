@@ -146,7 +146,7 @@
         <div class="login-card">
             {{-- Header --}}
             <div class="login-header" style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 24px;">
-                <img src="{{ asset('branding/logo_vertical.png') }}" alt="Black Door" style="max-width: 180px; height: auto;">
+                <img src="{{ file_exists(public_path('branding/custom_logo_vertical.png')) ? asset('branding/custom_logo_vertical.png') : asset('branding/logo_vertical.png') }}" alt="Black Door" style="max-width: 180px; height: auto;">
             </div>
 
             <div class="login-divider"></div>

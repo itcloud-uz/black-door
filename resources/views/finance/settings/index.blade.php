@@ -30,7 +30,7 @@
                     <div style="display: flex; flex-direction: column; align-items: center;">
                         <span class="form-label" style="margin-bottom: 8px; font-size: 0.75rem;">Joriy Logo</span>
                         <div style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-pressed-sm); overflow: hidden; padding: 4px;">
-                            <img src="{{ asset('branding/mark.png') }}?v={{ time() }}" alt="Current Logo" style="width: 100%; height: 100%; object-fit: contain;">
+                            <img src="{{ file_exists(public_path('branding/custom_mark.png')) ? asset('branding/custom_mark.png') : asset('branding/mark.png') }}?v={{ time() }}" alt="Current Logo" style="width: 100%; height: 100%; object-fit: contain;">
                         </div>
                     </div>
 

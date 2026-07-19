@@ -706,7 +706,7 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
             )
           : null,
       bottomNavigationBar: Container(
-        height: 80,
+        height: 75,
         decoration: const InsetBoxDecoration(
           color: AppColors.background,
           boxShadow: [
@@ -714,13 +714,14 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
           ],
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildNavItem(0, Icons.dashboard_outlined, 'Bosh sahifa'),
-            _buildNavItem(1, Icons.people_outline, 'Foydalanuvchilar'),
-            _buildNavItem(2, Icons.business_outlined, 'Obyektlar'),
-            _buildNavItem(3, Icons.inventory_2_outlined, 'Mahsulotlar'),
-            _buildNavItem(4, Icons.settings_outlined, 'Sozlamalar'),
+            _buildNavItem(0, Icons.dashboard_outlined, 'Bosh'),
+            _buildNavItem(1, Icons.people_outline, 'Userlar'),
+            _buildNavItem(2, Icons.business_outlined, 'Obyekt'),
+            _buildNavItem(3, Icons.inventory_2_outlined, 'Mahsulot'),
+            _buildNavItem(4, Icons.settings_outlined, 'Sozlama'),
           ],
         ),
       ),
@@ -739,32 +740,29 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
 
   Widget _buildNavItem(int index, IconData icon, String label) {
     final isSelected = _selectedIndex == index;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedIndex = index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: isSelected
-            ? NeumorphicDecorations.sunken(radius: 12)
-            : const InsetBoxDecoration(),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? AppColors.success : AppColors.textMuted,
-              size: 24,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? AppColors.textPrimary : AppColors.textMuted,
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _selectedIndex = index),
+        child: Container(
+          color: Colors.transparent,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                padding: const EdgeInsets.all(8),
+                decoration: isSelected
+                    ? NeumorphicDecorations.sunken(radius: 10)
+                    : const InsetBoxDecoration(),
+                child: Icon(
+                  icon,
+                  color: isSelected ? AppColors.success : AppColors.textMuted,
+                  size: 22,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

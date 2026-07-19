@@ -166,7 +166,7 @@
 
             {{-- Header --}}
             <div class="pin-header" style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 24px;">
-                <img src="{{ asset('branding/mark.png') }}" alt="Black Door Mark" style="width: 80px; height: 80px; margin-bottom: 16px; object-fit: contain;">
+                <img src="{{ file_exists(public_path('branding/custom_mark.png')) ? asset('branding/custom_mark.png') : asset('branding/mark.png') }}" alt="Black Door Mark" style="width: 80px; height: 80px; margin-bottom: 16px; object-fit: contain;">
                 <p class="pin-title" style="margin: 0; font-size: 0.95rem; color: var(--text-primary); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800;">PIN kodni kiriting</p>
             </div>
 
