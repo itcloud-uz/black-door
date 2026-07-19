@@ -13,6 +13,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
+    {{-- Favicons --}}
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+
     <style>
         body {
             display: flex;
@@ -121,10 +127,8 @@
     <div class="login-container">
         <div class="login-card">
             {{-- Header --}}
-            <div class="login-header">
-                <div class="login-knocker"></div>
-                <h1 class="login-title">Black Door</h1>
-                <p class="login-subtitle">Moliyaviy boshqaruv tizimi</p>
+            <div class="login-header" style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 24px;">
+                <img src="{{ asset('branding/logo_vertical.png') }}" alt="Black Door" style="max-width: 180px; height: auto;">
             </div>
 
             <div class="login-divider"></div>

@@ -40,6 +40,26 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.0
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/branding/mark.png"
+  adaptive_icon_background: "#EDF1F7"
+  adaptive_icon_foreground: "assets/branding/mark.png"
+
+flutter_native_splash:
+  color: "#EDF1F7"
+  image: "assets/branding/mark.png"
+  android_12:
+    color: "#EDF1F7"
+    image: "assets/branding/mark.png"
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/branding/logo_vertical.png
+    - assets/branding/mark.png
+    - assets/branding/logo_horizontal.png

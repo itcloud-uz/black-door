@@ -12,6 +12,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
+    {{-- Favicons --}}
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+
     <style>
         body {
             display: flex;
@@ -141,12 +147,11 @@
             </template>
 
             {{-- Header --}}
-            <div class="pin-header">
-                {{-- Safe Dial --}}
-                <div class="safe-dial" style="margin-bottom: 16px;">
-                    <div></div>
+            <div class="pin-header" style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 24px;">
+                <div style="display: inline-flex; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-pressed-sm); margin-bottom: 16px; overflow: hidden; padding: 6px;">
+                    <img src="{{ asset('branding/mark.png') }}" alt="Black Door Mark" style="width: 100%; height: 100%; object-fit: contain;">
                 </div>
-                <p class="pin-title">PIN kodni kiriting</p>
+                <p class="pin-title" style="margin: 0; font-size: 0.95rem; color: var(--text-primary); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800;">PIN kodni kiriting</p>
             </div>
 
             {{-- Errors --}}
