@@ -1,0 +1,340 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/network/providers.dart';
+import '../../core/widgets/neumorphic_widgets.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/theme/neumorphic_decorations.dart';
+import 'create_transaction_screen.dart';
+
+class FinanceDashboard extends ConsumerStatefulWidget {
+  final bool showBackButton;
+
+  const FinanceDashboard({Key? key, this.showBackButton = false}) : super(key: key);
+
+  @override
+  ConsumerState<FinanceDashboard> createState() => _FinanceDashboardState();
+}
+
+class _FinanceDashboardState extends ConsumerState<FinanceDashboard> {
+  int _selectedIndex = 0;
+  bool _isLoading = false;
+  List<dynamic> _accounts = [];
+  List<dynamic> _counterparties = [];
+  List<dynamic> _transactions = [];
+  List<dynamic> _categories = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchFinanceData();
+  }
+
+  Future<void> _fetchFinanceData() async {
+    setState(() => _isLoading = true);
+    try {
+      final client = ref.read(apiClientProvider);
+      
+      final accRes = await client.get('/finance/cash-accounts');
+      final cpRes = await client.get('/finance/counterparties');
+      final txRes = await client.get('/finance/transactions');
+      final catRes = await client.get('/finance/categories');
+
+      if (mounted) {
+        setState(() {
+          _accounts = accRes.data ?? [];
+          _counterparties = cpRes.data ?? [];
+          _transactions = txRes.data['data'] ?? [];
+          _categories = catRes.data ?? [];
+        });
+      }
+    } catch (_) {}
+    setState(() => _isLoading = false);
+  }
+
+  void _logout() {
+    ref.read(authProvider.notifier).logout();
+  }
+
+  void _openCreateTransaction() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CreateTransactionScreen(
+          accounts: _accounts,
+          categories: _categories,
+          counterparties: _counterparties,
+          onSuccess: () {
+            _fetchFinanceData();
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildKassalarTab() {
+    if (_isLoading) return const Center(child: CircularProgressIndicator(color: AppColors.success));
+
+    return RefreshIndicator(
+      onRefresh: _fetchFinanceData,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        itemCount: _accounts.length,
+        itemBuilder: (context, index) {
+          final acc = _accounts[index];
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: NeumorphicCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(acc['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: NeumorphicDecorations.sunken(radius: 6),
+                        child: Text(
+                          acc['type'].toUpperCase(),
+                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textMuted),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('USD Qoldiq', style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                          Text(
+                            '\$ ${acc['usd_balance'].toStringAsFixed(2)}',
+                            style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.success),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          const Text('UZS Qoldiq', style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                          Text(
+                            '${acc['uzs_balance'].toStringAsFixed(0)} UZS',
+                            style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.blueEnd),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildKontragentlarTab() {
+    if (_isLoading) return const Center(child: CircularProgressIndicator(color: AppColors.success));
+
+    return RefreshIndicator(
+      onRefresh: _fetchFinanceData,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        itemCount: _counterparties.length,
+        itemBuilder: (context, index) {
+          final cp = _counterparties[index];
+          final usd = cp['usd_balance'];
+          final uzs = cp['uzs_balance'];
+
+          final usdColor = usd >= 0 ? AppColors.success : AppColors.danger;
+          final uzsColor = uzs >= 0 ? AppColors.success : AppColors.danger;
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: NeumorphicCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(cp['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  if (cp['phone'] != null)
+                    Text(cp['phone'], style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'USD: ${usd >= 0 ? "+" : ""}${usd.toStringAsFixed(2)}',
+                        style: TextStyle(fontWeight: FontWeight.bold, color: usdColor),
+                      ),
+                      Text(
+                        'UZS: ${uzs >= 0 ? "+" : ""}${uzs.toStringAsFixed(0)} UZS',
+                        style: TextStyle(fontWeight: FontWeight.bold, color: uzsColor),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildTranzaksiyalarTab() {
+    if (_isLoading) return const Center(child: CircularProgressIndicator(color: AppColors.success));
+
+    return RefreshIndicator(
+      onRefresh: _fetchFinanceData,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        itemCount: _transactions.length,
+        itemBuilder: (context, index) {
+          final tx = _transactions[index];
+          final isIncome = tx['type'] == 'income' || tx['type'] == 'transfer_in';
+          final amountColor = isIncome ? AppColors.success : AppColors.danger;
+          final sign = isIncome ? '+' : '-';
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
+            child: NeumorphicCard(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(tx['note'] ?? tx['type'].toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text('${tx['currency']} • ${tx['transaction_date']}', style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                    ],
+                  ),
+                  Text(
+                    '$sign ${(tx['amount'] / 100).toStringAsFixed(2)}',
+                    style: TextStyle(fontWeight: FontWeight.bold, color: amountColor),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildReportsTab() {
+    return const Center(child: Text('Moliyaviy Hisobotlar (Tez orada...)'));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: AppColors.background,
+        leading: widget.showBackButton
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
+        title: Text(
+          _selectedIndex == 0
+              ? 'KASSALAR'
+              : _selectedIndex == 1
+                  ? 'KONTRAGENTLAR'
+                  : _selectedIndex == 2
+                      ? 'TRANZAKSIYALAR'
+                      : 'HISOBOTLAR',
+          style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5, fontSize: 18),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _fetchFinanceData,
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _logout,
+          ),
+        ],
+      ),
+      floatingActionButton: _selectedIndex == 2
+          ? Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
+              child: NeumorphicButton(
+                onTap: _openCreateTransaction,
+                isCircular: true,
+                gradientColors: AppColors.greenGradient,
+                padding: const EdgeInsets.all(20),
+                child: const Icon(Icons.add, color: Colors.white, size: 28),
+              ),
+            )
+          : null,
+      bottomNavigationBar: Container(
+        height: 80,
+        decoration: const BoxDecoration(
+          color: AppColors.background,
+          boxShadow: [
+            BoxShadow(color: AppColors.shadowDark, offset: Offset(0, -6), blurRadius: 10),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildNavItem(0, Icons.account_balance_outlined, 'Kassalar'),
+            _buildNavItem(1, Icons.contact_page_outlined, 'Kontragentlar'),
+            _buildNavItem(2, Icons.list_alt_outlined, 'Tranzaksiyalar'),
+            _buildNavItem(3, Icons.analytics_outlined, 'Hisobotlar'),
+          ],
+        ),
+      ),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: [
+          _buildKassalarTab(),
+          _buildKontragentlarTab(),
+          _buildTranzaksiyalarTab(),
+          _buildReportsTab(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, IconData icon, String label) {
+    final isSelected = _selectedIndex == index;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedIndex = index),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: isSelected
+            ? NeumorphicDecorations.sunken(radius: 12)
+            : const BoxDecoration(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? AppColors.success : AppColors.textMuted,
+              size: 24,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? AppColors.textPrimary : AppColors.textMuted,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

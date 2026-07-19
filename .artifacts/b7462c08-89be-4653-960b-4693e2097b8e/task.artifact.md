@@ -1,7 +1,5 @@
-- [x] Backend serverni ishga tushirish (8000)
-- [x] Hisobot xizmatini ishga tushirish (8001)
-- [x] WebSocket serverni ishga tushirish (8080)
-- [x] Queue workerni ishga tushirish
-- [x] Xizmatlar holatini tekshirish
-- [x] Flutter SDK tekshirish va sozlash
-- [/] Mobil ilovani emulatorda ishga tushirish
+- [ ] Admin dashbordiga "Chiqish" tugmasini qo'shish
+- [ ] Finance dashbordiga "Chiqish" tugmasini qo'shish
+- [ ] Manager dashbordiga "Chiqish" tugmasini qo'shish
+- [ ] Barcha o'zgarishlarni GitHubga yuklash (push)
+- [ ] Ilovani emulatorda qayta ishga tushirish

@@ -1,40 +1,37 @@
-# Black Door — Loyihani to'liq ishga tushirish rejasi
+# Dashbordlarda "Chiqish" funksiyasini qo'shish va GitHubga yuklash rejasi
 
-Ushbu reja loyihaning barcha qismlarini (Backend, Hisobot xizmati va WebSocket) ishga tushirishni ko'zda tutadi.
+Ushbu reja loyihaning barcha mobil panellariga tizimdan chiqish (logout) tugmasini qo'shish va barcha qilingan o'zgarishlarni GitHub serveriga yuborishni o'z ichiga oladi.
 
 ## Foydalanuvchi ko'rib chiqishi kerak bo'lgan bandlar
 
 > [!IMPORTANT]
-> Loyihani ishga tushirish uchun PHP va Python muhitlari tayyor bo'lishi kerak. Biz fon rejimida serverlarni ishga tushiramiz.
+> GitHubga yuklash uchun amaldagi `main` branch ishlatiladi. Token allaqachon git remote URL'da mavjud.
 
 ## Taklif etilayotgan o'zgarishlar
 
-Loyihani ishga tushirish uchun quyidagi xizmatlar fon rejimida yoqiladi:
+### 1. Mobil ilova (Flutter)
+Barcha dashbordlarning `AppBar` qismiga `Icons.logout` tugmasi qo'shiladi:
+- **Admin Dashboard**: `mobile/lib/features/admin/admin_dashboard.dart`
+- **Finance Dashboard**: `mobile/lib/features/finance/finance_dashboard.dart`
+- **Manager Dashboard**: `mobile/lib/features/manager/manager_dashboard.dart`
+- *(Employee Dashboard'da allaqachon mavjud)*
 
-### 1. Backend (Laravel)
-- **Buyruq:** `php artisan serve`
-- **Port:** `8000`
-- **Vazifasi:** Asosiy ERP tizimi va API.
+Har bir faylda `_logout` metodi quyidagicha ishlaydi:
+```dart
+void _logout() {
+  ref.read(authProvider.notifier).logout();
+}
+```
 
-### 2. Hisobot xizmati (Python FastAPI)
-- **Buyruq:** `services/reports/.venv/Scripts/python -m uvicorn main:app --port 8001`
-- **Port:** `8001`
-- **Vazifasi:** Excel va PDF hisobotlarini yaratish.
-
-### 3. WebSocket xizmati (Laravel Reverb)
-- **Buyruq:** `php artisan reverb:start`
-- **Port:** `8080`
-- **Vazifasi:** Real-vaqtda ma'lumotlarni yangilash.
-
-### 4. Navbatlar (Queue Worker)
-- **Buyruq:** `php artisan queue:work`
-- **Vazifasi:** Fon vazifalarini bajarish (masalan, hisobotlarni qayta ishlash).
+### 2. GitHub integratsiyasi
+Barcha o'zgarishlar stage qilinadi, commit qilinadi va push qilinadi.
+- **Commit xabari:** `feat: add logout to all dashboards and fix build environment issues`
 
 ## Tekshirish rejasi
 
 ### Avtomatlashtirilgan tekshiruvlar
-- Portlar ochiqligini tekshirish (`8000`, `8001`, `8080`).
-- `/health` endpointlari orqali xizmatlar holatini tekshirish.
+- Kodning sintaktik to'g'riligini tekshirish (`flutter analyze`).
 
 ### Qo'lda tekshirish
-- Brauzerda `http://localhost:8000` manziliga kirib ko'rish.
+- Emulatorda har bir rol bilan kirib, `Logout` tugmasi ishlayotganini va foydalanuvchini login ekraniga qaytarayotganini tekshirish.
+- GitHub'da repo yangilanganini tasdiqlash.
