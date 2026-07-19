@@ -79,40 +79,37 @@
 </div>
 
 {{-- Main Details Tab View --}}
-<div x-data="{ activeTab: 'cash' }" class="grid-sidebar-layout">
+<div x-data="{ activeTab: 'cash' }">
     
-    {{-- Sidebar tabs --}}
-    <div class="skeuo-card" style="padding: 10px; height: fit-content; box-shadow: var(--shadow-neutral-sm);">
-        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
-            <li>
-                <button class="skeuo-btn w-full" style="text-align: left; display: flex; align-items: center; gap: 8px;"
-                        :class="activeTab === 'cash' ? 'skeuo-btn-primary' : 'skeuo-btn-neutral'" @click="activeTab = 'cash'">
-                    <i class="bi bi-bank"></i> Kassalar ({{ $object->cashAccounts->count() }})
-                </button>
-            </li>
-            <li>
-                <button class="skeuo-btn w-full" style="text-align: left; display: flex; align-items: center; gap: 8px;"
-                        :class="activeTab === 'stock' ? 'skeuo-btn-primary' : 'skeuo-btn-neutral'" @click="activeTab = 'stock'">
-                    <i class="bi bi-box-seam"></i> Ombor / Mahsulotlar ({{ $object->warehouseStocks->count() }})
-                </button>
-            </li>
-            <li>
-                <button class="skeuo-btn w-full" style="text-align: left; display: flex; align-items: center; gap: 8px;"
-                        :class="activeTab === 'staff' ? 'skeuo-btn-primary' : 'skeuo-btn-neutral'" @click="activeTab = 'staff'">
-                    <i class="bi bi-people"></i> Obyekt xodimlari ({{ $object->employees->count() }})
-                </button>
-            </li>
-            <li>
-                <button class="skeuo-btn w-full" style="text-align: left; display: flex; align-items: center; gap: 8px;"
-                        :class="activeTab === 'txs' ? 'skeuo-btn-primary' : 'skeuo-btn-neutral'" @click="activeTab = 'txs'">
-                    <i class="bi bi-cash-stack"></i> Tranzaksiyalar ({{ $object->transactions->count() }})
-                </button>
-            </li>
-        </ul>
+    {{-- Segmented Tab Bar (Soft UI Neumorphic) --}}
+    <div style="display: flex; gap: var(--space-md); margin-bottom: var(--space-lg); padding: 8px; border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-pressed-sm); flex-wrap: wrap;">
+        <button type="button" class="skeuo-btn" style="flex: 1; min-width: 160px; border: none; padding: 12px 16px; border-radius: var(--radius-md); font-weight: 700; cursor: pointer; transition: all 0.25s ease; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem;"
+                :style="activeTab === 'cash' ? 'background: var(--surface); color: var(--text-primary); box-shadow: var(--shadow-raised-sm); border: 1px solid rgba(255,255,255,0.5);' : 'background: transparent; color: var(--text-muted); box-shadow: none; border: 1px solid transparent;'"
+                @click="activeTab = 'cash'">
+            <i class="bi bi-bank" :style="activeTab === 'cash' ? 'color: var(--success);' : ''"></i> Kassalar ({{ $object->cashAccounts->count() }})
+        </button>
+        
+        <button type="button" class="skeuo-btn" style="flex: 1; min-width: 160px; border: none; padding: 12px 16px; border-radius: var(--radius-md); font-weight: 700; cursor: pointer; transition: all 0.25s ease; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem;"
+                :style="activeTab === 'stock' ? 'background: var(--surface); color: var(--text-primary); box-shadow: var(--shadow-raised-sm); border: 1px solid rgba(255,255,255,0.5);' : 'background: transparent; color: var(--text-muted); box-shadow: none; border: 1px solid transparent;'"
+                @click="activeTab = 'stock'">
+            <i class="bi bi-box-seam" :style="activeTab === 'stock' ? 'color: #e67e22;' : ''"></i> Ombor / Mahsulotlar ({{ $object->warehouseStocks->count() }})
+        </button>
+        
+        <button type="button" class="skeuo-btn" style="flex: 1; min-width: 160px; border: none; padding: 12px 16px; border-radius: var(--radius-md); font-weight: 700; cursor: pointer; transition: all 0.25s ease; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem;"
+                :style="activeTab === 'staff' ? 'background: var(--surface); color: var(--text-primary); box-shadow: var(--shadow-raised-sm); border: 1px solid rgba(255,255,255,0.5);' : 'background: transparent; color: var(--text-muted); box-shadow: none; border: 1px solid transparent;'"
+                @click="activeTab = 'staff'">
+            <i class="bi bi-people" :style="activeTab === 'staff' ? 'color: #3498db;' : ''"></i> Obyekt xodimlari ({{ $object->employees->count() }})
+        </button>
+        
+        <button type="button" class="skeuo-btn" style="flex: 1; min-width: 160px; border: none; padding: 12px 16px; border-radius: var(--radius-md); font-weight: 700; cursor: pointer; transition: all 0.25s ease; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem;"
+                :style="activeTab === 'txs' ? 'background: var(--surface); color: var(--text-primary); box-shadow: var(--shadow-raised-sm); border: 1px solid rgba(255,255,255,0.5);' : 'background: transparent; color: var(--text-muted); box-shadow: none; border: 1px solid transparent;'"
+                @click="activeTab = 'txs'">
+            <i class="bi bi-cash-stack" :style="activeTab === 'txs' ? 'color: #9b59b6;' : ''"></i> Tranzaksiyalar ({{ $object->transactions->count() }})
+        </button>
     </div>
 
     {{-- Tab Content --}}
-    <div style="flex-grow: 1;">
+    <div style="width: 100%;">
         
         {{-- Cash Accounts Tab --}}
         <div x-show="activeTab === 'cash'" class="skeuo-card" style="box-shadow: var(--shadow-neutral-sm);">
