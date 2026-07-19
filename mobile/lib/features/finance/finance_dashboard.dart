@@ -306,7 +306,7 @@ class _FinanceDashboardState extends ConsumerState<FinanceDashboard> {
                 padding: const EdgeInsets.only(bottom: 12.0),
                 child: Row(
                   children: [
-                    Container(width: 12, height: 12, decoration: BoxDecoration(color: [AppColors.success, AppColors.blueEnd, AppColors.warning, AppColors.danger, Colors.purple, Colors.orange][categories.indexOf(cat) % 6], shape: BoxShape.circle)),
+                    Container(width: 12, height: 12, decoration: InsetBoxDecoration(color: [AppColors.success, AppColors.blueEnd, AppColors.warning, AppColors.danger, Colors.purple, Colors.orange][categories.indexOf(cat) % 6], shape: BoxShape.circle)),
                     const SizedBox(width: 12),
                     Expanded(child: Text(cat['category'], style: const TextStyle(fontWeight: FontWeight.w600))),
                     Text('\$ ${cat['total_usd'].toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold)),

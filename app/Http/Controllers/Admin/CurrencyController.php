@@ -37,14 +37,23 @@ class CurrencyController extends Controller
         $rateTiyin = $rateVal * 100;
         $today = now()->toDateString();
 
-        $rate = CurrencyRate::updateOrCreate(
-            ['effective_date' => $today],
-            [
+        // Use whereDate to reliably match the date portion across SQLite and other engines
+        $rate = CurrencyRate::whereDate('effective_date', $today)->first();
+
+        if ($rate) {
+            $rate->update([
                 'rate_uzs_per_usd' => $rateTiyin,
                 'set_by' => Auth::id(),
                 'note' => $request->note,
-            ]
-        );
+            ]);
+        } else {
+            $rate = CurrencyRate::create([
+                'effective_date' => $today,
+                'rate_uzs_per_usd' => $rateTiyin,
+                'set_by' => Auth::id(),
+                'note' => $request->note,
+            ]);
+        }
 
         AuditLogger::log('update_currency_rate', $rate, null, $rate->toArray());
 

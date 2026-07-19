@@ -351,7 +351,7 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
                   Container(
                     width: 40,
                     height: 40,
-                    decoration: const BoxDecoration(color: AppColors.surface, shape: BoxShape.circle),
+                    decoration: const InsetBoxDecoration(color: AppColors.surface, shape: BoxShape.circle),
                     child: const Icon(Icons.person, color: AppColors.success),
                   ),
                   const SizedBox(width: 16),

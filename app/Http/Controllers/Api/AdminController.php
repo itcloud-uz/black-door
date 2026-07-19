@@ -312,12 +312,22 @@ class AdminController extends Controller
         $rateVal = (float)$request->rate_uzs_per_usd;
         $rateCents = (int)round($rateVal * 100);
 
-        $rate = CurrencyRate::create([
-            'rate_uzs_per_usd' => $rateCents,
-            'set_by' => auth()->id(),
-            'effective_date' => now()->toDateString(),
-            'note' => $request->note,
-        ]);
+        $today = now()->toDateString();
+        $rate = CurrencyRate::whereDate('effective_date', $today)->first();
+        if ($rate) {
+            $rate->update([
+                'rate_uzs_per_usd' => $rateCents,
+                'set_by' => auth()->id(),
+                'note' => $request->note,
+            ]);
+        } else {
+            $rate = CurrencyRate::create([
+                'rate_uzs_per_usd' => $rateCents,
+                'set_by' => auth()->id(),
+                'effective_date' => $today,
+                'note' => $request->note,
+            ]);
+        }
 
         AuditLogger::log('create_currency_rate', $rate, null, $rate->toArray());
 

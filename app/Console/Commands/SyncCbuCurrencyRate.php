@@ -40,14 +40,21 @@ class SyncCbuCurrencyRate extends Command
             $systemUser = User::where('role', 'super_admin')->first();
             $userId = $systemUser ? $systemUser->id : 1;
 
-            $rate = CurrencyRate::updateOrCreate(
-                ['effective_date' => $today],
-                [
+            $rate = CurrencyRate::whereDate('effective_date', $today)->first();
+            if ($rate) {
+                $rate->update([
                     'rate_uzs_per_usd' => $rateTiyin,
                     'set_by' => $userId,
                     'note' => 'Markaziy Bank API orqali avtomatik yangilandi.',
-                ]
-            );
+                ]);
+            } else {
+                $rate = CurrencyRate::create([
+                    'effective_date' => $today,
+                    'rate_uzs_per_usd' => $rateTiyin,
+                    'set_by' => $userId,
+                    'note' => 'Markaziy Bank API orqali avtomatik yangilandi.',
+                ]);
+            }
 
             $this->info("Kurs muvaffaqiyatli sinxronizatsiya qilindi: 1 USD = {$cbuRate} UZS");
             AuditLogger::log('sync_currency_rate_cbu', $rate, null, $rate->toArray());
