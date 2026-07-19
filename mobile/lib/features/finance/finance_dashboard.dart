@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:fl_chart/fl_chart.dart';
 import '../../external/flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -238,7 +238,18 @@ class _FinanceDashboardState extends ConsumerState<FinanceDashboard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(tx['note'] ?? tx['type'].toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold)),
-                      Text('${tx['currency']} • ${tx['transaction_date']}', style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                      Row(
+                        children: [
+                          Text('${tx['currency']} • ${tx['transaction_date']}', style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                          if (tx['exchange_rate'] != null) ...[
+                            const SizedBox(width: 8),
+                            Text(
+                              '• Kurs: ${(tx['exchange_rate'] / 100).toStringAsFixed(0)} so\'m',
+                              style: const TextStyle(fontSize: 11, color: AppColors.success, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ],
+                      ),
                     ],
                   ),
                   Text(

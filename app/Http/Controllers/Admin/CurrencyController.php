@@ -50,4 +50,19 @@ class CurrencyController extends Controller
 
         return redirect()->route('admin.currency-rates')->with('success', 'Valyuta kursi muvaffaqiyatli saqlandi.');
     }
+
+    public function fetchCbuRate()
+    {
+        $rate = \App\Services\CbuCurrencyService::fetchCbuUsdRate();
+        if ($rate !== null) {
+            return response()->json([
+                'success' => true,
+                'rate' => (int) round($rate)
+            ]);
+        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Markaziy bank kursini olib bo\'lmadi.'
+        ], 500);
+    }
 }

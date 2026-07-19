@@ -64,11 +64,16 @@ class ObjectTransactionController extends Controller
             ->where('is_active', true)
             ->get();
 
+        $currentRate = \App\Models\CurrencyRate::orderBy('effective_date', 'desc')
+            ->orderBy('id', 'desc')
+            ->first();
+
         return view('manager.transactions.index', compact(
             'object',
             'transactions',
             'cashAccounts',
-            'categories'
+            'categories',
+            'currentRate'
         ));
     }
 

@@ -237,6 +237,9 @@ class FinanceController extends Controller
                         'currency' => $currencyVal,
                     ], ['balance' => 0]);
 
+                $latestRate = \App\Models\CurrencyRate::latest('effective_date')->latest('id')->first();
+                $rateTiyin = $latestRate ? $latestRate->rate_uzs_per_usd : null;
+
                 if ($type === 'income') {
                     $newBalance = $cashBalance->balance + $amountCents;
                     $cashBalance->balance = $newBalance;
@@ -254,6 +257,7 @@ class FinanceController extends Controller
                         'attachment_path' => $attachmentPath,
                         'created_by' => Auth::id(),
                         'transaction_date' => now()->toDateString(),
+                        'exchange_rate' => $rateTiyin,
                     ]);
 
                     AuditLogger::log('create_transaction', $tx, null, $tx->toArray());
@@ -281,6 +285,7 @@ class FinanceController extends Controller
                         'attachment_path' => $attachmentPath,
                         'created_by' => Auth::id(),
                         'transaction_date' => now()->toDateString(),
+                        'exchange_rate' => $rateTiyin,
                     ]);
 
                     AuditLogger::log('create_transaction', $tx, null, $tx->toArray());
@@ -326,6 +331,7 @@ class FinanceController extends Controller
                         'attachment_path' => $attachmentPath,
                         'created_by' => Auth::id(),
                         'transaction_date' => now()->toDateString(),
+                        'exchange_rate' => $rateTiyin,
                     ]);
 
                     // Inflow tx
@@ -339,6 +345,7 @@ class FinanceController extends Controller
                         'created_by' => Auth::id(),
                         'transaction_date' => now()->toDateString(),
                         'related_transaction_id' => $txOut->id,
+                        'exchange_rate' => $rateTiyin,
                     ]);
 
                     $txOut->related_transaction_id = $txIn->id;
@@ -403,6 +410,7 @@ class FinanceController extends Controller
                         'attachment_path' => $attachmentPath,
                         'created_by' => Auth::id(),
                         'transaction_date' => now()->toDateString(),
+                        'exchange_rate' => $rateTiyin,
                     ]);
 
                     // Transaction 2: Adding Currency B
@@ -416,6 +424,7 @@ class FinanceController extends Controller
                         'created_by' => Auth::id(),
                         'transaction_date' => now()->toDateString(),
                         'related_transaction_id' => $txOut->id,
+                        'exchange_rate' => $rateTiyin,
                     ]);
 
                     $txOut->related_transaction_id = $txIn->id;
@@ -567,5 +576,14 @@ class FinanceController extends Controller
                 'message' => 'Hisobot olishda xatolik: ' . $e->getMessage()
             ], 400);
         }
+    }
+
+    public function getCurrentRate()
+    {
+        $rate = \App\Models\CurrencyRate::latest('effective_date')->latest('id')->first();
+        return response()->json([
+            'rate' => $rate ? ($rate->rate_uzs_per_usd / 100) : 12500,
+            'updated_at' => $rate ? $rate->created_at->toIso8601String() : null
+        ]);
     }
 }

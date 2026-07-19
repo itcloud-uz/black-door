@@ -32,6 +32,7 @@ class Transaction extends Model
         'created_by',
         'related_transaction_id',
         'transaction_date',
+        'exchange_rate',
     ];
 
     /**
@@ -45,6 +46,7 @@ class Transaction extends Model
             'amount' => 'integer',
             'balance_after' => 'integer',
             'transaction_date' => 'date',
+            'exchange_rate' => 'integer',
         ];
     }
 

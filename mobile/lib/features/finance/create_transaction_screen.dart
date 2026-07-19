@@ -33,6 +33,7 @@ class _CreateTransactionScreenState extends ConsumerState<CreateTransactionScree
   String _type = 'income'; // income, expense, transfer, exchange
   String _amountStr = '0';
   String _currency = 'USD';
+  double? _currentRate;
   
   int? _selectedAccountId;
   int? _selectedDestAccountId;
@@ -46,6 +47,25 @@ class _CreateTransactionScreenState extends ConsumerState<CreateTransactionScree
   File? _imageFile;
   final ImagePicker _picker = ImagePicker();
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCurrentRate();
+  }
+
+  Future<void> _fetchCurrentRate() async {
+    try {
+      final client = ref.read(apiClientProvider);
+      final response = await client.get('/finance/currency-rate');
+      if (response.statusCode == 200 && response.data != null) {
+        setState(() {
+          _currentRate = (response.data['rate'] as num).toDouble();
+          _rateController.text = _currentRate!.toStringAsFixed(0);
+        });
+      }
+    } catch (_) {}
+  }
 
   void _onKeyPress(String val) {
     setState(() {
@@ -187,7 +207,21 @@ class _CreateTransactionScreenState extends ConsumerState<CreateTransactionScree
                   _buildTypeBtn('exchange', 'ALMAST'),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+
+              if (_currentRate != null) ...[
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: NeumorphicDecorations.sunken(radius: 8),
+                    child: Text(
+                      'Joriy Kurs: 1 USD = ${_currentRate!.toStringAsFixed(0)} so\'m',
+                      style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.success, fontSize: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
 
               // Screen showing Amount (Sunken)
               NeumorphicCard(

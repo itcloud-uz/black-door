@@ -81,6 +81,7 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')
     // Currency Rates Management
     Route::get('/currency-rates', [AdminCurrencyController::class, 'index'])->name('currency-rates');
     Route::post('/currency-rates', [AdminCurrencyController::class, 'store'])->name('currency-rates.store');
+    Route::get('/currency-rates/fetch-cbu', [AdminCurrencyController::class, 'fetchCbuRate'])->name('currency-rates.fetch-cbu');
     
     // Audit Log
     Route::get('/audit-log', [AdminAuditController::class, 'index'])->name('audit-log');
@@ -118,6 +119,9 @@ Route::middleware(['auth', 'role:super_admin,financier', 'finance.pin'])->prefix
     // System & Personal Settings (PIN-locked)
     Route::get('/settings', [\App\Http\Controllers\Finance\SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [\App\Http\Controllers\Finance\SettingController::class, 'update'])->name('settings.update');
+    
+    // Currency Rate Fetching
+    Route::get('/currency-rates/fetch-cbu', [\App\Http\Controllers\Admin\CurrencyController::class, 'fetchCbuRate'])->name('currency-rates.fetch-cbu');
 });
 
 // --- Operational (Manager / Employee) Routes ----------------------------------
@@ -139,4 +143,7 @@ Route::middleware(['auth', 'role:manager,employee'])->prefix('manager')->name('m
     Route::get('/warehouse', [ManagerWarehouseController::class, 'index'])->name('warehouse.index');
     Route::post('/warehouse/movement', [ManagerWarehouseController::class, 'movement'])->name('warehouse.movement');
     Route::post('/warehouse/check', [ManagerWarehouseController::class, 'check'])->name('warehouse.check');
+    
+    // Currency Rate Fetching
+    Route::get('/currency-rates/fetch-cbu', [\App\Http\Controllers\Admin\CurrencyController::class, 'fetchCbuRate'])->name('currency-rates.fetch-cbu');
 });

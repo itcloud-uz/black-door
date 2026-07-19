@@ -127,4 +127,49 @@ class ApiAuthTest extends TestCase
         $response->assertStatus(423);
         $response->assertJson(['locked' => true]);
     }
+
+    /**
+     * Test that transactions capture the current currency rate at the time of creation.
+     */
+    public function test_transaction_captures_exchange_rate(): void
+    {
+        $user = User::create([
+            'name' => 'Financier User',
+            'phone' => '+998901234568',
+            'email' => 'financier@test.com',
+            'password' => Hash::make('password123'),
+            'role' => UserRole::Financier,
+            'is_active' => true,
+        ]);
+
+        $account = \App\Models\CashAccount::create([
+            'name' => 'Kassa USD',
+            'type' => \App\Enums\CashAccountType::Cash,
+            'is_active' => true,
+        ]);
+
+        // Create currency rate
+        \App\Models\CurrencyRate::create([
+            'rate_uzs_per_usd' => 1250000,
+            'set_by' => $user->id,
+            'effective_date' => now()->toDateString(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $response = $this->postJson('/api/finance/transactions', [
+            'cash_account_id' => $account->id,
+            'type' => 'income',
+            'amount' => 100.00,
+            'currency' => 'USD',
+            'note' => 'Test',
+        ]);
+
+        $response->assertStatus(201);
+
+        // Fetch transaction and assert exchange_rate is saved correctly
+        $tx = \App\Models\Transaction::first();
+        $this->assertNotNull($tx);
+        $this->assertEquals(1250000, $tx->exchange_rate);
+    }
 }

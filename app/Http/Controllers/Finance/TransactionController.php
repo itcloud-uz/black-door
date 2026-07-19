@@ -48,12 +48,14 @@ class TransactionController extends Controller
         $cashAccounts = CashAccount::where('is_active', true)->orderBy('name')->get();
         $categories = TransactionCategory::orderBy('name')->get();
         $counterparties = Counterparty::orderBy('name')->get();
+        $currentRate = \App\Models\CurrencyRate::latest('effective_date')->latest('id')->first();
 
         return view('finance.transactions.index', compact(
             'transactions',
             'cashAccounts',
             'categories',
-            'counterparties'
+            'counterparties',
+            'currentRate'
         ));
     }
 
@@ -86,6 +88,9 @@ class TransactionController extends Controller
                         'currency' => $currencyVal,
                     ], ['balance' => 0]);
 
+                $latestRate = \App\Models\CurrencyRate::latest('effective_date')->latest('id')->first();
+                $rateTiyin = $latestRate ? $latestRate->rate_uzs_per_usd : null;
+
                 if ($type === 'income') {
                     $newBalance = $cashBalance->balance + $amountCents;
                     $cashBalance->balance = $newBalance;
@@ -102,6 +107,7 @@ class TransactionController extends Controller
                         'note' => $request->note,
                         'created_by' => Auth::id(),
                         'transaction_date' => now()->toDateString(),
+                        'exchange_rate' => $rateTiyin,
                     ]);
 
                     AuditLogger::log('create_transaction', $tx, null, $tx->toArray());
@@ -126,6 +132,7 @@ class TransactionController extends Controller
                         'note' => $request->note,
                         'created_by' => Auth::id(),
                         'transaction_date' => now()->toDateString(),
+                        'exchange_rate' => $rateTiyin,
                     ]);
 
                     AuditLogger::log('create_transaction', $tx, null, $tx->toArray());
@@ -168,6 +175,7 @@ class TransactionController extends Controller
                         'note' => $request->note ?? "O'tkazma: " . $destAccount->name,
                         'created_by' => Auth::id(),
                         'transaction_date' => now()->toDateString(),
+                        'exchange_rate' => $rateTiyin,
                     ]);
 
                     // Create transfer in transaction
@@ -181,6 +189,7 @@ class TransactionController extends Controller
                         'created_by' => Auth::id(),
                         'transaction_date' => now()->toDateString(),
                         'related_transaction_id' => $txOut->id,
+                        'exchange_rate' => $rateTiyin,
                     ]);
 
                     // Link outbound to inbound

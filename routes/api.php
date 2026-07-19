@@ -43,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Currency management
         Route::get('/currency-rates', [AdminController::class, 'getCurrencyRates']);
         Route::post('/currency-rates', [AdminController::class, 'storeCurrencyRate']);
+        Route::get('/currency-rates/fetch-cbu', [AdminController::class, 'fetchCbuRate']);
 
         // Audit log
         Route::get('/audit-logs', [AdminController::class, 'auditLogs']);
@@ -50,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // --- Financier (and Admin) Routes ---
     Route::middleware('role:super_admin,financier')->prefix('finance')->group(function () {
+        Route::get('/currency-rate', [FinanceController::class, 'getCurrentRate']);
         Route::get('/cash-accounts', [FinanceController::class, 'listCashAccounts']);
         
         Route::get('/counterparties', [FinanceController::class, 'listCounterparties']);

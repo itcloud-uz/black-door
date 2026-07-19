@@ -47,11 +47,16 @@
 
             <div class="form-group">
                 <label class="form-label" for="rate">Kurs (1 USD = ? so'm)</label>
-                <input type="number" id="rate" name="rate" class="skeuo-input"
-                       value="{{ old('rate') }}"
-                       placeholder="12500"
-                       step="1" min="1" required
-                       style="font-family: var(--font-mono); font-size: 1.25rem;">
+                <div style="display: flex; gap: 8px;">
+                    <input type="number" id="rate" name="rate" class="skeuo-input"
+                           value="{{ old('rate') }}"
+                           placeholder="12500"
+                           step="1" min="1" required
+                           style="font-family: var(--font-mono); font-size: 1.25rem; flex: 1;">
+                    <button type="button" id="btn-fetch-cbu" class="skeuo-btn" style="white-space: nowrap;">
+                        <i class="bi bi-bank"></i> MB Kursi
+                    </button>
+                </div>
                 @error('rate') <span class="form-error">{{ $message }}</span> @enderror
             </div>
 
@@ -107,5 +112,63 @@
         </table>
     </div>
 </div>
+
+<script>
+function fetchCbuRate(autofillIfEmpty = false) {
+    const btn = document.getElementById('btn-fetch-cbu');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Olinmoqda...';
+
+    fetch('{{ route("admin.currency-rates.fetch-cbu") }}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (autofillIfEmpty) {
+                    const rateInput = document.getElementById('rate');
+                    if (!rateInput.value) {
+                        rateInput.value = data.rate;
+                        document.getElementById('note').value = 'Markaziy bank kursi avtomatik yuklandi.';
+                    }
+                } else {
+                    document.getElementById('rate').value = data.rate;
+                    document.getElementById('note').value = 'Markaziy bank kursi avtomatik yuklandi.';
+                }
+                
+                // Show/Update live Central Bank rate badge
+                let badge = document.getElementById('cbu-live-badge');
+                if (!badge) {
+                    badge = document.createElement('div');
+                    badge.id = 'cbu-live-badge';
+                    badge.style.marginTop = '8px';
+                    badge.style.fontSize = '0.85rem';
+                    badge.style.color = 'var(--accent-green)';
+                    document.getElementById('rate').parentNode.parentNode.appendChild(badge);
+                }
+                badge.innerHTML = `<i class="bi bi-bank"></i> Markaziy bank joriy kursi: <strong class="mono-number" style="color: var(--text-primary); font-size: 0.95rem;">${data.rate} so'm</strong> <span style="font-size: 0.75rem; color: var(--text-secondary);">(Real vaqtda yuklandi)</span>`;
+            } else if (!autofillIfEmpty) {
+                alert(data.message || 'Xatolik yuz berdi.');
+            }
+        })
+        .catch(err => {
+            if (!autofillIfEmpty) {
+                alert('Markaziy bank kursini olishda tarmoq xatoligi yuz berdi.');
+            }
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        });
+}
+
+document.getElementById('btn-fetch-cbu').addEventListener('click', function() {
+    fetchCbuRate(false);
+});
+
+// Auto-fetch on load
+document.addEventListener('DOMContentLoaded', function() {
+    fetchCbuRate(true);
+});
+</script>
 
 @endsection

@@ -353,4 +353,19 @@ class AdminController extends Controller
         $logs = $query->orderByDesc('created_at')->paginate(50);
         return response()->json($logs);
     }
+
+    public function fetchCbuRate()
+    {
+        $rate = \App\Services\CbuCurrencyService::fetchCbuUsdRate();
+        if ($rate !== null) {
+            return response()->json([
+                'success' => true,
+                'rate' => $rate
+            ]);
+        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Markaziy bank kursini olib bo\'lmadi.'
+        ], 500);
+    }
 }
