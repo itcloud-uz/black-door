@@ -26,13 +26,23 @@ class Setting extends Model
      */
     public static function get(string $key, mixed $default = null): mixed
     {
-        $setting = Cache::remember(
-            "setting.{$key}",
-            now()->addHours(24),
-            fn () => static::where('key', $key)->first()
-        );
-
-        return $setting?->value ?? $default;
+        try {
+            $setting = Cache::remember(
+                "setting.{$key}",
+                now()->addHours(24),
+                fn () => static::where('key', $key)->first()
+            );
+            return $setting?->value ?? $default;
+        } catch (\Throwable $e) {
+            try {
+                // Fallback: Query database directly without cache
+                $setting = static::where('key', $key)->first();
+                return $setting?->value ?? $default;
+            } catch (\Throwable $ex) {
+                // Fallback 2: Return default value (e.g. before migrations run)
+                return $default;
+            }
+        }
     }
 
     /**
