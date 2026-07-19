@@ -1,37 +1,27 @@
-# Dashbordlarda "Chiqish" funksiyasini qo'shish va GitHubga yuklash rejasi
+# UI Xatoliklarini tuzatish va Brendingni yangilash rejasi
 
-Ushbu reja loyihaning barcha mobil panellariga tizimdan chiqish (logout) tugmasini qo'shish va barcha qilingan o'zgarishlarni GitHub serveriga yuborishni o'z ichiga oladi.
+Ushbu reja ekran ostidagi qizil xatolikni bartaraf etish va foydalanuvchi taqdim etgan yangi logoni tizimga integratsiya qilishni o'z ichiga oladi.
 
 ## Foydalanuvchi ko'rib chiqishi kerak bo'lgan bandlar
 
 > [!IMPORTANT]
-> GitHubga yuklash uchun amaldagi `main` branch ishlatiladi. Token allaqachon git remote URL'da mavjud.
+> `Null is not a subtype of BoxDecoration` xatosi Flutter'ning standart turlari va bizning custom inset-shadow turlarimiz o'rtasidagi ziddiyat tufayli yuzaga kelayotgan edi. Biz turlarni nomini o'zgartirish orqali buni to'liq hal qildik.
 
 ## Taklif etilayotgan o'zgarishlar
 
-### 1. Mobil ilova (Flutter)
-Barcha dashbordlarning `AppBar` qismiga `Icons.logout` tugmasi qo'shiladi:
-- **Admin Dashboard**: `mobile/lib/features/admin/admin_dashboard.dart`
-- **Finance Dashboard**: `mobile/lib/features/finance/finance_dashboard.dart`
-- **Manager Dashboard**: `mobile/lib/features/manager/manager_dashboard.dart`
-- *(Employee Dashboard'da allaqachon mavjud)*
+### 1. UI Xatoliklarini bartaraf etish
+- **Turlar ziddiyati**: Bizning custom `BoxDecoration` va `BoxShadow` turlarimiz endi `InsetBoxDecoration` va `InsetBoxShadow` deb nomlandi. Bu Flutter'ning standart turlari bilan adashib ketishning oldini oladi.
+- **Null safety**: `lerp` va `scale` metodlari null qiymatlarni xavfsiz qayta ishlash uchun yangilandi.
 
-Har bir faylda `_logout` metodi quyidagicha ishlaydi:
-```dart
-void _logout() {
-  ref.read(authProvider.notifier).logout();
-}
-```
+### 2. Brending (Logo) yangilash
+- **Yangi Logo**: Foydalanuvchi taqdim etgan rasm asosida (arch + keyhole) `NeumorphicLogo` widgeti yaratildi.
+- **Login va Profil**: Ilova logosi barcha asosiy ekranlarda yangisiga almashtirildi.
 
-### 2. GitHub integratsiyasi
-Barcha o'zgarishlar stage qilinadi, commit qilinadi va push qilinadi.
-- **Commit xabari:** `feat: add logout to all dashboards and fix build environment issues`
+### 3. GitHubga yuklash
+- Barcha tuzatishlar repozitoriyaga yuboriladi.
 
 ## Tekshirish rejasi
 
-### Avtomatlashtirilgan tekshiruvlar
-- Kodning sintaktik to'g'riligini tekshirish (`flutter analyze`).
-
 ### Qo'lda tekshirish
-- Emulatorda har bir rol bilan kirib, `Logout` tugmasi ishlayotganini va foydalanuvchini login ekraniga qaytarayotganini tekshirish.
-- GitHub'da repo yangilanganini tasdiqlash.
+- Emulatorda pastki menyularni (tabs) almashtirib ko'rish va qizil xatolik yo'qligiga ishonch hosil qilish.
+- Login ekranida yangi logoni tekshirish.
