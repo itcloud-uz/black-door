@@ -272,15 +272,59 @@ class NeumorphicLogo extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      padding: EdgeInsets.all(size * 0.15),
       decoration: NeumorphicDecorations.extruded(radius: size * 0.25),
-      child: Image.asset(
-        'assets/branding/mark.png',
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) => Icon(
-          Icons.door_back_door_outlined,
-          size: size * 0.5,
-          color: AppColors.success,
+      child: Center(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // The Arch (Inverted U)
+            Container(
+              width: size * 0.5,
+              height: size * 0.6,
+              decoration: InsetBoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(size * 0.25),
+                  topRight: Radius.circular(size * 0.25),
+                  bottomLeft: Radius.circular(size * 0.05),
+                  bottomRight: Radius.circular(size * 0.05),
+                ),
+                border: Border.all(color: Colors.white, width: 2),
+                boxShadow: [
+                  const InsetBoxShadow(color: AppColors.shadowDark, offset: Offset(4, 4), blurRadius: 8),
+                  const InsetBoxShadow(color: AppColors.shadowLight, offset: Offset(-4, -4), blurRadius: 8),
+                  // Green glow on top edge
+                  InsetBoxShadow(color: AppColors.success.withOpacity(0.5), offset: const Offset(0, -2), blurRadius: 4),
+                ],
+              ),
+            ),
+            // The Keyhole
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: size * 0.12,
+                  height: size * 0.12,
+                  decoration: BoxDecoration(
+                    color: AppColors.success.withOpacity(0.8),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(color: AppColors.success.withOpacity(0.5), blurRadius: 10, spreadRadius: 2),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: size * 0.08,
+                  height: size * 0.15,
+                  margin: const EdgeInsets.only(top: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.success.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(size * 0.02),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

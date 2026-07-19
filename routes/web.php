@@ -75,6 +75,10 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')
     
     // Audit Log
     Route::get('/audit-log', [AdminAuditController::class, 'index'])->name('audit-log');
+
+    // System Settings
+    Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 });
 
 // --- Finance (Qora Daftar) Routes ----------------------------------------------

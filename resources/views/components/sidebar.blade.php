@@ -13,8 +13,8 @@
     {{-- Brand --}}
     <div class="sidebar-brand">
         <img src="{{ asset('branding/mark.png') }}" alt="Black Door" style="width: 72px; height: 72px; margin-bottom: 8px; object-fit: contain; display: block; margin-left: auto; margin-right: auto;">
-        <h1>Black Door</h1>
-        <div class="brand-subtitle">Moliyaviy Boshqaruv</div>
+        <h1>{{ \App\Models\Setting::get('company_name', 'Black Door') }}</h1>
+        <div class="brand-subtitle">{{ \App\Models\Setting::get('company_tagline', 'Moliyaviy Boshqaruv') }}</div>
     </div>
 
     {{-- ═══════════════════════════════════════ --}}
@@ -52,6 +52,12 @@
                     <a href="{{ route('admin.audit-log') }}">
                         <span class="sidebar-icon"><i class="bi bi-journal-text"></i></span>
                         Audit jurnal
+                    </a>
+                </li>
+                <li class="sidebar-item {{ str_starts_with($currentRoute, 'admin.settings') ? 'active' : '' }}">
+                    <a href="{{ route('admin.settings.index') }}">
+                        <span class="sidebar-icon"><i class="bi bi-gear"></i></span>
+                        Sozlamalar
                     </a>
                 </li>
             </ul>

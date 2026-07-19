@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Black Door — Korxona moliyaviy boshqaruv tizimi">
+    <meta name="description" content="{{ \App\Models\Setting::get('company_name', 'Black Door') }} — Korxona moliyaviy boshqaruv tizimi">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Black Door')</title>
+    <title>@yield('title', \App\Models\Setting::get('company_name', 'Black Door'))</title>
 
     {{-- Google Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,6 +17,24 @@
 
     {{-- App CSS --}}
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+
+    {{-- Theme Accent Custom Override --}}
+    <style>
+        :root {
+            @php
+                $accent = \App\Models\Setting::get('accent_color', 'green');
+                if ($accent === 'blue') {
+                    echo '--accent-green: var(--accent-blue) !important; ';
+                    echo '--accent-green-start: var(--accent-blue-start) !important; ';
+                    echo '--accent-green-end: var(--accent-blue-end) !important; ';
+                } elseif ($accent === 'red') {
+                    echo '--accent-green: var(--accent-red) !important; ';
+                    echo '--accent-green-start: var(--accent-red-start) !important; ';
+                    echo '--accent-green-end: var(--accent-red-end) !important; ';
+                }
+            @endphp
+        }
+    </style>
 
     {{-- Favicons --}}
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">

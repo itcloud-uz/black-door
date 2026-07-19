@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Black Door — PIN Tasdiqlash</title>
+    <title>{{ \App\Models\Setting::get('company_name', 'Black Door') }} — PIN Tasdiqlash</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,6 +11,24 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+
+    {{-- Theme Accent Custom Override --}}
+    <style>
+        :root {
+            @php
+                $accent = \App\Models\Setting::get('accent_color', 'green');
+                if ($accent === 'blue') {
+                    echo '--accent-green: var(--accent-blue) !important; ';
+                    echo '--accent-green-start: var(--accent-blue-start) !important; ';
+                    echo '--accent-green-end: var(--accent-blue-end) !important; ';
+                } elseif ($accent === 'red') {
+                    echo '--accent-green: var(--accent-red) !important; ';
+                    echo '--accent-green-start: var(--accent-red-start) !important; ';
+                    echo '--accent-green-end: var(--accent-red-end) !important; ';
+                }
+            @endphp
+        }
+    </style>
 
     {{-- Favicons --}}
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
