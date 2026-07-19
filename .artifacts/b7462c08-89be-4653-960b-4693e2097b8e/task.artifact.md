@@ -1,5 +1,5 @@
-- [ ] Admin dashbordiga "Chiqish" tugmasini qo'shish
-- [ ] Finance dashbordiga "Chiqish" tugmasini qo'shish
-- [ ] Manager dashbordiga "Chiqish" tugmasini qo'shish
-- [ ] Barcha o'zgarishlarni GitHubga yuklash (push)
-- [ ] Ilovani emulatorda qayta ishga tushirish
+- [x] Admin dashbordiga "Chiqish" tugmasini qo'shish
+- [x] Finance dashbordiga "Chiqish" tugmasini qo'shish
+- [x] Manager dashbordiga "Chiqish" tugmasini qo'shish
+- [x] Barcha o'zgarishlarni GitHubga yuklash (push)
+- [x] Ilovani emulatorda qayta ishga tushirish
