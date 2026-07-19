@@ -65,10 +65,19 @@ class ManagerController extends Controller
             'usd' => 0,
             'uzs' => 0
         ];
+        $balancesDetailed = [];
 
         foreach ($cashAccounts as $acc) {
-            $balances['usd'] += $acc->getBalance(Currency::USD) / 100;
-            $balances['uzs'] += $acc->getBalance(Currency::UZS) / 100;
+            $usd = $acc->getBalance(Currency::USD) / 100;
+            $uzs = $acc->getBalance(Currency::UZS) / 100;
+            $balances['usd'] += $usd;
+            $balances['uzs'] += $uzs;
+            $balancesDetailed[] = [
+                'id' => $acc->id,
+                'name' => $acc->name,
+                'usd' => $usd,
+                'uzs' => $uzs
+            ];
         }
 
         $employeeCount = ObjectEmployee::where('object_id', $object->id)->where('is_active', true)->count();
@@ -98,6 +107,7 @@ class ManagerController extends Controller
                 'type' => $object->type->value,
             ],
             'balances' => $balances,
+            'balances_detailed' => $balancesDetailed,
             'employee_count' => $employeeCount,
             'stocks' => $stocks,
             'low_stock_warnings' => $lowStockWarnings
@@ -231,6 +241,94 @@ class ManagerController extends Controller
             'message' => 'Xodim holati o\'zgartirildi.',
             'employee' => $employee
         ]);
+    }
+
+    /**
+     * Pay Salary or Advance
+     */
+    public function paySalary(Request $request, ObjectEmployee $employee)
+    {
+        $object = $this->getObject();
+        if (!$object || $employee->object_id !== $object->id) {
+            return response()->json(['message' => 'Obyekt ruxsati yo\'q.'], 403);
+        }
+
+        $request->validate([
+            'object_cash_account_id' => 'required|exists:object_cash_accounts,id',
+            'type' => 'required|string|in:salary,advance',
+            'amount' => 'required|numeric|min:0.01',
+            'currency' => 'required|string|in:UZS,USD',
+            'period_start' => 'required|date',
+            'period_end' => 'required|date',
+            'note' => 'nullable|string',
+        ]);
+
+        $cashAccountId = (int)$request->object_cash_account_id;
+        $currencyVal = $request->currency;
+        $amountCents = (int)round((float)$request->amount * 100);
+
+        try {
+            DB::transaction(function () use ($request, $object, $employee, $cashAccountId, $currencyVal, $amountCents) {
+                $cashBalance = ObjectCashBalance::where('object_cash_account_id', $cashAccountId)
+                    ->where('currency', $currencyVal)
+                    ->first();
+
+                if (!$cashBalance || $cashBalance->balance < $amountCents) {
+                    throw new \Exception('Kassada yetarli mablag\' mavjud emas.');
+                }
+
+                $newBalance = $cashBalance->balance - $amountCents;
+                $cashBalance->balance = $newBalance;
+                $cashBalance->save();
+
+                $categoryName = $request->type === 'salary' ? 'Ish haqi' : 'Avans';
+                $category = ObjectTransactionCategory::where('name', $categoryName)
+                    ->where('type', 'expense')
+                    ->first();
+                if (!$category) {
+                    $category = ObjectTransactionCategory::create([
+                        'object_id' => $object->id,
+                        'name' => $categoryName,
+                        'type' => 'expense',
+                        'is_active' => true
+                    ]);
+                }
+
+                $tx = ObjectTransaction::create([
+                    'object_id' => $object->id,
+                    'object_cash_account_id' => $cashAccountId,
+                    'category_id' => $category->id,
+                    'counterparty_name' => $employee->user->name,
+                    'type' => TransactionType::Expense->value,
+                    'currency' => $currencyVal,
+                    'amount' => $amountCents,
+                    'balance_after' => $newBalance,
+                    'note' => $request->note ?? ($request->type === 'salary' ? 'Oylik to\'lovi' : 'Avans to\'lovi'),
+                    'created_by' => Auth::id(),
+                    'transaction_date' => now()->toDateString(),
+                ]);
+
+                $payment = SalaryPayment::create([
+                    'object_id' => $object->id,
+                    'employee_id' => $employee->id,
+                    'currency' => $currencyVal,
+                    'amount' => $amountCents,
+                    'period_start' => $request->period_start,
+                    'period_end' => $request->period_end,
+                    'note' => $request->note,
+                    'paid_at' => now(),
+                    'created_by' => Auth::id(),
+                ]);
+
+                AuditLogger::log('create_salary_payment', $payment, null, $payment->toArray());
+                AuditLogger::log('create_object_transaction', $tx, null, $tx->toArray());
+            });
+
+            return response()->json(['message' => 'To\'lov muvaffaqiyatli amalga oshirildi.']);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
     }
 
     /**

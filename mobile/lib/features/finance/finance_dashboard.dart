@@ -7,6 +7,7 @@ import '../../core/widgets/neumorphic_widgets.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/neumorphic_decorations.dart';
 import '../auth/profile_screen.dart';
+import 'counterparty_form_screen.dart';
 import 'create_transaction_screen.dart';
 
 class FinanceDashboard extends ConsumerStatefulWidget {
@@ -82,6 +83,17 @@ class _FinanceDashboardState extends ConsumerState<FinanceDashboard> {
     );
   }
 
+  void _openCounterpartyForm() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CounterpartyFormScreen(
+          onSuccess: _fetchFinanceData,
+        ),
+      ),
+    );
+  }
+
   void _openCreateTransaction() {
     Navigator.push(
       context,
@@ -96,6 +108,28 @@ class _FinanceDashboardState extends ConsumerState<FinanceDashboard> {
         ),
       ),
     );
+  }
+
+  void _stornoTransaction(Map<String, dynamic> tx) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Storno (Bekor qilish)'),
+        content: const Text('Haqiqatan ham ushbu tranzaksiyani bekor qilmoqchimisiz?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('YO\'Q')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('HA, BEKOR QIL')),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final client = ref.read(apiClientProvider);
+        await client.post('/finance/transactions/${tx['id']}/storno');
+        _fetchFinanceData();
+      } catch (_) {}
+    }
   }
 
   Widget _buildKassalarTab() {
@@ -256,6 +290,11 @@ class _FinanceDashboardState extends ConsumerState<FinanceDashboard> {
                     '$sign ${(tx['amount'] / 100).toStringAsFixed(2)}',
                     style: TextStyle(fontWeight: FontWeight.bold, color: amountColor),
                   ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(Icons.history, size: 18, color: AppColors.textMuted),
+                    onPressed: () => _stornoTransaction(tx),
+                  ),
                 ],
               ),
             ),
@@ -356,11 +395,11 @@ class _FinanceDashboardState extends ConsumerState<FinanceDashboard> {
           ),
         ],
       ),
-      floatingActionButton: _selectedIndex == 2
+      floatingActionButton: _selectedIndex == 1 || _selectedIndex == 2
           ? Padding(
               padding: const EdgeInsets.only(bottom: 12.0),
               child: NeumorphicButton(
-                onTap: _openCreateTransaction,
+                onTap: _selectedIndex == 1 ? _openCounterpartyForm : _openCreateTransaction,
                 isCircular: true,
                 gradientColors: AppColors.greenGradient,
                 padding: const EdgeInsets.all(20),

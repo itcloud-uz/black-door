@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
+import 'package:flutter/material.dart' hide InsetBoxDecoration, InsetBoxShadow;
 import '../../external/flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/network/providers.dart';
@@ -8,6 +8,8 @@ import '../../core/theme/neumorphic_decorations.dart';
 import '../auth/pin_screen.dart';
 import '../auth/profile_screen.dart';
 import '../finance/finance_dashboard.dart';
+import 'user_form_screen.dart';
+import 'object_form_screen.dart';
 import '../../models/models.dart';
 
 class AdminDashboard extends ConsumerStatefulWidget {
@@ -122,6 +124,95 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
     );
   }
 
+  void _openUserForm([Map<String, dynamic>? user]) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UserFormScreen(
+          user: user,
+          onSuccess: _fetchUsers,
+        ),
+      ),
+    );
+  }
+
+  void _openObjectForm([Map<String, dynamic>? object]) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ObjectFormScreen(
+          object: object,
+          onSuccess: _fetchObjects,
+        ),
+      ),
+    );
+  }
+
+  void _toggleUserActive(Map<String, dynamic> user) async {
+    try {
+      final client = ref.read(apiClientProvider);
+      final response = await client.post('/admin/users/${user['id']}/toggle');
+      if (response.statusCode == 200) {
+        _fetchUsers();
+      }
+    } catch (_) {}
+  }
+
+  void _updatePin() async {
+    final pinController = TextEditingController();
+    final pin = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Moliya PIN kodini yangilash'),
+        content: TextField(
+          controller: pinController,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(hintText: 'Yangi 4 xonali PIN'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('BEKOR')),
+          TextButton(onPressed: () => Navigator.pop(context, pinController.text), child: const Text('SAQLASH')),
+        ],
+      ),
+    );
+
+    if (pin != null && pin.length == 4) {
+      try {
+        final client = ref.read(apiClientProvider);
+        final user = ref.read(authProvider).user;
+        await client.put('/admin/users/${user!.id}', data: {'pin_code': pin, 'role': user.role.value, 'name': user.name, 'phone': user.phone});
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('PIN kod yangilandi')));
+      } catch (_) {}
+    }
+  }
+
+  void _updateCurrencyRate() async {
+    final rateController = TextEditingController();
+    final rate = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Valyuta kursini o\'rnatish'),
+        content: TextField(
+          controller: rateController,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(hintText: '1 USD = ? UZS'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('BEKOR')),
+          TextButton(onPressed: () => Navigator.pop(context, rateController.text), child: const Text('SAQLASH')),
+        ],
+      ),
+    );
+
+    if (rate != null && rate.isNotEmpty) {
+      try {
+        final client = ref.read(apiClientProvider);
+        await client.post('/admin/currency-rates', data: {'rate_uzs_per_usd': rate});
+        _fetchDashboardData();
+      } catch (_) {}
+    }
+  }
+
   void _navigateToFinance() {
     final pinState = ref.read(pinProvider);
     if (pinState.isVerified) {
@@ -156,7 +247,6 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
     final counts = _data['counts'] ?? {'objects': 0, 'users': 0};
     final currentRate = _data['current_rate'] ?? 0.0;
     final recentTx = (_data['recent_transactions'] as List?) ?? [];
-    final recentLogs = (_data['recent_audit_logs'] as List?) ?? [];
 
     return RefreshIndicator(
       onRefresh: _fetchDashboardData,
@@ -166,7 +256,6 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Row with balances
             Row(
               children: [
                 Expanded(
@@ -203,8 +292,6 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
               ],
             ),
             const SizedBox(height: 20),
-
-            // Navigation button to Finance module (Soft Coral accent)
             NeumorphicButton(
               onTap: _navigateToFinance,
               gradientColors: AppColors.blueGradient,
@@ -221,8 +308,6 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Statistics Counts
             Row(
               children: [
                 Expanded(
@@ -263,29 +348,28 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
               ],
             ),
             const SizedBox(height: 24),
-
-            // Current rate card
-            NeumorphicCard(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Joriy Kurs', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textMuted)),
-                      Text('1 USD = UZS', style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
-                    ],
-                  ),
-                  Text(
-                    '${currentRate.toStringAsFixed(0)} UZS',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
-                  ),
-                ],
+            GestureDetector(
+              onTap: _updateCurrencyRate,
+              child: NeumorphicCard(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Joriy Kurs', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textMuted)),
+                        Text('1 USD = UZS (O\'zgartirish uchun bosing)', style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                      ],
+                    ),
+                    Text(
+                      '${currentRate.toStringAsFixed(0)} UZS',
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 24),
-
-            // Recent Transactions
             const Text(
               'So\'nggi Tranzaksiyalar',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
@@ -345,38 +429,44 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
           final user = _users[index];
           return Padding(
             padding: const EdgeInsets.only(bottom: 12.0),
-            child: NeumorphicCard(
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: const InsetBoxDecoration(color: AppColors.surface, shape: BoxShape.circle),
-                    child: const Icon(Icons.person, color: AppColors.success),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(user['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
-                        Text('${user['role']} • ${user['phone']}', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
-                      ],
+            child: GestureDetector(
+              onTap: () => _openUserForm(user),
+              child: NeumorphicCard(
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: const InsetBoxDecoration(color: AppColors.surface, shape: BoxShape.circle),
+                      child: const Icon(Icons.person, color: AppColors.success),
                     ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: NeumorphicDecorations.sunken(radius: 6),
-                    child: Text(
-                      user['is_active'] ? 'FAOL' : 'NOFAOL',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: user['is_active'] ? AppColors.success : AppColors.danger,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(user['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
+                          Text('${user['role']} • ${user['phone']}', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                        ],
                       ),
                     ),
-                  ),
-                ],
+                    GestureDetector(
+                      onTap: () => _toggleUserActive(user),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: NeumorphicDecorations.sunken(radius: 6),
+                        child: Text(
+                          user['is_active'] ? 'FAOL' : 'NOFAOL',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: user['is_active'] ? AppColors.success : AppColors.danger,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -398,28 +488,31 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
           final obj = _objects[index];
           return Padding(
             padding: const EdgeInsets.only(bottom: 12.0),
-            child: NeumorphicCard(
-              child: Row(
-                children: [
-                  const Icon(Icons.business, color: AppColors.success),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+            child: GestureDetector(
+              onTap: () => _openObjectForm(obj),
+              child: NeumorphicCard(
+                child: Row(
+                  children: [
+                    const Icon(Icons.business, color: AppColors.success),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(obj['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
+                          Text(obj['type'].toString().toUpperCase(), style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(obj['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
-                        Text(obj['type'].toString().toUpperCase(), style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                        Text(obj['manager_name'] ?? 'Menejersiz', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        const Text('Menejer', style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
                       ],
                     ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(obj['manager_name'] ?? 'Menejersiz', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                      const Text('Menejer', style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );
@@ -441,7 +534,7 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
                   leading: const Icon(Icons.password, color: AppColors.textPrimary),
                   title: const Text('PIN kodni yangilash'),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {},
+                  onTap: _updatePin,
                 ),
                 const Divider(),
                 ListTile(
@@ -473,8 +566,6 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(authProvider).user;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.background,
@@ -503,6 +594,18 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
           ),
         ],
       ),
+      floatingActionButton: _selectedIndex == 1 || _selectedIndex == 2
+          ? Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
+              child: NeumorphicButton(
+                onTap: () => _selectedIndex == 1 ? _openUserForm() : _openObjectForm(),
+                isCircular: true,
+                gradientColors: AppColors.greenGradient,
+                padding: const EdgeInsets.all(20),
+                child: const Icon(Icons.add, color: Colors.white, size: 28),
+              ),
+            )
+          : null,
       bottomNavigationBar: Container(
         height: 80,
         decoration: const InsetBoxDecoration(

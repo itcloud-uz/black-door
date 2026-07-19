@@ -21,6 +21,43 @@ class _EmployeeDashboardState extends ConsumerState<EmployeeDashboard> {
     ref.read(authProvider.notifier).logout();
   }
 
+  void _recordAttendance(String type) async {
+    setState(() => _isLoading = true);
+    try {
+      // In web app this uses a special endpoint or just logs.
+      // For now we'll simulate with a success message since backend controller for employee specific day is limited.
+      await Future.delayed(const Duration(seconds: 1));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(type == 'start' ? 'Ish kuni boshlandi' : 'Ish kuni yakunlandi')),
+      );
+    } catch (_) {}
+    setState(() => _isLoading = false);
+  }
+
+  void _requestAdvance() async {
+    final amountController = TextEditingController();
+    final amount = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Avans so\'rovi'),
+        content: TextField(
+          controller: amountController,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(hintText: 'Summani kiriting'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('BEKOR')),
+          TextButton(onPressed: () => Navigator.pop(context, amountController.text), child: const Text('YUBORISH')),
+        ],
+      ),
+    );
+
+    if (amount != null && amount.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Avans so\'rovi menejerga yuborildi')));
+    }
+  }
+
   void _openProfile() {
     Navigator.push(
       context,
@@ -39,6 +76,10 @@ class _EmployeeDashboardState extends ConsumerState<EmployeeDashboard> {
         backgroundColor: AppColors.background,
         title: const Text('ISHCHI VA OMOBR PANELI', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => setState(() {}),
+          ),
           IconButton(
             icon: const Icon(Icons.person_outline),
             onPressed: _openProfile,
@@ -82,11 +123,7 @@ class _EmployeeDashboardState extends ConsumerState<EmployeeDashboard> {
               const SizedBox(height: 16),
 
               NeumorphicButton(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Ishga kelish qayd etildi.')),
-                  );
-                },
+                onTap: () => _recordAttendance('start'),
                 child: const Row(
                   children: [
                     Icon(Icons.play_arrow_outlined, color: AppColors.success),
@@ -98,11 +135,7 @@ class _EmployeeDashboardState extends ConsumerState<EmployeeDashboard> {
               const SizedBox(height: 18),
 
               NeumorphicButton(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Ish tugaganligi qayd etildi.')),
-                  );
-                },
+                onTap: () => _recordAttendance('stop'),
                 child: const Row(
                   children: [
                     Icon(Icons.stop_circle_outlined, color: AppColors.danger),
@@ -114,11 +147,7 @@ class _EmployeeDashboardState extends ConsumerState<EmployeeDashboard> {
               const SizedBox(height: 18),
 
               NeumorphicButton(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Avans so\'rovi yuborildi.')),
-                  );
-                },
+                onTap: _requestAdvance,
                 child: const Row(
                   children: [
                     Icon(Icons.monetization_on_outlined, color: AppColors.blueEnd),

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
+import 'package:flutter/material.dart' hide InsetBoxDecoration, InsetBoxShadow;
 import '../../external/flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/network/providers.dart';
@@ -6,6 +6,9 @@ import '../../core/widgets/neumorphic_widgets.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/neumorphic_decorations.dart';
 import '../auth/profile_screen.dart';
+import 'salary_payment_screen.dart';
+import 'warehouse_movement_screen.dart';
+import '../../models/models.dart';
 
 class ManagerDashboard extends ConsumerStatefulWidget {
   const ManagerDashboard({Key? key}) : super(key: key);
@@ -61,6 +64,35 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
     );
   }
 
+  void _paySalary(Map<String, dynamic> emp) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SalaryPaymentScreen(
+          employee: emp,
+          cashAccounts: _data['balances_detailed'] ?? [],
+          onSuccess: _fetchManagerData,
+        ),
+      ),
+    );
+  }
+
+  void _openWarehouseMovement() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => WarehouseMovementScreen(
+          products: _stocks,
+          onSuccess: _fetchManagerData,
+        ),
+      ),
+    );
+  }
+
+  void _openInventoryCheck() async {
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Inventarizatsiya funksiyasi Web App orqali tavsiya etiladi')));
+  }
+
   Widget _buildDashboardHome() {
     if (_isLoading) return const Center(child: CircularProgressIndicator(color: AppColors.success));
 
@@ -77,7 +109,6 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Object details card
             NeumorphicCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,8 +120,6 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Mini cash balances
             Row(
               children: [
                 Expanded(
@@ -127,8 +156,6 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
               ],
             ),
             const SizedBox(height: 24),
-
-            // Employee count
             NeumorphicCard(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -142,8 +169,6 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Low Stock Warnings
             if (lowStock.isNotEmpty) ...[
               const Text(
                 'Minimal Qoldiqdan Kamlar',
@@ -183,8 +208,6 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
                 ),
               ),
             const SizedBox(height: 24),
-
-            // Recent Transactions
             const Text(
               'So\'nggi Tranzaksiyalar',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
@@ -257,17 +280,27 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
                         Text(emp['phone'], style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
                     ],
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: NeumorphicDecorations.sunken(radius: 6),
-                    child: Text(
-                      emp['is_active'] ? 'FAOL' : 'NOFAOL',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: emp['is_active'] ? AppColors.success : AppColors.danger,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: NeumorphicDecorations.sunken(radius: 6),
+                        child: Text(
+                          emp['is_active'] ? 'FAOL' : 'NOFAOL',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: emp['is_active'] ? AppColors.success : AppColors.danger,
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 8),
+                      IconButton(
+                        icon: const Icon(Icons.payments_outlined, color: AppColors.blueEnd),
+                        onPressed: () => _paySalary(emp),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -281,44 +314,64 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
   Widget _buildOmborTab() {
     if (_isLoading) return const Center(child: CircularProgressIndicator(color: AppColors.success));
 
-    return RefreshIndicator(
-      onRefresh: _fetchManagerData,
-      child: ListView.builder(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
-        itemCount: _stocks.length,
-        itemBuilder: (context, index) {
-          final st = _stocks[index];
-          final product = st['product'] ?? {'name': 'Noma\'lum', 'unit': 'ta'};
-          final isLow = st['quantity'] < (product['min_limit'] ?? 0);
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: NeumorphicButton(
+            onTap: _openInventoryCheck,
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.inventory_outlined, size: 20, color: AppColors.blueEnd),
+                SizedBox(width: 12),
+                Text('INVENTARIZATSIYA (TEKSHIRUV)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+              ],
+            ),
+          ),
+        ),
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: _fetchManagerData,
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              itemCount: _stocks.length,
+              itemBuilder: (context, index) {
+                final st = _stocks[index];
+                final product = st['product'] ?? {'name': 'Noma\'lum', 'unit': 'ta'};
+                final isLow = st['quantity'] < (product['min_limit'] ?? 0);
 
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 12.0),
-            child: NeumorphicCard(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(product['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
-                      Text('Min limit: ${product['min_limit'] ?? 0} ${product['unit']}', style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
-                    ],
-                  ),
-                  Text(
-                    '${st['quantity']} ${product['unit']}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: isLow ? AppColors.danger : AppColors.textPrimary,
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: NeumorphicCard(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(product['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
+                            Text('Min limit: ${product['min_limit'] ?? 0} ${product['unit']}', style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                          ],
+                        ),
+                        Text(
+                          '${st['quantity']} ${product['unit']}',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: isLow ? AppColors.danger : AppColors.textPrimary,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                );
+              },
             ),
-          );
-        },
-      ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -329,9 +382,7 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           NeumorphicButton(
-            onTap: () {
-              ref.read(authProvider.notifier).logout();
-            },
+            onTap: _logout,
             gradientColors: AppColors.redGradient,
             child: const Center(
               child: Text(
@@ -375,6 +426,18 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
           ),
         ],
       ),
+      floatingActionButton: _selectedIndex == 2
+          ? Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
+              child: NeumorphicButton(
+                onTap: _openWarehouseMovement,
+                isCircular: true,
+                gradientColors: AppColors.greenGradient,
+                padding: const EdgeInsets.all(20),
+                child: const Icon(Icons.add, color: Colors.white, size: 28),
+              ),
+            )
+          : null,
       bottomNavigationBar: Container(
         height: 80,
         decoration: const InsetBoxDecoration(

@@ -76,6 +76,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/employees', [ManagerController::class, 'storeEmployee']);
         Route::put('/employees/{employee}', [ManagerController::class, 'updateEmployee']);
         Route::post('/employees/{employee}/toggle', [ManagerController::class, 'toggleActiveEmployee']);
+        Route::post('/employees/{employee}/pay', [ManagerController::class, 'paySalary']);
 
         // Object transaction management
         Route::get('/transactions', [ManagerController::class, 'listTransactions']);
