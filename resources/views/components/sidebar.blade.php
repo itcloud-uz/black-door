@@ -12,9 +12,7 @@
 <aside class="sidebar" :class="{ 'open': open }">
     {{-- Brand --}}
     <div class="sidebar-brand">
-        <div style="display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 14px; background: var(--surface); box-shadow: var(--shadow-pressed-sm); margin-bottom: 12px; overflow: hidden; padding: 4px;">
-            <img src="{{ asset('branding/mark.png') }}" alt="Black Door" style="width: 100%; height: 100%; object-fit: contain;">
-        </div>
+        <img src="{{ asset('branding/mark.png') }}" alt="Black Door" style="width: 72px; height: 72px; margin-bottom: 8px; object-fit: contain; display: block; margin-left: auto; margin-right: auto;">
         <h1>Black Door</h1>
         <div class="brand-subtitle">Moliyaviy Boshqaruv</div>
     </div>

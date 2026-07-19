@@ -148,9 +148,7 @@
 
             {{-- Header --}}
             <div class="pin-header" style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 24px;">
-                <div style="display: inline-flex; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-pressed-sm); margin-bottom: 16px; overflow: hidden; padding: 6px;">
-                    <img src="{{ asset('branding/mark.png') }}" alt="Black Door Mark" style="width: 100%; height: 100%; object-fit: contain;">
-                </div>
+                <img src="{{ asset('branding/mark.png') }}" alt="Black Door Mark" style="width: 80px; height: 80px; margin-bottom: 16px; object-fit: contain;">
                 <p class="pin-title" style="margin: 0; font-size: 0.95rem; color: var(--text-primary); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800;">PIN kodni kiriting</p>
             </div>
 
