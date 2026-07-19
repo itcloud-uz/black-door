@@ -19,8 +19,28 @@
             <i class="bi bi-palette-fill text-green"></i> Brending va Tizim Sozlamalari
         </h2>
         
-        <form method="POST" action="{{ route('admin.settings.update') }}">
+        <form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data">
             @csrf
+
+            <div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 20px;">
+                {{-- Current Logo Preview --}}
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <span class="form-label" style="margin-bottom: 8px; font-size: 0.8rem;">Joriy Logo</span>
+                    <div style="display: inline-flex; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 14px; background: var(--surface); box-shadow: var(--shadow-pressed-sm); overflow: hidden; padding: 4px;">
+                        <img src="{{ asset('branding/mark.png') }}?v={{ time() }}" alt="Current Logo" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                </div>
+
+                {{-- Upload File Input --}}
+                <div style="flex-grow: 1;">
+                    <label class="form-label" for="logo">Yangi logotip (PNG, JPG)</label>
+                    <input type="file" id="logo" name="logo" class="skeuo-input" accept="image/png, image/jpeg, image/jpg" style="padding: 8px 12px; height: auto;">
+                    <span style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; display: block; line-height: 1.3;">
+                        Tavsiya etiladi: shaffof fondagi kvadrat shaklidagi rasm.
+                    </span>
+                    @error('logo') <span class="form-error">{{ $message }}</span> @enderror
+                </div>
+            </div>
             
             <div class="form-group">
                 <label class="form-label" for="company_name">Kompaniya / Tizim nomi</label>

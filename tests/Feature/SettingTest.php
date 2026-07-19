@@ -136,4 +136,27 @@ class SettingTest extends TestCase
         $admin->refresh();
         $this->assertTrue($admin->hasValidPin('9999'));
     }
+
+    /**
+     * Admin can upload logo.
+     */
+    public function test_admin_can_upload_logo(): void
+    {
+        $admin = User::create([
+            'name' => 'Admin User',
+            'email' => 'admin@test.com',
+            'password' => Hash::make('password123'),
+            'role' => UserRole::SuperAdmin,
+            'is_active' => true,
+        ]);
+
+        \Illuminate\Support\Facades\Storage::fake('local');
+        $file = \Illuminate\Http\UploadedFile::fake()->image('logo.png', 512, 512);
+
+        $response = $this->actingAs($admin)->post('/admin/settings', [
+            'logo' => $file,
+        ]);
+
+        $response->assertRedirect();
+    }
 }

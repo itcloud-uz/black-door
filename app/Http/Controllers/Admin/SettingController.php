@@ -36,24 +36,77 @@ class SettingController extends Controller
     {
         $user = Auth::user();
 
-        // 1. Update Global Settings
-        if ($request->has('company_name')) {
+        // 1. Update Global Settings & Logo
+        if ($request->has('company_name') || $request->hasFile('logo')) {
             $request->validate([
-                'company_name' => 'required|string|max:50',
-                'company_tagline' => 'required|string|max:100',
-                'accent_color' => 'required|string|in:green,blue,red',
+                'company_name' => 'nullable|string|max:50',
+                'company_tagline' => 'nullable|string|max:100',
+                'accent_color' => 'nullable|string|in:green,blue,red',
+                'logo' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
             ]);
 
-            Setting::set('company_name', $request->input('company_name'));
-            Setting::set('company_tagline', $request->input('company_tagline'));
-            Setting::set('accent_color', $request->input('accent_color'));
+            if ($request->has('company_name')) {
+                Setting::set('company_name', $request->input('company_name'));
+                Setting::set('company_tagline', $request->input('company_tagline'));
+                Setting::set('accent_color', $request->input('accent_color'));
+            }
+
+            if ($request->hasFile('logo')) {
+                $file = $request->file('logo');
+                
+                $brandingPath = base_path('branding/mark.png');
+                $publicBrandingPath = public_path('branding/mark.png');
+                $mobileBrandingPath = base_path('mobile/assets/branding/mark.png');
+
+                // Ensure directories exist
+                if (!file_exists(dirname($brandingPath))) {
+                    mkdir(dirname($brandingPath), 0777, true);
+                }
+                if (!file_exists(dirname($publicBrandingPath))) {
+                    mkdir(dirname($publicBrandingPath), 0777, true);
+                }
+                if (!file_exists(dirname($mobileBrandingPath))) {
+                    mkdir(dirname($mobileBrandingPath), 0777, true);
+                }
+
+                // Save new logo mark to all three places
+                $file->move(dirname($brandingPath), basename($brandingPath));
+                copy($brandingPath, $publicBrandingPath);
+                copy($brandingPath, $mobileBrandingPath);
+
+                // Run compilation scripts
+                $faviconsScript = 'C:\Users\ITCloud\.gemini\antigravity\brain\77ffb933-087e-4693-9873-5fe5adbe620c/scratch/generate_favicons.php';
+                $androidScript = 'C:\Users\ITCloud\.gemini\antigravity\brain\77ffb933-087e-4693-9873-5fe5adbe620c/scratch/generate_android_branding.php';
+                $assemblerScript = 'C:\Users\ITCloud\.gemini\antigravity\brain\77ffb933-087e-4693-9873-5fe5adbe620c/scratch/assemble_logos.php';
+
+                if (file_exists($faviconsScript)) {
+                    shell_exec("php " . escapeshellarg($faviconsScript));
+                }
+                if (file_exists($androidScript)) {
+                    shell_exec("php " . escapeshellarg($androidScript));
+                }
+                if (file_exists($assemblerScript)) {
+                    shell_exec("php " . escapeshellarg($assemblerScript));
+                }
+                
+                // Copy assembled vertical/horizontal logos to public and mobile assets
+                if (file_exists(base_path('branding/logo_vertical.png'))) {
+                    copy(base_path('branding/logo_vertical.png'), public_path('branding/logo_vertical.png'));
+                    copy(base_path('branding/logo_vertical.png'), base_path('mobile/assets/branding/logo_vertical.png'));
+                }
+                if (file_exists(base_path('branding/logo_horizontal.png'))) {
+                    copy(base_path('branding/logo_horizontal.png'), public_path('branding/logo_horizontal.png'));
+                    copy(base_path('branding/logo_horizontal.png'), base_path('mobile/assets/branding/logo_horizontal.png'));
+                }
+            }
 
             AuditLogger::log('settings_global_update', $user, null, [
                 'company_name' => $request->input('company_name'),
                 'accent_color' => $request->input('accent_color'),
+                'logo_updated' => $request->hasFile('logo'),
             ]);
 
-            return back()->with('success', 'Global sozlamalar muvaffaqiyatli saqlandi!');
+            return back()->with('success', 'Global sozlamalar va yangi logotip muvaffaqiyatli saqlandi!');
         }
 
         // 2. Update Security (PIN or Password)
