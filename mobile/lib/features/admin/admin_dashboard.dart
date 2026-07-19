@@ -1,11 +1,14 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
+import '../../external/flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/network/providers.dart';
 import '../../core/widgets/neumorphic_widgets.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/neumorphic_decorations.dart';
 import '../auth/pin_screen.dart';
+import '../auth/profile_screen.dart';
 import '../finance/finance_dashboard.dart';
+import '../../models/models.dart';
 
 class AdminDashboard extends ConsumerStatefulWidget {
   const AdminDashboard({Key? key}) : super(key: key);
@@ -41,6 +44,13 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
 
   void _logout() {
     ref.read(authProvider.notifier).logout();
+  }
+
+  void _openProfile() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ProfileScreen()),
+    );
   }
 
   void _navigateToFinance() {
@@ -325,6 +335,10 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _fetchDashboardData,
+          ),
+          IconButton(
+            icon: const Icon(Icons.person_outline),
+            onPressed: _openProfile,
           ),
           IconButton(
             icon: const Icon(Icons.logout),

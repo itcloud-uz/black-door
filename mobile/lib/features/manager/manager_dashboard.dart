@@ -1,9 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
+import '../../external/flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/network/providers.dart';
 import '../../core/widgets/neumorphic_widgets.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/neumorphic_decorations.dart';
+import '../auth/profile_screen.dart';
 
 class ManagerDashboard extends ConsumerStatefulWidget {
   const ManagerDashboard({Key? key}) : super(key: key);
@@ -47,6 +49,13 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
 
   void _logout() {
     ref.read(authProvider.notifier).logout();
+  }
+
+  void _openProfile() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ProfileScreen()),
+    );
   }
 
   Widget _buildDashboardHome() {
@@ -309,6 +318,10 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _fetchManagerData,
+          ),
+          IconButton(
+            icon: const Icon(Icons.person_outline),
+            onPressed: _openProfile,
           ),
           IconButton(
             icon: const Icon(Icons.logout),
