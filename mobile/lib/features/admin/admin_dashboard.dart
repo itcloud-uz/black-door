@@ -10,6 +10,7 @@ import '../auth/profile_screen.dart';
 import '../finance/finance_dashboard.dart';
 import 'user_form_screen.dart';
 import 'object_form_screen.dart';
+import 'product_form_screen.dart';
 import '../../models/models.dart';
 
 class AdminDashboard extends ConsumerStatefulWidget {
@@ -25,6 +26,7 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
   Map<String, dynamic> _data = {};
   List<dynamic> _users = [];
   List<dynamic> _objects = [];
+  List<dynamic> _products = [];
 
   @override
   void initState() {
@@ -32,6 +34,7 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
     _fetchDashboardData();
     _fetchUsers();
     _fetchObjects();
+    _fetchProducts();
   }
 
   Future<void> _fetchDashboardData() async {
@@ -113,6 +116,18 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
     } catch (_) {}
   }
 
+  Future<void> _fetchProducts() async {
+    try {
+      final client = ref.read(apiClientProvider);
+      final response = await client.get('/admin/products');
+      if (response.statusCode == 200) {
+        setState(() {
+          _products = response.data ?? [];
+        });
+      }
+    } catch (_) {}
+  }
+
   void _logout() {
     ref.read(authProvider.notifier).logout();
   }
@@ -148,6 +163,18 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
     );
   }
 
+  void _openProductForm([Map<String, dynamic>? product]) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProductFormScreen(
+          product: product,
+          onSuccess: _fetchProducts,
+        ),
+      ),
+    );
+  }
+
   void _toggleUserActive(Map<String, dynamic> user) async {
     try {
       final client = ref.read(apiClientProvider);
@@ -156,6 +183,29 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
         _fetchUsers();
       }
     } catch (_) {}
+  }
+
+  void _deleteTransaction(Map<String, dynamic> tx) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('O\'chirish'),
+        content: const Text('Haqiqatan ham ushbu tranzaksiyani butunlay o\'chirmoqchimisiz? (Admin huquqi)'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('YO\'Q')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('HA, O\'CHIR')),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final client = ref.read(apiClientProvider);
+        await client.delete('/admin/transactions/${tx['id']}');
+        _fetchDashboardData();
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tranzaksiya o\'chirildi')));
+      } catch (_) {}
+    }
   }
 
   void _updatePin() async {
@@ -384,28 +434,31 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
                 final sign = isIncome ? '+' : '-';
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12.0),
-                  child: NeumorphicCard(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(tx['category'] ?? tx['type'], style: const TextStyle(fontWeight: FontWeight.bold)),
-                              Text(
-                                '${tx['cash_account'] ?? ''} • ${tx['created_at']}',
-                                style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
-                              ),
-                            ],
+                  child: GestureDetector(
+                    onLongPress: () => _deleteTransaction(tx),
+                    child: NeumorphicCard(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(tx['category'] ?? tx['type'], style: const TextStyle(fontWeight: FontWeight.bold)),
+                                Text(
+                                  '${tx['cash_account'] ?? ''} • ${tx['created_at']}',
+                                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        Text(
-                          '$sign ${tx['amount']} ${tx['currency']}',
-                          style: TextStyle(fontWeight: FontWeight.bold, color: amountColor),
-                        ),
-                      ],
+                          Text(
+                            '$sign ${tx['amount']} ${tx['currency']}',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: amountColor),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -521,6 +574,46 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
     );
   }
 
+  Widget _buildProductsList() {
+    if (_isLoading && _products.isEmpty) return const Center(child: CircularProgressIndicator(color: AppColors.success));
+
+    return RefreshIndicator(
+      onRefresh: _fetchProducts,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        itemCount: _products.length,
+        itemBuilder: (context, index) {
+          final prod = _products[index];
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
+            child: GestureDetector(
+              onTap: () => _openProductForm(prod),
+              child: NeumorphicCard(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(prod['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text('Birlik: ${prod['unit']}', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                      ],
+                    ),
+                    Text(
+                      'Min: ${prod['min_limit']}',
+                      style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.warning),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildSettings() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
@@ -576,7 +669,9 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
                   ? 'FOYDALANUVCHILAR'
                   : _selectedIndex == 2
                       ? 'OBYEKTLAR'
-                      : 'SOZLAMALAR',
+                      : _selectedIndex == 3
+                          ? 'MAHSULOTLAR'
+                          : 'SOZLAMALAR',
           style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5, fontSize: 18),
         ),
         actions: [
@@ -594,11 +689,15 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
           ),
         ],
       ),
-      floatingActionButton: _selectedIndex == 1 || _selectedIndex == 2
+      floatingActionButton: _selectedIndex >= 1 && _selectedIndex <= 3
           ? Padding(
               padding: const EdgeInsets.only(bottom: 12.0),
               child: NeumorphicButton(
-                onTap: () => _selectedIndex == 1 ? _openUserForm() : _openObjectForm(),
+                onTap: () {
+                  if (_selectedIndex == 1) _openUserForm();
+                  if (_selectedIndex == 2) _openObjectForm();
+                  if (_selectedIndex == 3) _openProductForm();
+                },
                 isCircular: true,
                 gradientColors: AppColors.greenGradient,
                 padding: const EdgeInsets.all(20),
@@ -620,7 +719,8 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
             _buildNavItem(0, Icons.dashboard_outlined, 'Bosh sahifa'),
             _buildNavItem(1, Icons.people_outline, 'Foydalanuvchilar'),
             _buildNavItem(2, Icons.business_outlined, 'Obyektlar'),
-            _buildNavItem(3, Icons.settings_outlined, 'Sozlamalar'),
+            _buildNavItem(3, Icons.inventory_2_outlined, 'Mahsulotlar'),
+            _buildNavItem(4, Icons.settings_outlined, 'Sozlamalar'),
           ],
         ),
       ),
@@ -630,6 +730,7 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
           _buildDashboardHome(),
           _buildUsersList(),
           _buildObjectsList(),
+          _buildProductsList(),
           _buildSettings(),
         ],
       ),

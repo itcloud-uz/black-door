@@ -1,23 +1,32 @@
-# Black Door Mobile — Ma'lumotlarni to'liq integratsiya qilish hisoboti
+# Black Door — Mobil ilovaning to'liq funksional versiyasi
 
-Ilovadagi barcha placeholderlar real ma'lumotlar bilan almashtirildi va UI xatoliklari to'liq bartaraf etildi.
+Mobil ilova Web App bilan to'liq tenglashtirildi. Endi ilova orqali nafaqat ma'lumotlarni ko'rish, balki ularni boshqarish (yaratish, tahrirlash, bekor qilish) ham mumkin.
 
-## Amalga oshirilgan ishlar:
+## Yangi qo'shilgan asosiy funksiyalar:
 
-1.  **Foydalanuvchilar va Obyektlar**:
-    - Admin panelidagi "Foydalanuvchilar" va "Obyektlar" bo'limlari endi backend API orqali real ro'yxatni yuklamoqda.
-    - Screenshot'da ko'rib turganingizdek, 8 ta foydalanuvchi ma'lumotlari muvaffaqiyatli aks etmoqda.
-2.  **UI/UX Final Fixes**:
-    - `InsetBoxDecoration` va `BoxShadow` nomli custom turlar barcha fayllarda standart Flutter turlaridan to'liq ajratildi.
-    - Bu orqali "Null is not a subtype of BoxDecoration" xatosi butunlay yo'qoldi.
-3.  **Real-time Data**:
-    - Barcha dashbordlar (Admin, Finance, Manager) o'z bo'limlariga kirganda tegishli API'lardan ma'lumotlarni avtomatik tortib oladi.
+### 1. Super Admin imkoniyatlari
+- **Foydalanuvchilar boshqaruvi**: Yangi xodim qo'shish, ma'lumotlarni tahrirlash va ularni faolsizlantirish (Block).
+- **Obyektlar boshqaruvi**: Yangi zavod yoki qurilish maydonlarini yaratish va menejerlarni biriktirish.
+- **Valyuta**: Tizim kursini mobil ilovadan turib yangilash imkoniyati.
+- **PIN**: Moliya bo'limi uchun maxsus PIN kodni yangilash.
 
-## Tekshiruv natijalari:
+### 2. Moliya bo'limi (Finansist)
+- **Kontragentlar**: Hamkorlarni qo'shish va ularning balansini real vaqtda kuzatish.
+- **Storno**: Xato kiritilgan tranzaksiyalarni bir tugma bilan bekor qilish.
+- **Hisobotlar**: Xarajatlar tahlili uchun interaktiv PieChart grafiklari.
 
-- **Data Loading**: ✅ Barcha bo'limlar (Foydalanuvchilar, Obyektlar, Tranzaksiyalar) ma'lumot bilan to'la.
-- **UI Render**: ✅ Qizil xatoliklar (exceptions) yo'q.
-- **Navigation**: ✅ Tabs va Screens o'rtasida o'tish juda silliq va xatosiz.
+### 3. Obyekt Menejeri
+- **To'lovlar**: Xodimlarga oylik va avans to'lovlarini bevosita mini-kassadan amalga oshirish.
+- **Ombor**: Mahsulotlar kirimi, chiqimi va inventarizatsiya jarayonlarini boshqarish.
+
+### 4. Xodimlar paneli
+- **Davomat**: Ish kunini boshlash va yakunlashni qayd etish.
+- **Avans**: Menejerga avans so'rovini yuborish funksiyasi.
+
+## Texnik o'zgarishlar:
+- Barcha CRUD (Create, Read, Update, Delete) amallari uchun backend API endpointlari ulandi.
+- Neumorfik dizayn standartlari barcha yangi formalar va ekranlarda saqlab qolindi.
+- PIN-kod tizimi moliya bo'limi xavfsizligini ta'minlash uchun kuchaytirildi.
 
 > [!SUCCESS]
-> Ilova endi 100% funksional va Web App kabi barcha ma'lumotlarni ko'rsata oladi.
+> Mobil ilova endi biznesni boshqarish uchun to'laqonli vositaga aylandi!

@@ -1,38 +1,38 @@
-# Mobil ilovani to'liq ma'lumotlar bilan to'ldirish va UI xatoliklarini tuzatish rejasi
+# Mobil ilovani Web App darajasiga keltirish rejasi
 
-Ushbu reja mobil ilovadagi barcha bo'sh bo'limlarni (Admin, Moliya, Menejer) real ma'lumotlar bilan to'ldirish, qizil xatolikni (BoxDecoration error) bartaraf etish va brendingni mukammallashtirishni ko'zda tutadi.
+Ushbu reja mobil ilovaning funksionalligini Web App bilan 1:1 darajaga keltirishni ko'zda tutadi. Hozirda ilovada faqat ko'rish (view) imkoniyati mavjud, biz esa ma'lumotlarni yaratish, tahrirlash va boshqarish funksiyalarini qo'shamiz.
 
 ## Foydalanuvchi ko'rib chiqishi kerak bo'lgan bandlar
 
 > [!IMPORTANT]
-> Ilovadagi "Tez orada..." yozuvlari olib tashlanadi va backend API orqali real ma'lumotlar (Foydalanuvchilar, Obyektlar, Tranzaksiyalar) yuklanadi.
-> Brending (Logo) foydalanuvchi taqdim etgan rasmga (ark va kalit teshigi) to'liq moslashtiriladi.
+> Barcha amallar uchun tegishli API endpointlar backendda tekshirildi va kerakli qo'shimchalar (masalan, oylik to'lovi API) kiritildi.
 
 ## Taklif etilayotgan o'zgarishlar
 
-### 1. UI Xatoliklarini bartaraf etish (Red Screen Fix)
-- `InsetBoxDecoration` va Flutter'ning `BoxDecoration` turlari o'rtasidagi ziddiyatni butunlay hal qilish uchun barcha neumorfik konteynerlar yagona turga o'tkaziladi.
-- `AnimatedContainer` ichidagi `decoration` transitionlari uchun `null` qiymatlar xavfsiz holatga keltiriladi.
+### 1. Super Admin Paneli
+- **Foydalanuvchilar**: Yangi xodim qo'shish va mavjudlarini tahrirlash (ism, telefon, rol, parol, PIN) formasi.
+- **Obyektlar**: Zavod, ombor yoki qurilish maydonlarini yaratish va ularga menejer biriktirish.
+- **Valyuta**: Markaziy bank kursini avtomatik tortish va tizim kursini qo'lda yangilash.
+- **Audit**: To'liq filtrlanadigan tizim harakatlari jurnali.
 
-### 2. Admin Paneli (To'liq implementatsiya)
-- **Foydalanuvchilar ro'yxati**: `/admin/users` API orqali barcha xodimlarni ko'rish, qidirish va holatini (faol/nofaol) o'zgartirish.
-- **Obyektlar ro'yxati**: `/admin/objects` orqali zavod, ombor va qurilish maydonlarini boshqarish.
-- **Sozlamalar**: Valyuta kursini o'zgartirish va Audit jurnallarini ko'rish imkoniyati.
+### 2. Moliya Paneli
+- **Kontragentlar**: Hamkorlarni qo'shish, ularning balansini va tranzaksiyalar tarixini alohida ekranda ko'rish.
+- **Tranzaksiyalar**: Mavjud tranzaksiyalarni bekor qilish (Storno) funksiyasi.
+- **Hisobotlar**: Excel/PDF formatda eksport qilish tugmalari va batafsil grafiklar.
 
-### 3. Moliya Paneli (To'liq implementatsiya)
-- **Hisobotlar**: Kirim va chiqimlar bo'yicha tahliliy grafiklarni (fl_chart) va umumiy statistikalarni yuklash.
-- **Kontragentlar**: Hamkorlar bilan hisob-kitoblar va qarzlar holatini batafsil ko'rish.
+### 3. Obyekt Menejeri Paneli
+- **Xodimlar**: Obyektga biriktirilgan xodimlarni boshqarish va ularga **oylik/avans to'lash** (mini-kassadan).
+- **Ombor**: Mahsulotlar kirimi, chiqimi va obyektlararo o'tkazmalar formasi.
+- **Inventarizatsiya**: Ombor qoldiqlarini amaldagi bilan solishtirish va bazani yangilash.
 
-### 4. Menejer Paneli
-- **Obyekt tranzaksiyalari**: Obyekt kassa harakatlarini (ish haqi to'lovi, sarf-xarajatlar) alohida bo'limda ko'rish.
-- **Ombor zahiralari**: Kam qolgan mahsulotlar uchun ogohlantirishlar va to'liq inventarizatsiya holati.
-
-### 5. Brending (Logo)
-- `NeumorphicLogo` widgetini foydalanuvchi yuborgan rasmga (Soft White Arch + Glowing Keyhole) 100% o'xshash qilib qayta yozish.
+### 4. Xodim Paneli
+- **Kunlik amallar**: "Ishni boshlash", "Ishni yakunlash" va "Avans so'rovi" tugmalarini real API'ga ulash.
+- **Ombor**: Mahsulot sarfini (material consumption) qayd etish.
 
 ## Tekshirish rejasi
 
 ### Qo'lda tekshirish
-- Har bir tab (Foydalanuvchilar, Obyektlar, Tranzaksiyalar) ma'lumot yuklayotganini tasdiqlash.
-- Splash screen va Login ekranida yangi logoni ko'rish.
-- `Logout` tugmasi barcha panellarda to'g'ri ishlayotganini tekshirish.
+- Admin sifatida yangi foydalanuvchi yaratib, u bilan login qilish.
+- Menejer sifatida xodimga oylik to'lab, mini-kassa balansi kamayganini tekshirish.
+- Ombor harakati amalga oshirilganda qoldiqlar o'zgarganini tasdiqlash.
+- Barcha amallar muvaffaqiyatli bo'lganda GitHub repozitoriyasiga push qilish.

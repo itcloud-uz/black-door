@@ -92,6 +92,34 @@ class _ObjectFormScreenState extends ConsumerState<ObjectFormScreen> {
     }
   }
 
+  Future<void> _delete() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('O\'chirish'),
+        content: const Text('Haqiqatan ham ushbu obyektni o\'chirmoqchimisiz?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('YO\'Q')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('HA, O\'CHIR')),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      setState(() => _isLoading = true);
+      try {
+        final client = ref.read(apiClientProvider);
+        await client.delete('/admin/objects/${widget.object!['id']}');
+        widget.onSuccess();
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Obyekt o\'chirildi')));
+      } catch (_) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('O\'chirishda xatolik')));
+      }
+      setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -193,6 +221,16 @@ class _ObjectFormScreenState extends ConsumerState<ObjectFormScreen> {
                     : const Text('SAQLASH', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
                 ),
               ),
+              if (widget.object != null) ...[
+                const SizedBox(height: 20),
+                NeumorphicButton(
+                  onTap: _isLoading ? null : _delete,
+                  gradientColors: AppColors.redGradient,
+                  child: const Center(
+                    child: Text('O\'CHIRISH', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                  ),
+                ),
+              ],
             ],
           ),
         ),

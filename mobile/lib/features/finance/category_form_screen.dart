@@ -6,40 +6,34 @@ import '../../core/widgets/neumorphic_widgets.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/neumorphic_decorations.dart';
 
-class CounterpartyFormScreen extends ConsumerStatefulWidget {
-  final Map<String, dynamic>? counterparty;
+class CategoryFormScreen extends ConsumerStatefulWidget {
+  final Map<String, dynamic>? category;
   final VoidCallback onSuccess;
 
-  const CounterpartyFormScreen({Key? key, this.counterparty, required this.onSuccess}) : super(key: key);
+  const CategoryFormScreen({Key? key, this.category, required this.onSuccess}) : super(key: key);
 
   @override
-  ConsumerState<CounterpartyFormScreen> createState() => _CounterpartyFormScreenState();
+  ConsumerState<CategoryFormScreen> createState() => _CategoryFormScreenState();
 }
 
-class _CounterpartyFormScreenState extends ConsumerState<CounterpartyFormScreen> {
+class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
-  late TextEditingController _phoneController;
-  late TextEditingController _noteController;
-  String _selectedCategory = 'supplier';
+  String _selectedType = 'expense';
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.counterparty?['name']);
-    _phoneController = TextEditingController(text: widget.counterparty?['phone']);
-    _noteController = TextEditingController(text: widget.counterparty?['note']);
-    if (widget.counterparty != null) {
-      _selectedCategory = widget.counterparty!['category'];
+    _nameController = TextEditingController(text: widget.category?['name']);
+    if (widget.category != null) {
+      _selectedType = widget.category!['type'];
     }
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _phoneController.dispose();
-    _noteController.dispose();
     super.dispose();
   }
 
@@ -50,20 +44,18 @@ class _CounterpartyFormScreenState extends ConsumerState<CounterpartyFormScreen>
         final client = ref.read(apiClientProvider);
         final data = {
           'name': _nameController.text,
-          'phone': _phoneController.text,
-          'note': _noteController.text,
-          'category': _selectedCategory,
+          'type': _selectedType,
         };
 
-        final response = widget.counterparty == null
-            ? await client.post('/finance/counterparties', data: data)
-            : await client.put('/finance/counterparties/${widget.counterparty!['id']}', data: data);
+        final response = widget.category == null
+            ? await client.post('/finance/categories', data: data)
+            : await client.put('/finance/categories/${widget.category!['id']}', data: data);
 
         if (response.statusCode == 200 || response.statusCode == 201) {
           widget.onSuccess();
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(widget.counterparty == null ? 'Kontragent yaratildi' : 'Yangilandi')),
+            SnackBar(content: Text(widget.category == null ? 'Kategoriya yaratildi' : 'Yangilandi')),
           );
         }
       } catch (_) {}
@@ -76,7 +68,7 @@ class _CounterpartyFormScreenState extends ConsumerState<CounterpartyFormScreen>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('O\'chirish'),
-        content: const Text('Haqiqatan ham ushbu kontragentni o\'chirmoqchimisiz?'),
+        content: const Text('Haqiqatan ham ushbu kategoriyani o\'chirmoqchimisiz?'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('YO\'Q')),
           TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('HA, O\'CHIR')),
@@ -88,13 +80,11 @@ class _CounterpartyFormScreenState extends ConsumerState<CounterpartyFormScreen>
       setState(() => _isLoading = true);
       try {
         final client = ref.read(apiClientProvider);
-        await client.delete('/finance/counterparties/${widget.counterparty!['id']}');
+        await client.delete('/finance/categories/${widget.category!['id']}');
         widget.onSuccess();
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Kontragent o\'chirildi')));
-      } catch (_) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('O\'chirishda xatolik')));
-      }
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Kategoriya o\'chirildi')));
+      } catch (_) {}
       setState(() => _isLoading = false);
     }
   }
@@ -105,7 +95,7 @@ class _CounterpartyFormScreenState extends ConsumerState<CounterpartyFormScreen>
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
-        title: const Text('YANGI KONTRAGENT'),
+        title: Text(widget.category == null ? 'YANGI KATEGORIYA' : 'TAHRIRLASH'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -115,15 +105,9 @@ class _CounterpartyFormScreenState extends ConsumerState<CounterpartyFormScreen>
             children: [
               NeumorphicTextField(
                 controller: _nameController,
-                labelText: 'Nomi / F.I.Sh',
-                hintText: 'Masalan: Akmal aka',
-                validator: (v) => v?.isEmpty ?? true ? 'Nomni kiriting' : null,
-              ),
-              const SizedBox(height: 20),
-              NeumorphicTextField(
-                controller: _phoneController,
-                labelText: 'Telefon',
-                hintText: '+99890...',
+                labelText: 'Nomi',
+                hintText: 'Masalan: Qurilish mollari',
+                validator: (v) => v?.isEmpty ?? true ? 'Majburiy' : null,
               ),
               const SizedBox(height: 20),
 
@@ -132,32 +116,24 @@ class _CounterpartyFormScreenState extends ConsumerState<CounterpartyFormScreen>
                 children: [
                   const Padding(
                     padding: EdgeInsets.only(left: 8, bottom: 8),
-                    child: Text('Toifa', style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: Text('Turi', style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: NeumorphicDecorations.sunken(radius: 14),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
-                        value: _selectedCategory,
+                        value: _selectedType,
                         isExpanded: true,
                         items: const [
-                          DropdownMenuItem(value: 'supplier', child: Text('Yetkazib beruvchi')),
-                          DropdownMenuItem(value: 'client', child: Text('Mijoz')),
-                          DropdownMenuItem(value: 'partner', child: Text('Hamkor')),
-                          DropdownMenuItem(value: 'other', child: Text('Boshqa')),
+                          DropdownMenuItem(value: 'income', child: Text('Kirim')),
+                          DropdownMenuItem(value: 'expense', child: Text('Chiqim')),
                         ],
-                        onChanged: (v) => setState(() => _selectedCategory = v!),
+                        onChanged: (v) => setState(() => _selectedType = v!),
                       ),
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 20),
-              NeumorphicTextField(
-                controller: _noteController,
-                labelText: 'Izoh',
-                hintText: 'Qo\'shimcha...',
               ),
               const SizedBox(height: 40),
 
@@ -170,7 +146,7 @@ class _CounterpartyFormScreenState extends ConsumerState<CounterpartyFormScreen>
                     : const Text('SAQLASH', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
                 ),
               ),
-              if (widget.counterparty != null) ...[
+              if (widget.category != null) ...[
                 const SizedBox(height: 20),
                 NeumorphicButton(
                   onTap: _isLoading ? null : _delete,

@@ -233,7 +233,9 @@ class ManagerController extends Controller
         $employee->update(['is_active' => !$employee->is_active]);
 
         // Toggle user as well
-        $employee->user->update(['is_active' => $employee->is_active]);
+        if ($employee->user) {
+            $employee->user->update(['is_active' => $employee->is_active]);
+        }
 
         AuditLogger::log('toggle_employee_active', $employee, $oldData, $employee->toArray());
 
@@ -241,6 +243,47 @@ class ManagerController extends Controller
             'message' => 'Xodim holati o\'zgartirildi.',
             'employee' => $employee
         ]);
+    }
+
+    public function destroyEmployee(ObjectEmployee $employee)
+    {
+        $oldData = $employee->toArray();
+        $user = $employee->user;
+
+        $employee->delete();
+        if ($user) {
+            $user->delete();
+        }
+
+        AuditLogger::log('delete_employee', $employee, $oldData, null);
+
+        return response()->json(['message' => 'Xodim muvaffaqiyatli o\'chirildi.']);
+    }
+
+    public function destroyMovement(WarehouseMovement $movement)
+    {
+        $oldData = $movement->toArray();
+
+        DB::transaction(function() use ($movement) {
+            $stock = WarehouseStock::where('object_id', $movement->object_id)
+                ->where('product_id', $movement->product_id)
+                ->first();
+
+            if ($stock) {
+                if ($movement->type->value === 'incoming') {
+                    $stock->quantity -= $movement->quantity;
+                } else {
+                    $stock->quantity += $movement->quantity;
+                }
+                $stock->save();
+            }
+
+            $movement->delete();
+        });
+
+        AuditLogger::log('delete_warehouse_movement', $movement, $oldData, null);
+
+        return response()->json(['message' => 'Ombor harakati o\'chirildi va qoldiq tiklandi.']);
     }
 
     /**

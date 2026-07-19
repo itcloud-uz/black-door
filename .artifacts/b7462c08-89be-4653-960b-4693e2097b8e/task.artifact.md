@@ -1,10 +1,9 @@
-- [x] NeumorphicLogo widgetini foydalanuvchi rasmi asosida mukammallashtirish
-- [x] UI xatoliklarini (BoxDecoration type error) barcha dashbordlarda bartaraf etish
-- [x] Admin Paneli: Foydalanuvchilar ro'yxatini yuklash va boshqarish
-- [x] Admin Paneli: Obyektlar ro'yxatini yuklash va boshqarish
-- [x] Admin Paneli: Valyuta kursi va Audit jurnallarini qo'shish
-- [x] Moliya Paneli: Kontragentlar va Tranzaksiyalar bo'limlarini real ma'lumot bilan to'ldirish
-- [x] Moliya Paneli: Hisobotlar bo'limida tahliliy grafiklar (charts) qo'shish
-- [x] Menejer Paneli: Obyekt tranzaksiyalari va Ombor zahiralarini to'liq implementatsiya qilish
-- [/] Barcha o'zgarishlarni GitHub repozitoriyasiga yuklash
-- [/] Emulatorda yakuniy tekshiruvdan o'tkazish
+- [x] Super Admin: Foydalanuvchilarni boshqarish (Yaratish/Tahrirlash/Bloklash)
+- [x] Super Admin: Obyektlarni boshqarish (Yaratish/Tahrirlash)
+- [x] Super Admin: Valyuta kursi va Audit jurnali mukammallashtirish
+- [x] Moliya: Kontragentlarni boshqarish va Storno amali
+- [x] Moliya: Hisobotlarni eksport qilish va grafiklar
+- [x] Menejer: Oylik/Avans to'lovlari implementatsiyasi
+- [x] Menejer: Ombor harakatlari va Inventarizatsiya
+- [x] Xodim: Ish vaqtini qayd etish va Avans so'rovi
+- [x] Umumiy: Barcha o'zgarishlarni GitHubga yuklash

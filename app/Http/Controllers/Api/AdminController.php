@@ -13,6 +13,7 @@ use App\Models\Transaction;
 use App\Models\CurrencyRate;
 use App\Models\AuditLog;
 use App\Models\ObjectManager;
+use App\Models\Product;
 use App\Enums\UserRole;
 use App\Enums\ObjectType;
 use App\Enums\Currency;
@@ -194,6 +195,20 @@ class AdminController extends Controller
         ]);
     }
 
+    public function destroyUser(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return response()->json(['message' => 'O\'zingizni o\'chira olmaysiz.'], 403);
+        }
+
+        $oldData = $user->toArray();
+        $user->delete();
+
+        AuditLogger::log('delete_user', $user, $oldData, null);
+
+        return response()->json(['message' => 'Foydalanuvchi muvaffaqiyatli o\'chirildi.']);
+    }
+
     /**
      * Objects Management
      */
@@ -291,6 +306,104 @@ class AdminController extends Controller
             'message' => 'Obyekt muvaffaqiyatli yangilandi.',
             'object' => $object
         ]);
+    }
+
+    public function destroyObject(Obj $object)
+    {
+        $oldData = $object->toArray();
+        $object->delete();
+
+        AuditLogger::log('delete_object', $object, $oldData, null);
+
+        return response()->json(['message' => 'Obyekt muvaffaqiyatli o\'chirildi.']);
+    }
+
+    /**
+     * Products Management
+     */
+    public function listProducts()
+    {
+        $products = Product::orderBy('name')->get();
+        return response()->json($products);
+    }
+
+    public function storeProduct(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'unit' => 'required|string',
+            'min_limit' => 'nullable|integer|min:0',
+        ]);
+
+        $product = Product::create($request->only(['name', 'unit', 'min_limit']) + ['is_active' => true]);
+
+        AuditLogger::log('create_product', $product, null, $product->toArray());
+
+        return response()->json([
+            'message' => 'Mahsulot muvaffaqiyatli yaratildi.',
+            'product' => $product
+        ], 201);
+    }
+
+    public function updateProduct(Request $request, Product $product)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'unit' => 'required|string',
+            'min_limit' => 'nullable|integer|min:0',
+            'is_active' => 'boolean',
+        ]);
+
+        $oldData = $product->toArray();
+        $product->update($request->only(['name', 'unit', 'min_limit', 'is_active']));
+
+        AuditLogger::log('update_product', $product, $oldData, $product->toArray());
+
+        return response()->json([
+            'message' => 'Mahsulot muvaffaqiyatli yangilandi.',
+            'product' => $product
+        ]);
+    }
+
+    public function destroyProduct(Product $product)
+    {
+        $oldData = $product->toArray();
+        $product->delete();
+
+        AuditLogger::log('delete_product', $product, $oldData, null);
+
+        return response()->json(['message' => 'Mahsulot muvaffaqiyatli o\'chirildi.']);
+    }
+
+    /**
+     * Dangerous: Hard Delete Transaction (Super Admin only)
+     */
+    public function destroyTransaction(Transaction $transaction)
+    {
+        $oldData = $transaction->toArray();
+
+        // Reverse balance before deleting
+        DB::transaction(function() use ($transaction, $oldData) {
+            $cashBalance = CashBalance::where('cash_account_id', $transaction->cash_account_id)
+                ->where('currency', $transaction->currency->value)
+                ->first();
+
+            if ($cashBalance) {
+                // If it was income, subtract. If expense, add back.
+                if ($transaction->type->value === 'income' || $transaction->type->value === 'transfer_in') {
+                    $cashBalance->balance -= $transaction->amount;
+                } else {
+                    $cashBalance->balance += $transaction->amount;
+                }
+                $cashBalance->save();
+            }
+
+            $transaction->delete();
+        });
+
+        AuditLogger::log('hard_delete_transaction', $transaction, $oldData, null);
+
+        return response()->json(['message' => 'Tranzaksiya butunlay o\'chirildi va balanslar tiklandi.']);
     }
 
     /**

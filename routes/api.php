@@ -33,12 +33,20 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/users', [AdminController::class, 'listUsers']);
         Route::post('/users', [AdminController::class, 'storeUser']);
         Route::put('/users/{user}', [AdminController::class, 'updateUser']);
+        Route::delete('/users/{user}', [AdminController::class, 'destroyUser']);
         Route::post('/users/{user}/toggle', [AdminController::class, 'toggleActiveUser']);
 
         // Object management
         Route::get('/objects', [AdminController::class, 'listObjects']);
         Route::post('/objects', [AdminController::class, 'storeObject']);
         Route::put('/objects/{object}', [AdminController::class, 'updateObject']);
+        Route::delete('/objects/{object}', [AdminController::class, 'destroyObject']);
+
+        // Product management
+        Route::get('/products', [AdminController::class, 'listProducts']);
+        Route::post('/products', [AdminController::class, 'storeProduct']);
+        Route::put('/products/{product}', [AdminController::class, 'updateProduct']);
+        Route::delete('/products/{product}', [AdminController::class, 'destroyProduct']);
 
         // Currency management
         Route::get('/currency-rates', [AdminController::class, 'getCurrencyRates']);
@@ -47,6 +55,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Audit log
         Route::get('/audit-logs', [AdminController::class, 'auditLogs']);
+
+        // Hard Delete Transaction
+        Route::delete('/transactions/{transaction}', [AdminController::class, 'destroyTransaction']);
     });
 
     // --- Financier (and Admin) Routes ---
@@ -56,10 +67,15 @@ Route::middleware('auth:sanctum')->group(function () {
         
         Route::get('/counterparties', [FinanceController::class, 'listCounterparties']);
         Route::post('/counterparties', [FinanceController::class, 'storeCounterparty']);
+        Route::put('/counterparties/{counterparty}', [FinanceController::class, 'updateCounterparty']);
+        Route::delete('/counterparties/{counterparty}', [FinanceController::class, 'destroyCounterparty']);
         Route::get('/counterparties/{counterparty}', [FinanceController::class, 'showCounterparty']);
 
         Route::get('/categories', [FinanceController::class, 'listCategories']);
-        
+        Route::post('/categories', [FinanceController::class, 'storeCategory']);
+        Route::put('/categories/{category}', [FinanceController::class, 'updateCategory']);
+        Route::delete('/categories/{category}', [FinanceController::class, 'destroyCategory']);
+
         Route::get('/transactions', [FinanceController::class, 'listTransactions']);
         Route::post('/transactions', [FinanceController::class, 'storeTransaction']);
         Route::post('/transactions/{transaction}/storno', [FinanceController::class, 'stornoTransaction']);
@@ -75,6 +91,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/employees', [ManagerController::class, 'listEmployees']);
         Route::post('/employees', [ManagerController::class, 'storeEmployee']);
         Route::put('/employees/{employee}', [ManagerController::class, 'updateEmployee']);
+        Route::delete('/employees/{employee}', [ManagerController::class, 'destroyEmployee']);
         Route::post('/employees/{employee}/toggle', [ManagerController::class, 'toggleActiveEmployee']);
         Route::post('/employees/{employee}/pay', [ManagerController::class, 'paySalary']);
 
@@ -85,6 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Warehouse stock & movements
         Route::get('/stocks', [ManagerController::class, 'listStocks']);
         Route::post('/movements', [ManagerController::class, 'storeMovement']);
+        Route::delete('/movements/{movement}', [ManagerController::class, 'destroyMovement']);
         Route::post('/inventory-check', [ManagerController::class, 'storeInventoryCheck']);
 
         // Daily summary

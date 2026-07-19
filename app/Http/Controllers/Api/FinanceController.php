@@ -120,6 +120,36 @@ class FinanceController extends Controller
         ], 201);
     }
 
+    public function updateCounterparty(Request $request, Counterparty $counterparty)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'nullable|string',
+            'note' => 'nullable|string',
+            'category' => 'required|string',
+        ]);
+
+        $oldData = $counterparty->toArray();
+        $counterparty->update($request->only(['name', 'phone', 'note', 'category']));
+
+        AuditLogger::log('update_counterparty', $counterparty, $oldData, $counterparty->toArray());
+
+        return response()->json([
+            'message' => 'Kontragent muvaffaqiyatli yangilandi.',
+            'counterparty' => $counterparty
+        ]);
+    }
+
+    public function destroyCounterparty(Counterparty $counterparty)
+    {
+        $oldData = $counterparty->toArray();
+        $counterparty->delete();
+
+        AuditLogger::log('delete_counterparty', $counterparty, $oldData, null);
+
+        return response()->json(['message' => 'Kontragent muvaffaqiyatli o\'chirildi.']);
+    }
+
     public function showCounterparty(Counterparty $counterparty)
     {
         $transactions = $counterparty->transactions()
@@ -152,12 +182,58 @@ class FinanceController extends Controller
     }
 
     /**
-     * Categories Tree
+     * Categories Management
      */
     public function listCategories()
     {
         $categories = TransactionCategory::with('children')->whereNull('parent_id')->get();
         return response()->json($categories);
+    }
+
+    public function storeCategory(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'type' => 'required|string|in:income,expense',
+            'parent_id' => 'nullable|exists:transaction_categories,id',
+        ]);
+
+        $category = TransactionCategory::create($request->only(['name', 'type', 'parent_id']));
+
+        AuditLogger::log('create_category', $category, null, $category->toArray());
+
+        return response()->json([
+            'message' => 'Kategoriya muvaffaqiyatli yaratildi.',
+            'category' => $category
+        ], 201);
+    }
+
+    public function updateCategory(Request $request, TransactionCategory $category)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'type' => 'required|string|in:income,expense',
+        ]);
+
+        $oldData = $category->toArray();
+        $category->update($request->only(['name', 'type']));
+
+        AuditLogger::log('update_category', $category, $oldData, $category->toArray());
+
+        return response()->json([
+            'message' => 'Kategoriya muvaffaqiyatli yangilandi.',
+            'category' => $category
+        ]);
+    }
+
+    public function destroyCategory(TransactionCategory $category)
+    {
+        $oldData = $category->toArray();
+        $category->delete();
+
+        AuditLogger::log('delete_category', $category, $oldData, null);
+
+        return response()->json(['message' => 'Kategoriya muvaffaqiyatli o\'chirildi.']);
     }
 
     /**

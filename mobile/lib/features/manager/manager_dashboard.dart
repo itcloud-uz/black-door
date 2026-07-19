@@ -8,6 +8,7 @@ import '../../core/theme/neumorphic_decorations.dart';
 import '../auth/profile_screen.dart';
 import 'salary_payment_screen.dart';
 import 'warehouse_movement_screen.dart';
+import 'employee_form_screen.dart';
 import '../../models/models.dart';
 
 class ManagerDashboard extends ConsumerStatefulWidget {
@@ -71,6 +72,18 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
         builder: (context) => SalaryPaymentScreen(
           employee: emp,
           cashAccounts: _data['balances_detailed'] ?? [],
+          onSuccess: _fetchManagerData,
+        ),
+      ),
+    );
+  }
+
+  void _openEmployeeForm([Map<String, dynamic>? emp]) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EmployeeFormScreen(
+          employee: emp,
           onSuccess: _fetchManagerData,
         ),
       ),
@@ -267,8 +280,10 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
           final emp = _employees[index];
           return Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
-            child: NeumorphicCard(
-              child: Row(
+            child: GestureDetector(
+              onTap: () => _openEmployeeForm(emp),
+              child: NeumorphicCard(
+                child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Column(
@@ -305,11 +320,12 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
                 ],
               ),
             ),
-          );
-        },
-      ),
-    );
-  }
+          ),
+        );
+      },
+    ),
+  );
+}
 
   Widget _buildOmborTab() {
     if (_isLoading) return const Center(child: CircularProgressIndicator(color: AppColors.success));
@@ -426,11 +442,11 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
           ),
         ],
       ),
-      floatingActionButton: _selectedIndex == 2
+      floatingActionButton: _selectedIndex == 1 || _selectedIndex == 2
           ? Padding(
               padding: const EdgeInsets.only(bottom: 12.0),
               child: NeumorphicButton(
-                onTap: _openWarehouseMovement,
+                onTap: _selectedIndex == 1 ? _openEmployeeForm : _openWarehouseMovement,
                 isCircular: true,
                 gradientColors: AppColors.greenGradient,
                 padding: const EdgeInsets.all(20),

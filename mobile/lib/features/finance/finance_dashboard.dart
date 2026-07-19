@@ -8,6 +8,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/theme/neumorphic_decorations.dart';
 import '../auth/profile_screen.dart';
 import 'counterparty_form_screen.dart';
+import 'category_form_screen.dart';
 import 'create_transaction_screen.dart';
 
 class FinanceDashboard extends ConsumerStatefulWidget {
@@ -83,11 +84,24 @@ class _FinanceDashboardState extends ConsumerState<FinanceDashboard> {
     );
   }
 
-  void _openCounterpartyForm() {
+  void _openCounterpartyForm([Map<String, dynamic>? cp]) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => CounterpartyFormScreen(
+          counterparty: cp,
+          onSuccess: _fetchFinanceData,
+        ),
+      ),
+    );
+  }
+
+  void _openCategoryForm([Map<String, dynamic>? cat]) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CategoryFormScreen(
+          category: cat,
           onSuccess: _fetchFinanceData,
         ),
       ),
@@ -217,8 +231,10 @@ class _FinanceDashboardState extends ConsumerState<FinanceDashboard> {
 
           return Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
-            child: NeumorphicCard(
-              child: Column(
+            child: GestureDetector(
+              onTap: () => _openCounterpartyForm(cp),
+              child: NeumorphicCard(
+                child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(cp['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
@@ -241,11 +257,12 @@ class _FinanceDashboardState extends ConsumerState<FinanceDashboard> {
                 ],
               ),
             ),
-          );
-        },
-      ),
-    );
-  }
+          ),
+        );
+      },
+    ),
+  );
+}
 
   Widget _buildTranzaksiyalarTab() {
     if (_isLoading) return const Center(child: CircularProgressIndicator(color: AppColors.success));
@@ -381,6 +398,10 @@ class _FinanceDashboardState extends ConsumerState<FinanceDashboard> {
           style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5, fontSize: 18),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.category_outlined),
+            onPressed: () => _openCategoryForm(),
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _fetchFinanceData,
