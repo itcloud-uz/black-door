@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
+import 'package:flutter/material.dart';
 import '../../external/flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/network/providers.dart';
@@ -175,8 +175,8 @@ class _PinScreenState extends ConsumerState<PinScreen> {
                             color: AppColors.surface,
                             shape: BoxShape.circle,
                             boxShadow: [
-                              BoxShadow(color: AppColors.shadowDark, offset: Offset(2, 2), blurRadius: 4, inset: true),
-                              BoxShadow(color: AppColors.shadowLight, offset: Offset(-2, -2), blurRadius: 4, inset: true),
+                              InsetBoxShadow(color: AppColors.shadowDark, offset: Offset(2, 2), blurRadius: 4, inset: true),
+                              InsetBoxShadow(color: AppColors.shadowLight, offset: Offset(-2, -2), blurRadius: 4, inset: true),
                             ],
                           ),
                   );

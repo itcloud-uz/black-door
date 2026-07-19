@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
+import 'package:flutter/material.dart';
 import '../../external/flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/network/providers.dart';
@@ -331,10 +331,10 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
       ),
       bottomNavigationBar: Container(
         height: 80,
-        decoration: const BoxDecoration(
+        decoration: const InsetBoxDecoration(
           color: AppColors.background,
           boxShadow: [
-            BoxShadow(color: AppColors.shadowDark, offset: Offset(0, -6), blurRadius: 10),
+            InsetBoxShadow(color: AppColors.shadowDark, offset: Offset(0, -6), blurRadius: 10),
           ],
         ),
         child: Row(
@@ -368,7 +368,7 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: isSelected
             ? NeumorphicDecorations.sunken(radius: 12)
-            : const BoxDecoration(),
+            : const InsetBoxDecoration(),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow, Card;
+import 'package:flutter/material.dart';
 import '../../external/flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import '../theme/app_theme.dart';
 import '../theme/neumorphic_decorations.dart';
@@ -81,7 +81,7 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
 
   @override
   Widget build(BuildContext context) {
-    BoxDecoration dec;
+    InsetBoxDecoration dec;
 
     if (widget.isCircular) {
       dec = NeumorphicDecorations.circular(color: widget.color, pressed: _isPressed);
@@ -258,6 +258,31 @@ class NeumorphicKeyboard extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+/// --- Neumorphic Logo (Arch with Keyhole) ---
+class NeumorphicLogo extends StatelessWidget {
+  final double size;
+  const NeumorphicLogo({Key? key, this.size = 100}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      padding: EdgeInsets.all(size * 0.15),
+      decoration: NeumorphicDecorations.extruded(radius: size * 0.25),
+      child: Image.asset(
+        'assets/branding/mark.png',
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) => Icon(
+          Icons.door_back_door_outlined,
+          size: size * 0.5,
+          color: AppColors.success,
+        ),
+      ),
     );
   }
 }

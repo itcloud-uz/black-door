@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
+import 'package:flutter/material.dart';
 import '../../external/flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/network/providers.dart';
@@ -54,32 +54,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Logo
-                  Center(
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      decoration: const BoxDecoration(
-                        color: AppColors.background,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.shadowDark,
-                            offset: Offset(8, 8),
-                            blurRadius: 16,
-                          ),
-                          BoxShadow(
-                            color: AppColors.shadowLight,
-                            offset: Offset(-8, -8),
-                            blurRadius: 16,
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.door_back_door_outlined,
-                        size: 48,
-                        color: AppColors.success,
-                      ),
-                    ),
+                  const Center(
+                    child: NeumorphicLogo(size: 120),
                   ),
                   const SizedBox(height: 32),
                   

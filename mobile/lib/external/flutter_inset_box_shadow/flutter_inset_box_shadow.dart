@@ -1,2 +1,2 @@
-export './src/box_shadow.dart' show BoxShadow;
-export './src/box_decoration.dart' show BoxDecoration;
+export './src/inset_box_shadow.dart' show InsetBoxShadow;
+export './src/inset_box_decoration.dart' show InsetBoxDecoration;

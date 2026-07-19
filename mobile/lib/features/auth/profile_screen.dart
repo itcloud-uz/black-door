@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
+import 'package:flutter/material.dart';
 import '../../external/flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/network/providers.dart';
@@ -32,21 +32,9 @@ class ProfileScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            // Profile Avatar/Icon
-            Center(
-              child: Container(
-                width: 120,
-                height: 120,
-                decoration: const BoxDecoration(
-                  color: AppColors.surface,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(color: AppColors.shadowDark, offset: Offset(8, 8), blurRadius: 16),
-                    BoxShadow(color: AppColors.shadowLight, offset: Offset(-8, -8), blurRadius: 16),
-                  ],
-                ),
-                child: const Icon(Icons.person_outline, size: 60, color: AppColors.success),
-              ),
+            // Profile Avatar/Logo
+            const Center(
+              child: NeumorphicLogo(size: 140),
             ),
             const SizedBox(height: 32),
 
