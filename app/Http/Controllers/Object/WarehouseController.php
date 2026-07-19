@@ -82,6 +82,8 @@ class WarehouseController extends Controller
 
         try {
             DB::transaction(function () use ($request, $object, $productId, $type, $qty) {
+                $product = Product::findOrFail($productId);
+
                 $stock = WarehouseStock::where('object_id', $object->id)
                     ->where('product_id', $productId)
                     ->firstOrCreate([
@@ -126,6 +128,20 @@ class WarehouseController extends Controller
                     ]);
 
                     AuditLogger::log('warehouse_outgoing', $mvt, null, $mvt->toArray());
+
+                    // Check for low stock alert
+                    if ($stock->quantity < ($product->min_stock_level ?? 0)) {
+                        try {
+                            broadcast(new \App\Events\LowStockWarning([
+                                'object_name' => $object->name,
+                                'product_name' => $product->name,
+                                'quantity' => $stock->quantity,
+                                'min_limit' => $product->min_stock_level
+                            ]))->toOthers();
+                        } catch (\Throwable $e) {
+                            // Ignore broadcast failures
+                        }
+                    }
 
                 } elseif ($type === 'transfer') {
                     $toObjectId = (int)$request->to_object_id;
@@ -185,6 +201,20 @@ class WarehouseController extends Controller
                         'source_movement' => $mvtOut->toArray(),
                         'destination_movement' => $mvtIn->toArray()
                     ]);
+
+                    // Check for low stock alert
+                    if ($stock->quantity < ($product->min_stock_level ?? 0)) {
+                        try {
+                            broadcast(new \App\Events\LowStockWarning([
+                                'object_name' => $object->name,
+                                'product_name' => $product->name,
+                                'quantity' => $stock->quantity,
+                                'min_limit' => $product->min_stock_level
+                            ]))->toOthers();
+                        } catch (\Throwable $e) {
+                            // Ignore broadcast failures
+                        }
+                    }
                 }
             });
 

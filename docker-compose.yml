@@ -108,6 +108,7 @@ services:
       REPORT_FILES_DIR: /app/generated_reports
     volumes:
       - ./services/reports:/app
+      - ./public/branding:/app/branding:ro
       - report-files:/app/generated_reports
     ports:
       - "8001:8001"

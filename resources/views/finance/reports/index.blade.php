@@ -80,6 +80,8 @@
                     <input type="hidden" name="start_date" value="{{ $startDate }}">
                     <input type="hidden" name="end_date" value="{{ $endDate }}">
                     <input type="hidden" name="cash_account_id" value="{{ $cashAccountId }}">
+                    <input type="hidden" name="category_id" value="{{ $categoryId }}">
+                    <input type="hidden" name="category_type" value="{{ request('category_type') }}">
                     <button type="submit" class="skeuo-btn skeuo-btn-sm" style="background: #217346; color: white;"><i class="bi bi-download"></i> Excel Yuklab olish</button>
                 </form>
                 <form method="POST" action="{{ route('finance.reports.export', 'pdf') }}" style="display: inline;">
@@ -88,6 +90,8 @@
                     <input type="hidden" name="start_date" value="{{ $startDate }}">
                     <input type="hidden" name="end_date" value="{{ $endDate }}">
                     <input type="hidden" name="cash_account_id" value="{{ $cashAccountId }}">
+                    <input type="hidden" name="category_id" value="{{ $categoryId }}">
+                    <input type="hidden" name="category_type" value="{{ request('category_type') }}">
                     <button type="submit" class="skeuo-btn skeuo-btn-sm" style="background: #d32f2f; color: white;"><i class="bi bi-download"></i> PDF Yuklab olish</button>
                 </form>
             </div>

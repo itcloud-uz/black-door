@@ -80,8 +80,11 @@ class PinController extends Controller
 
             AuditLogger::log('pin_lockout', $user);
 
-            // Here we can notify super admins if there is a notification mechanism
-            // For now, it's recorded in the audit log.
+            try {
+                broadcast(new \App\Events\PinLocked($user->id, 900))->toOthers();
+            } catch (\Throwable $e) {
+                // Ignore broadcast failures
+            }
             
             return redirect()->route('finance.pin')->withErrors([
                 'pin' => 'PIN 3 marta xato kiritildi. Moliya bo\'limi 15 daqiqaga qulflandi!'

@@ -211,7 +211,9 @@ class EmployeeController extends Controller
         $amountCents = (int)round((float)$request->amount * 100);
 
         try {
-            DB::transaction(function () use ($request, $object, $employee, $cashAccountId, $currencyVal, $amountCents) {
+            $tx = null;
+
+            DB::transaction(function () use ($request, $object, $employee, $cashAccountId, $currencyVal, $amountCents, &$tx) {
                 // 1. Get cash balance
                 $cashBalance = ObjectCashBalance::where('object_cash_account_id', $cashAccountId)
                     ->where('currency', $currencyVal)
@@ -271,6 +273,15 @@ class EmployeeController extends Controller
                 AuditLogger::log('create_salary_payment', $payment, null, $payment->toArray());
                 AuditLogger::log('create_object_transaction', $tx, null, $tx->toArray());
             });
+
+            // Broadcast created transaction
+            if ($tx) {
+                try {
+                    broadcast(new \App\Events\TransactionCreated($tx->toArray()))->toOthers();
+                } catch (\Throwable $e) {
+                    // Ignore broadcast failures
+                }
+            }
 
             return redirect()->route('manager.employees.index')->with('success', 'To\'lov muvaffaqiyatli amalga oshirildi.');
 

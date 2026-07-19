@@ -17,6 +17,7 @@ from reportlab.platypus import (
     Paragraph,
     Spacer,
     PageBreak,
+    Image,
 )
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
 
@@ -35,6 +36,18 @@ def _cents_to_display(value: int | None) -> str:
         return "0.00"
     amount = value / 100.0
     return f"{amount:,.2f}"
+
+
+def _get_logo_flowable(width_mm: float = 30.0, height_mm: float = 30.0) -> Image | None:
+    """Load the custom vertical logo or fallback vertical logo if it exists."""
+    for path in ["/app/branding/custom_logo_vertical.png", "/app/branding/logo_vertical.png"]:
+        if os.path.exists(path):
+            try:
+                # Returns the Image flowable
+                return Image(path, width=width_mm * mm, height=height_mm * mm)
+            except Exception as e:
+                print(f"Error loading logo {path}: {e}")
+    return None
 
 
 def _build_styles():
@@ -168,6 +181,12 @@ def generate_income_expense_pdf(report_data: dict) -> str:
     styles = _build_styles()
     elements = []
 
+    # ─── Logo ────────────────────────────────────────────────────────────
+    logo = _get_logo_flowable(35.0, 35.0)
+    if logo:
+        elements.append(logo)
+        elements.append(Spacer(1, 4 * mm))
+
     # ─── Title ───────────────────────────────────────────────────────────
     elements.append(Paragraph("Daromad va Xarajat Hisoboti", styles["BrandTitle"]))
     elements.append(Paragraph(f"Davr: {report_data.get('period', '')}", styles["BrandSubtitle"]))
@@ -255,6 +274,12 @@ def generate_generic_pdf(
 
     styles = _build_styles()
     elements = []
+
+    # ─── Logo ────────────────────────────────────────────────────────────
+    logo = _get_logo_flowable(35.0, 35.0)
+    if logo:
+        elements.append(logo)
+        elements.append(Spacer(1, 4 * mm))
 
     # ─── Title ───────────────────────────────────────────────────────────
     elements.append(Paragraph(title, styles["BrandTitle"]))

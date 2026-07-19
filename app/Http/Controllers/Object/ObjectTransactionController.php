@@ -100,7 +100,9 @@ class ObjectTransactionController extends Controller
         $cashAccountId = (int)$request->object_cash_account_id;
 
         try {
-            DB::transaction(function () use ($request, $object, $type, $currencyVal, $amountCents, $cashAccountId) {
+            $createdTransactions = [];
+
+            DB::transaction(function () use ($request, $object, $type, $currencyVal, $amountCents, $cashAccountId, &$createdTransactions) {
                 $cashBalance = ObjectCashBalance::where('object_cash_account_id', $cashAccountId)
                     ->where('currency', $currencyVal)
                     ->firstOrCreate([
@@ -127,6 +129,7 @@ class ObjectTransactionController extends Controller
                         'transaction_date' => now()->toDateString(),
                     ]);
 
+                    $createdTransactions[] = $tx;
                     AuditLogger::log('create_object_transaction', $tx, null, $tx->toArray());
 
                 } elseif ($type === 'expense') {
@@ -152,9 +155,19 @@ class ObjectTransactionController extends Controller
                         'transaction_date' => now()->toDateString(),
                     ]);
 
+                    $createdTransactions[] = $tx;
                     AuditLogger::log('create_object_transaction', $tx, null, $tx->toArray());
                 }
             });
+
+            // Broadcast created transactions
+            foreach ($createdTransactions as $tx) {
+                try {
+                    broadcast(new \App\Events\TransactionCreated($tx->toArray()))->toOthers();
+                } catch (\Throwable $e) {
+                    // Ignore broadcast failures
+                }
+            }
 
             return redirect()->route('manager.transactions.index')->with('success', 'Tranzaksiya muvaffaqiyatli saqlandi.');
 

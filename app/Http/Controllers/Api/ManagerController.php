@@ -311,7 +311,8 @@ class ManagerController extends Controller
         $amountCents = (int)round((float)$request->amount * 100);
 
         try {
-            DB::transaction(function () use ($request, $object, $employee, $cashAccountId, $currencyVal, $amountCents) {
+            $tx = null;
+            DB::transaction(function () use ($request, $object, $employee, $cashAccountId, $currencyVal, $amountCents, &$tx) {
                 $cashBalance = ObjectCashBalance::where('object_cash_account_id', $cashAccountId)
                     ->where('currency', $currencyVal)
                     ->first();
@@ -366,6 +367,15 @@ class ManagerController extends Controller
                 AuditLogger::log('create_salary_payment', $payment, null, $payment->toArray());
                 AuditLogger::log('create_object_transaction', $tx, null, $tx->toArray());
             });
+
+            // Broadcast created transaction
+            if ($tx) {
+                try {
+                    broadcast(new TransactionCreated($tx->toArray()))->toOthers();
+                } catch (\Throwable $e) {
+                    // Ignore broadcast failures
+                }
+            }
 
             return response()->json(['message' => 'To\'lov muvaffaqiyatli amalga oshirildi.']);
 
@@ -462,6 +472,15 @@ class ManagerController extends Controller
 
                 return $transaction;
             });
+
+            // Broadcast created transaction
+            if ($tx) {
+                try {
+                    broadcast(new TransactionCreated($tx->toArray()))->toOthers();
+                } catch (\Throwable $e) {
+                    // Ignore broadcast failures
+                }
+            }
 
             return response()->json([
                 'message' => 'Tranzaksiya muvaffaqiyatli qo\'shildi.',

@@ -284,6 +284,64 @@
         });
     </script>
 
+    {{-- Laravel Echo & Reverb WebSockets Integration --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pusher/8.3.0/pusher.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.16.0/dist/echo.iife.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                if (typeof Echo !== 'undefined') {
+                    window.Echo = new Echo({
+                        broadcaster: 'reverb',
+                        key: '{{ env('REVERB_APP_KEY', 'blackdoor-key') }}',
+                        wsHost: '{{ env('REVERB_HOST', '127.0.0.1') }}',
+                        wsPort: {{ env('REVERB_PORT', 8080) }},
+                        wssPort: {{ env('REVERB_PORT', 8080) }},
+                        forceTLS: {{ env('REVERB_SCHEME', 'http') === 'https' ? 'true' : 'false' }},
+                        enabledTransports: ['ws', 'wss'],
+                    });
+
+                    // Listen for new transactions
+                    window.Echo.channel('finance')
+                        .listen('.transaction.created', (e) => {
+                            console.log('Real-time transaction event:', e);
+                            const toast = document.querySelector('[x-data="notification"]');
+                            const amountVal = e.transaction ? (e.transaction.amount / 100).toLocaleString('uz-UZ', { minimumFractionDigits: 2 }) : '0.00';
+                            const currencyVal = e.transaction ? e.transaction.currency : '';
+                            const noteVal = e.transaction ? (e.transaction.note || '') : '';
+                            
+                            if (toast && toast.__x) {
+                                toast.__x.$data.success(`Yangi tranzaksiya: ${amountVal} ${currencyVal} ${noteVal ? '- ' + noteVal : ''}`);
+                            }
+                        });
+
+                    // Listen for low stock warnings
+                    window.Echo.channel('warehouse')
+                        .listen('.stock.low', (e) => {
+                            console.log('Real-time stock warning:', e);
+                            const toast = document.querySelector('[x-data="notification"]');
+                            const warning = e.warning || {};
+                            if (toast && toast.__x) {
+                                toast.__x.$data.warning(`Zaxira ogohlantirishi: ${warning.product_name || 'Mahsulot'} qoldig'i kam! (Joriy qoldiq: ${warning.quantity || 0})`);
+                            }
+                        });
+
+                    // Listen for security locks
+                    window.Echo.channel('security')
+                        .listen('.pin.locked', (e) => {
+                            console.log('Real-time PIN lock:', e);
+                            const toast = document.querySelector('[x-data="notification"]');
+                            if (toast && toast.__x) {
+                                toast.__x.$data.error(`Xavfsizlik: PIN bloklandi! Foydalanuvchi ID: ${e.userId}`);
+                            }
+                        });
+                }
+            } catch (err) {
+                console.error('Reverb client initialization failed:', err);
+            }
+        });
+    </script>
+
     @stack('scripts')
 </body>
 </html>

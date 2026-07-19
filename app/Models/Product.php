@@ -22,8 +22,16 @@ class Product extends Model
         'name',
         'unit',
         'min_stock_level',
+        'min_limit',
         'note',
         'is_active',
+    ];
+
+    /**
+     * @var list<string>
+     */
+    protected $appends = [
+        'min_limit',
     ];
 
     /**
@@ -56,5 +64,21 @@ class Product extends Model
     public function warehouseMovements(): HasMany
     {
         return $this->hasMany(WarehouseMovement::class, 'product_id');
+    }
+
+    /**
+     * Get the min_limit alias for min_stock_level.
+     */
+    public function getMinLimitAttribute(): int
+    {
+        return (int) $this->min_stock_level;
+    }
+
+    /**
+     * Set the min_limit alias for min_stock_level.
+     */
+    public function setMinLimitAttribute(mixed $value): void
+    {
+        $this->attributes['min_stock_level'] = $value;
     }
 }

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('object_managers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('object_id')->unique()->constrained('objects')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
             $table->timestamp('assigned_at');
             $table->timestamps();
         });

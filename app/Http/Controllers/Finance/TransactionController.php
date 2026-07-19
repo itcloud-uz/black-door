@@ -79,7 +79,9 @@ class TransactionController extends Controller
         $cashAccountId = (int)$request->cash_account_id;
 
         try {
-            DB::transaction(function () use ($request, $type, $amountCents, $currencyVal, $cashAccountId) {
+            $createdTransactions = [];
+
+            DB::transaction(function () use ($request, $type, $amountCents, $currencyVal, $cashAccountId, &$createdTransactions) {
                 $cashAccount = CashAccount::findOrFail($cashAccountId);
                 $cashBalance = CashBalance::where('cash_account_id', $cashAccountId)
                     ->where('currency', $currencyVal)
@@ -110,6 +112,7 @@ class TransactionController extends Controller
                         'exchange_rate' => $rateTiyin,
                     ]);
 
+                    $createdTransactions[] = $tx;
                     AuditLogger::log('create_transaction', $tx, null, $tx->toArray());
 
                 } elseif ($type === 'expense') {
@@ -135,6 +138,7 @@ class TransactionController extends Controller
                         'exchange_rate' => $rateTiyin,
                     ]);
 
+                    $createdTransactions[] = $tx;
                     AuditLogger::log('create_transaction', $tx, null, $tx->toArray());
 
                 } elseif ($type === 'transfer') {
@@ -196,12 +200,24 @@ class TransactionController extends Controller
                     $txOut->related_transaction_id = $txIn->id;
                     $txOut->save();
 
+                    $createdTransactions[] = $txOut;
+                    $createdTransactions[] = $txIn;
+
                     AuditLogger::log('create_transfer', $txOut, null, [
                         'source_transaction' => $txOut->toArray(),
                         'destination_transaction' => $txIn->toArray()
                     ]);
                 }
             });
+
+            // Broadcast created transactions
+            foreach ($createdTransactions as $tx) {
+                try {
+                    broadcast(new \App\Events\TransactionCreated($tx->toArray()))->toOthers();
+                } catch (\Throwable $e) {
+                    // Ignore broadcast failures
+                }
+            }
 
             return redirect()->route('finance.transactions.index')->with('success', 'Tranzaksiya muvaffaqiyatli saqlandi.');
 
