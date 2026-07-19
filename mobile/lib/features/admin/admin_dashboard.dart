@@ -21,11 +21,15 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
   int _selectedIndex = 0;
   bool _isLoading = false;
   Map<String, dynamic> _data = {};
+  List<dynamic> _users = [];
+  List<dynamic> _objects = [];
 
   @override
   void initState() {
     super.initState();
     _fetchDashboardData();
+    _fetchUsers();
+    _fetchObjects();
   }
 
   Future<void> _fetchDashboardData() async {
@@ -40,6 +44,71 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
       }
     } catch (_) {}
     setState(() => _isLoading = false);
+  }
+
+  void _showAuditLogs() async {
+    final client = ref.read(apiClientProvider);
+    final response = await client.get('/admin/audit-logs');
+    if (!mounted) return;
+
+    if (response.statusCode == 200) {
+      final logs = (response.data['data'] as List?) ?? [];
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: AppColors.background,
+        isScrollControlled: true,
+        builder: (context) => DraggableScrollableSheet(
+          initialChildSize: 0.8,
+          maxChildSize: 0.95,
+          minChildSize: 0.5,
+          expand: false,
+          builder: (context, scrollController) => Column(
+            children: [
+              const SizedBox(height: 20),
+              const Text('TIZIM AUDIT JURNALI', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+              const Divider(),
+              Expanded(
+                child: ListView.builder(
+                  controller: scrollController,
+                  itemCount: logs.length,
+                  itemBuilder: (context, index) {
+                    final log = logs[index];
+                    return ListTile(
+                      title: Text('${log['user']} - ${log['action']}'),
+                      subtitle: Text(log['created_at']),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _fetchUsers() async {
+    try {
+      final client = ref.read(apiClientProvider);
+      final response = await client.get('/admin/users');
+      if (response.statusCode == 200) {
+        setState(() {
+          _users = response.data['data'] ?? [];
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _fetchObjects() async {
+    try {
+      final client = ref.read(apiClientProvider);
+      final response = await client.get('/admin/objects');
+      if (response.statusCode == 200) {
+        setState(() {
+          _objects = response.data ?? [];
+        });
+      }
+    } catch (_) {}
   }
 
   void _logout() {
@@ -264,11 +333,99 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
   }
 
   Widget _buildUsersList() {
-    return const Center(child: Text('Foydalanuvchilar Ro\'yxati (Tez orada...)'));
+    if (_isLoading && _users.isEmpty) return const Center(child: CircularProgressIndicator(color: AppColors.success));
+
+    return RefreshIndicator(
+      onRefresh: _fetchUsers,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        itemCount: _users.length,
+        itemBuilder: (context, index) {
+          final user = _users[index];
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
+            child: NeumorphicCard(
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: const BoxDecoration(color: AppColors.surface, shape: BoxShape.circle),
+                    child: const Icon(Icons.person, color: AppColors.success),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(user['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text('${user['role']} • ${user['phone']}', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: NeumorphicDecorations.sunken(radius: 6),
+                    child: Text(
+                      user['is_active'] ? 'FAOL' : 'NOFAOL',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: user['is_active'] ? AppColors.success : AppColors.danger,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   Widget _buildObjectsList() {
-    return const Center(child: Text('Obyektlar Ro\'yxati (Tez orada...)'));
+    if (_isLoading && _objects.isEmpty) return const Center(child: CircularProgressIndicator(color: AppColors.success));
+
+    return RefreshIndicator(
+      onRefresh: _fetchObjects,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        itemCount: _objects.length,
+        itemBuilder: (context, index) {
+          final obj = _objects[index];
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
+            child: NeumorphicCard(
+              child: Row(
+                children: [
+                  const Icon(Icons.business, color: AppColors.success),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(obj['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text(obj['type'].toString().toUpperCase(), style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(obj['manager_name'] ?? 'Menejersiz', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      const Text('Menejer', style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   Widget _buildSettings() {
@@ -291,7 +448,7 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
                   leading: const Icon(Icons.history_toggle_off, color: AppColors.textPrimary),
                   title: const Text('Tizim Audit jurnali'),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {},
+                  onTap: _showAuditLogs,
                 ),
               ],
             ),

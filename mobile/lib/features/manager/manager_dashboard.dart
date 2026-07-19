@@ -20,6 +20,7 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
   Map<String, dynamic> _data = {};
   List<dynamic> _employees = [];
   List<dynamic> _stocks = [];
+  List<dynamic> _transactions = [];
 
   @override
   void initState() {
@@ -35,12 +36,14 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
       final dashRes = await client.get('/manager/dashboard');
       final empRes = await client.get('/manager/employees');
       final stockRes = await client.get('/manager/stocks');
+      final txRes = await client.get('/manager/transactions');
 
       if (mounted) {
         setState(() {
           _data = dashRes.data ?? {};
           _employees = empRes.data ?? [];
           _stocks = stockRes.data ?? [];
+          _transactions = txRes.data['data'] ?? [];
         });
       }
     } catch (_) {}
@@ -179,6 +182,49 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
                   child: Text('Ombor minimal qoldiqlari joyida.'),
                 ),
               ),
+            const SizedBox(height: 24),
+
+            // Recent Transactions
+            const Text(
+              'So\'nggi Tranzaksiyalar',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+            ),
+            const SizedBox(height: 12),
+            if (_transactions.isEmpty)
+              const NeumorphicCard(child: Center(child: Text('Tranzaksiyalar yo\'q')))
+            else
+              ..._transactions.take(5).map((tx) {
+                final isIncome = tx['type'] == 'income';
+                final amountColor = isIncome ? AppColors.success : AppColors.danger;
+                final sign = isIncome ? '+' : '-';
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: NeumorphicCard(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(tx['note'] ?? tx['type'].toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold)),
+                              Text(
+                                '${tx['currency']} • ${tx['transaction_date']}',
+                                style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          '$sign ${(tx['amount'] / 100).toStringAsFixed(2)}',
+                          style: TextStyle(fontWeight: FontWeight.bold, color: amountColor),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
           ],
         ),
       ),

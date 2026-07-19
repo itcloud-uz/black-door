@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 import '../../external/flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/network/providers.dart';
@@ -24,11 +25,13 @@ class _FinanceDashboardState extends ConsumerState<FinanceDashboard> {
   List<dynamic> _counterparties = [];
   List<dynamic> _transactions = [];
   List<dynamic> _categories = [];
+  Map<String, dynamic> _reportData = {};
 
   @override
   void initState() {
     super.initState();
     _fetchFinanceData();
+    _fetchReportData();
   }
 
   Future<void> _fetchFinanceData() async {
@@ -51,6 +54,21 @@ class _FinanceDashboardState extends ConsumerState<FinanceDashboard> {
       }
     } catch (_) {}
     setState(() => _isLoading = false);
+  }
+
+  Future<void> _fetchReportData() async {
+    try {
+      final client = ref.read(apiClientProvider);
+      final response = await client.get('/finance/reports', queryParameters: {
+        'type': 'category_breakdown',
+        'category_type': 'expense',
+      });
+      if (response.statusCode == 200) {
+        setState(() {
+          _reportData = response.data;
+        });
+      }
+    } catch (_) {}
   }
 
   void _logout() {
@@ -237,7 +255,58 @@ class _FinanceDashboardState extends ConsumerState<FinanceDashboard> {
   }
 
   Widget _buildReportsTab() {
-    return const Center(child: Text('Moliyaviy Hisobotlar (Tez orada...)'));
+    if (_reportData.isEmpty) return const Center(child: CircularProgressIndicator(color: AppColors.success));
+
+    final categories = (_reportData['categories'] as List?) ?? [];
+    final totalUsd = _reportData['grand_total_usd'] ?? 0.0;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text('XARAJATLAR TAHLILI (USD)', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+          const SizedBox(height: 24),
+
+          if (categories.isEmpty)
+            const NeumorphicCard(child: Center(child: Text('Ma\'lumotlar mavjud emas')))
+          else ...[
+            SizedBox(
+              height: 200,
+              child: PieChart(
+                PieChartData(
+                  sections: categories.map((cat) {
+                    final index = categories.indexOf(cat);
+                    final colors = [AppColors.success, AppColors.blueEnd, AppColors.warning, AppColors.danger, Colors.purple, Colors.orange];
+                    return PieChartSectionData(
+                      color: colors[index % colors.length],
+                      value: (cat['total_usd'] as num).toDouble(),
+                      title: '${cat['percentage_usd']}%',
+                      radius: 50,
+                      titleStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+            const SizedBox(height: 32),
+            ...categories.map((cat) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
+                child: Row(
+                  children: [
+                    Container(width: 12, height: 12, decoration: BoxDecoration(color: [AppColors.success, AppColors.blueEnd, AppColors.warning, AppColors.danger, Colors.purple, Colors.orange][categories.indexOf(cat) % 6], shape: BoxShape.circle)),
+                    const SizedBox(width: 12),
+                    Expanded(child: Text(cat['category'], style: const TextStyle(fontWeight: FontWeight.w600))),
+                    Text('\$ ${cat['total_usd'].toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              );
+            }).toList(),
+          ],
+        ],
+      ),
+    );
   }
 
   @override
