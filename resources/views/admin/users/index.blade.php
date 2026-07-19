@@ -69,12 +69,32 @@
                             </span>
                         </td>
                         <td>
-                            <div class="d-flex gap-xs">
-                                <a href="#" class="skeuo-btn skeuo-btn-sm" title="Tahrirlash"><i class="bi bi-pencil"></i></a>
-                                @if($user->is_active)
-                                    <button class="skeuo-btn skeuo-btn-sm skeuo-btn-danger" title="O'chirish"><i class="bi bi-slash-circle"></i></button>
-                                @else
-                                    <button class="skeuo-btn skeuo-btn-sm skeuo-btn-success" title="Faollashtirish">✅</button>
+                            <div class="d-flex gap-xs" style="align-items: center;">
+                                <a href="{{ route('admin.users.edit', $user->id) }}" class="skeuo-btn skeuo-btn-sm" title="Tahrirlash"><i class="bi bi-pencil"></i></a>
+                                
+                                {{-- Active/Inactive status toggle --}}
+                                <form method="POST" action="{{ route('admin.users.toggle-active', $user->id) }}" style="display: inline;" onsubmit="return confirm('Foydalanuvchi holatini o\'zgartirishni tasdiqlaysizmi?');">
+                                    @csrf
+                                    @if($user->is_active)
+                                        <button type="submit" class="skeuo-btn skeuo-btn-sm skeuo-btn-danger" title="Faolsizlantirish" style="border: none; cursor: pointer;">
+                                            <i class="bi bi-slash-circle"></i>
+                                        </button>
+                                    @else
+                                        <button type="submit" class="skeuo-btn skeuo-btn-sm skeuo-btn-success" title="Faollashtirish" style="border: none; cursor: pointer;">
+                                            ✅
+                                        </button>
+                                    @endif
+                                </form>
+
+                                {{-- Delete User (Cannot delete self) --}}
+                                @if($user->id !== auth()->id())
+                                    <form method="POST" action="{{ route('admin.users.destroy', $user->id) }}" style="display: inline;" onsubmit="return confirm('Foydalanuvchini tizimdan o\'chirishni tasdiqlaysizmi? Ushbu amal ortga qaytmaydi!');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="skeuo-btn skeuo-btn-sm skeuo-btn-red" title="O'chirish" style="border: none; cursor: pointer; background: var(--accent-red); color: white;">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
                                 @endif
                             </div>
                         </td>

@@ -309,11 +309,11 @@ class NeumorphicLogo extends StatelessWidget {
                     Container(
                       width: size * 0.12,
                       height: size * 0.12,
-                      decoration: BoxDecoration(
+                      decoration: InsetBoxDecoration(
                         color: AppColors.success.withOpacity(0.9),
                         shape: BoxShape.circle,
                         boxShadow: [
-                          BoxShadow(
+                          InsetBoxShadow(
                             color: AppColors.success.withOpacity(0.6),
                             blurRadius: 12,
                             spreadRadius: 2,
@@ -325,11 +325,11 @@ class NeumorphicLogo extends StatelessWidget {
                       width: size * 0.08,
                       height: size * 0.15,
                       margin: const EdgeInsets.only(top: 1),
-                      decoration: BoxDecoration(
+                      decoration: InsetBoxDecoration(
                         color: AppColors.success.withOpacity(0.9),
                         borderRadius: BorderRadius.circular(size * 0.02),
                         boxShadow: [
-                          BoxShadow(
+                          InsetBoxShadow(
                             color: AppColors.success.withOpacity(0.4),
                             blurRadius: 8,
                           ),

@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:local_auth/local_auth.dart';
+import '../../external/flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 
 class BiometricsHelper {
   static final LocalAuthentication _auth = LocalAuthentication();
@@ -70,16 +71,16 @@ class _PrivacyShieldState extends State<PrivacyShield> with WidgetsBindingObserv
               children: [
                 Container(
                   padding: const EdgeInsets.all(24),
-                  decoration: const BoxDecoration(
+                  decoration: const InsetBoxDecoration(
                     color: Color(0xFFEEF2F7),
                     shape: BoxShape.circle,
                     boxShadow: [
-                      BoxShadow(
+                      InsetBoxShadow(
                         color: Color(0xFFC9D2DE),
                         offset: Offset(6, 6),
                         blurRadius: 12,
                       ),
-                      BoxShadow(
+                      InsetBoxShadow(
                         color: Color(0xFFFFFFFF),
                         offset: Offset(-6, -6),
                         blurRadius: 12,

@@ -10,7 +10,7 @@ class NeumorphicDecorations {
     return InsetBoxDecoration(
       color: color,
       borderRadius: BorderRadius.circular(radius),
-      boxShadow: const [
+      boxShadow: [
         InsetBoxShadow(
           color: AppColors.shadowDark,
           offset: Offset(6, 6),
@@ -32,7 +32,7 @@ class NeumorphicDecorations {
     return InsetBoxDecoration(
       color: color,
       borderRadius: BorderRadius.circular(radius),
-      boxShadow: const [
+      boxShadow: [
         InsetBoxShadow(
           color: AppColors.shadowDark,
           offset: Offset(4, 4),

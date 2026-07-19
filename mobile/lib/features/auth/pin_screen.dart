@@ -122,12 +122,12 @@ class _PinScreenState extends ConsumerState<PinScreen> {
             Center(
               child: Container(
                 padding: const EdgeInsets.all(24),
-                decoration: const BoxDecoration(
+                decoration: const InsetBoxDecoration(
                   color: AppColors.surface,
                   shape: BoxShape.circle,
                   boxShadow: [
-                    BoxShadow(color: AppColors.shadowDark, offset: Offset(6, 6), blurRadius: 12),
-                    BoxShadow(color: AppColors.shadowLight, offset: Offset(-6, -6), blurRadius: 12),
+                    InsetBoxShadow(color: AppColors.shadowDark, offset: Offset(6, 6), blurRadius: 12),
+                    InsetBoxShadow(color: AppColors.shadowLight, offset: Offset(-6, -6), blurRadius: 12),
                   ],
                 ),
                 child: Icon(
@@ -164,14 +164,14 @@ class _PinScreenState extends ConsumerState<PinScreen> {
                     width: 20,
                     height: 20,
                     decoration: filled
-                        ? const BoxDecoration(
+                        ? const InsetBoxDecoration(
                             gradient: LinearGradient(colors: AppColors.greenGradient),
                             shape: BoxShape.circle,
                             boxShadow: [
-                              BoxShadow(color: AppColors.shadowDark, offset: Offset(2, 2), blurRadius: 4),
+                              InsetBoxShadow(color: AppColors.shadowDark, offset: Offset(2, 2), blurRadius: 4),
                             ],
                           )
-                        : const BoxDecoration(
+                        : const InsetBoxDecoration(
                             color: AppColors.surface,
                             shape: BoxShape.circle,
                             boxShadow: [
