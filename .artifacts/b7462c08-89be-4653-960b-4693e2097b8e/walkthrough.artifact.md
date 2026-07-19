@@ -1,24 +1,24 @@
-# Black Door Mobile — Chiqish funksiyasi va GitHubga yuklash hisoboti
+# Black Door Mobile — Profil Sozlamalari va UI Fix Hisoboti
 
-Barcha dashbordlarga tizimdan chiqish funksiyasi qo'shildi va barcha o'zgarishlar GitHub repozitoriyasiga muvaffaqiyatli yuklandi.
+Barcha dashbordlarga Profil sozlamalari va Chiqish tugmalari muvaffaqiyatli qo'shildi. UI xatoliklari (red screen) to'liq bartaraf etildi.
 
 ## Amalga oshirilgan ishlar:
 
-1.  **Logout funksiyasi**:
-    - `AdminDashboard`, `FinanceDashboard` va `ManagerDashboard` AppBar qismiga chiqish (Logout) tugmasi qo'shildi.
-    - Tugma bosilganda foydalanuvchi tizimdan chiqariladi va Login ekraniga qaytariladi.
-2.  **Git/GitHub**:
-    - Mobil ilova kodi (`mobile/lib`, `mobile/pubspec.yaml`, `android/` sozlamalari) stage qilindi.
-    - Keraksiz kesh va build fayllari `.gitignore` orqali chetlashtirildi.
-    - Barcha o'zgarishlar GitHub'ga `feat: add logout to all dashboards and fix build environment issues` xabari bilan push qilindi.
-3.  **Ilovani qayta ishga tushirish**:
-    - Ilova emulatorda yangilangan funksiyalar bilan qayta ishga tushirildi.
+1.  **Profil Sozlamalari**:
+    - Yangi `ProfileScreen` yaratildi (F.I.Sh, Telefon, Email va Rol ma'lumotlari bilan).
+    - Barcha dashbordlarning `AppBar` qismiga Profil (person icon) va Chiqish (logout icon) tugmalari qo'shildi.
+2.  **UI/UX Tuzatishlari**:
+    - `BoxDecoration` va `BoxShadow` turlari o'rtasidagi ziddiyat (custom vs material) bartaraf etildi.
+    - Bu orqali "red screen" (exception) va noto'g'ri render xatoliklari hal qilindi.
+3.  **GitHub integratsiyasi**:
+    - Yangi fayllar va tuzatishlar GitHub'ga yuklandi.
+    - **Commit:** `fix: resolve BoxDecoration type conflict and add Profile settings to all dashboards`
 
 ## Tekshiruv natijalari:
 
-- **Logout**: ✅ Barcha rollar uchun ishlamoqda.
-- **GitHub**: ✅ Repozitoriya muvaffaqiyatli yangilandi.
-- **App Status**: ✅ Ilova barqaror ishlamoqda.
+- **Profil Ekran**: ✅ User ma'lumotlari to'g'ri ko'rinmoqda.
+- **Logout**: ✅ Dashbord va Profil ekranidan chiqish muvaffaqiyatli.
+- **UI Render**: ✅ Hech qanday "overflow" yoki "type error" yo'q.
 
 > [!TIP]
-> GitHub repozitoriyasi: `https://github.com/itcloud-uz/black-door.git`
+> Profilga kirish uchun yuqoridagi odamcha ikonasini bosing.

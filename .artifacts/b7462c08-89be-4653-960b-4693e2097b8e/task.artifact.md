@@ -1,5 +1,8 @@
-- [x] Admin dashbordiga "Chiqish" tugmasini qo'shish
-- [x] Finance dashbordiga "Chiqish" tugmasini qo'shish
-- [x] Manager dashbordiga "Chiqish" tugmasini qo'shish
+- [x] Admin dashbordiga "Chiqish" va "Profil" tugmalarini qo'shish
+- [x] Finance dashbordiga "Chiqish" va "Profil" tugmalarini qo'shish
+- [x] Manager dashbordiga "Chiqish" va "Profil" tugmalarini qo'shish
+- [x] Employee dashbordiga "Profil" tugmasini qo'shish
+- [x] Yangi "Profil Sozlamalari" ekranini yaratish
+- [x] BoxDecoration type conflict (red screen) muammosini hal qilish
 - [x] Barcha o'zgarishlarni GitHubga yuklash (push)
-- [x] Ilovani emulatorda qayta ishga tushirish
+- [x] Ilovani emulatorda qayta ishga tushirish va tekshirish
