@@ -75,10 +75,6 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')
     
     // Audit Log
     Route::get('/audit-log', [AdminAuditController::class, 'index'])->name('audit-log');
-
-    // System Settings
-    Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
-    Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 });
 
 // --- Finance (Qora Daftar) Routes ----------------------------------------------
@@ -109,6 +105,10 @@ Route::middleware(['auth', 'role:super_admin,financier', 'finance.pin'])->prefix
     // Reports
     Route::get('/reports', [FinanceReportController::class, 'index'])->name('reports.index');
     Route::post('/reports/export/{format}', [FinanceReportController::class, 'export'])->name('reports.export');
+
+    // System & Personal Settings (PIN-locked)
+    Route::get('/settings', [\App\Http\Controllers\Finance\SettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [\App\Http\Controllers\Finance\SettingController::class, 'update'])->name('settings.update');
 });
 
 // --- Operational (Manager / Employee) Routes ----------------------------------

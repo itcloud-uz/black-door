@@ -274,57 +274,73 @@ class NeumorphicLogo extends StatelessWidget {
       height: size,
       decoration: NeumorphicDecorations.extruded(radius: size * 0.25),
       child: Center(
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // The Arch (Inverted U)
-            Container(
-              width: size * 0.5,
-              height: size * 0.6,
-              decoration: InsetBoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(size * 0.25),
-                  topRight: Radius.circular(size * 0.25),
-                  bottomLeft: Radius.circular(size * 0.05),
-                  bottomRight: Radius.circular(size * 0.05),
-                ),
-                border: Border.all(color: Colors.white, width: 2),
-                boxShadow: [
-                  const InsetBoxShadow(color: AppColors.shadowDark, offset: Offset(4, 4), blurRadius: 8),
-                  const InsetBoxShadow(color: AppColors.shadowLight, offset: Offset(-4, -4), blurRadius: 8),
-                  // Green glow on top edge
-                  InsetBoxShadow(color: AppColors.success.withOpacity(0.5), offset: const Offset(0, -2), blurRadius: 4),
-                ],
-              ),
+        child: Container(
+          width: size * 0.55,
+          height: size * 0.65,
+          decoration: InsetBoxDecoration(
+            color: const Color(0xFFF0F3F8),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(size * 0.3),
+              topRight: Radius.circular(size * 0.3),
+              bottomLeft: Radius.circular(size * 0.08),
+              bottomRight: Radius.circular(size * 0.08),
             ),
-            // The Keyhole
-            Column(
-              mainAxisSize: MainAxisSize.min,
+            boxShadow: [
+              const InsetBoxShadow(
+                color: Color(0xFFC9D2DE),
+                offset: Offset(4, 4),
+                blurRadius: 8,
+              ),
+              const InsetBoxShadow(
+                color: Colors.white,
+                offset: Offset(-4, -4),
+                blurRadius: 8,
+              ),
+            ],
+          ),
+          child: Center(
+            child: Stack(
+              alignment: Alignment.center,
               children: [
-                Container(
-                  width: size * 0.12,
-                  height: size * 0.12,
-                  decoration: BoxDecoration(
-                    color: AppColors.success.withOpacity(0.8),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(color: AppColors.success.withOpacity(0.5), blurRadius: 10, spreadRadius: 2),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: size * 0.08,
-                  height: size * 0.15,
-                  margin: const EdgeInsets.only(top: 2),
-                  decoration: BoxDecoration(
-                    color: AppColors.success.withOpacity(0.8),
-                    borderRadius: BorderRadius.circular(size * 0.02),
-                  ),
+                // Glowing Keyhole
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: size * 0.12,
+                      height: size * 0.12,
+                      decoration: BoxDecoration(
+                        color: AppColors.success.withOpacity(0.9),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.success.withOpacity(0.6),
+                            blurRadius: 12,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: size * 0.08,
+                      height: size * 0.15,
+                      margin: const EdgeInsets.only(top: 1),
+                      decoration: BoxDecoration(
+                        color: AppColors.success.withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(size * 0.02),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.success.withOpacity(0.4),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );

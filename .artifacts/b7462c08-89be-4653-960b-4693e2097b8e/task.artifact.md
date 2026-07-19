@@ -1,8 +1,10 @@
-- [x] Admin dashbordiga "Chiqish" va "Profil" tugmalarini qo'shish
-- [x] Finance dashbordiga "Chiqish" va "Profil" tugmalarini qo'shish
-- [x] Manager dashbordiga "Chiqish" va "Profil" tugmalarini qo'shish
-- [x] Employee dashbordiga "Profil" tugmasini qo'shish
-- [x] Yangi "Profil Sozlamalari" ekranini yaratish
-- [x] BoxDecoration type conflict (red screen) muammosini hal qilish
-- [x] Barcha o'zgarishlarni GitHubga yuklash (push)
-- [x] Ilovani emulatorda qayta ishga tushirish va tekshirish
+- [ ] NeumorphicLogo widgetini foydalanuvchi rasmi asosida mukammallashtirish
+- [ ] UI xatoliklarini (BoxDecoration type error) barcha dashbordlarda bartaraf etish
+- [ ] Admin Paneli: Foydalanuvchilar ro'yxatini yuklash va boshqarish
+- [ ] Admin Paneli: Obyektlar ro'yxatini yuklash va boshqarish
+- [ ] Admin Paneli: Valyuta kursi va Audit jurnallarini qo'shish
+- [ ] Moliya Paneli: Kontragentlar va Tranzaksiyalar bo'limlarini real ma'lumot bilan to'ldirish
+- [ ] Moliya Paneli: Hisobotlar bo'limida tahliliy grafiklar (charts) qo'shish
+- [ ] Menejer Paneli: Obyekt tranzaksiyalari va Ombor zahiralarini to'liq implementatsiya qilish
+- [ ] Barcha o'zgarishlarni GitHub repozitoriyasiga yuklash
+- [ ] Emulatorda yakuniy tekshiruvdan o'tkazish

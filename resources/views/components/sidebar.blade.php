@@ -54,12 +54,6 @@
                         Audit jurnal
                     </a>
                 </li>
-                <li class="sidebar-item {{ str_starts_with($currentRoute, 'admin.settings') ? 'active' : '' }}">
-                    <a href="{{ route('admin.settings.index') }}">
-                        <span class="sidebar-icon"><i class="bi bi-gear"></i></span>
-                        Sozlamalar
-                    </a>
-                </li>
             </ul>
         </div>
 
@@ -101,6 +95,12 @@
                     <a href="{{ route('finance.reports.index') }}">
                         <span class="sidebar-icon"><i class="bi bi-graph-up-arrow"></i></span>
                         Hisobotlar
+                    </a>
+                </li>
+                <li class="sidebar-item {{ str_starts_with($currentRoute, 'finance.settings') ? 'active' : '' }}">
+                    <a href="{{ route('finance.settings.index') }}">
+                        <span class="sidebar-icon"><i class="bi bi-gear"></i></span>
+                        Sozlamalar
                     </a>
                 </li>
             </ul>
@@ -148,6 +148,12 @@
                     <a href="{{ route('finance.reports.index') }}">
                         <span class="sidebar-icon"><i class="bi bi-graph-up-arrow"></i></span>
                         Hisobotlar
+                    </a>
+                </li>
+                <li class="sidebar-item {{ str_starts_with($currentRoute, 'finance.settings') ? 'active' : '' }}">
+                    <a href="{{ route('finance.settings.index') }}">
+                        <span class="sidebar-icon"><i class="bi bi-gear"></i></span>
+                        Sozlamalar
                     </a>
                 </li>
             </ul>

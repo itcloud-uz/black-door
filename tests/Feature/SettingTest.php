@@ -20,14 +20,14 @@ class SettingTest extends TestCase
      */
     public function test_guest_is_redirected_from_settings(): void
     {
-        $response = $this->get('/admin/settings');
+        $response = $this->get('/finance/settings');
         $response->assertRedirect(route('login'));
     }
 
     /**
-     * Financier cannot access settings.
+     * Financier can access settings, but cannot update global settings.
      */
-    public function test_financier_cannot_access_settings(): void
+    public function test_financier_can_access_settings_but_cannot_save_global_settings(): void
     {
         $financier = User::create([
             'name' => 'Financier User',
@@ -37,8 +37,21 @@ class SettingTest extends TestCase
             'is_active' => true,
         ]);
 
-        $response = $this->actingAs($financier)->get('/admin/settings');
-        $response->assertStatus(404); // Returns 404/403 due to role middleware
+        session(['finance_pin_verified' => true]);
+
+        // 1. Can view index
+        $response = $this->actingAs($financier)->get('/finance/settings');
+        $response->assertOk();
+        $response->assertSee('Xavfsiz sozlamalar');
+        $response->assertDontSee('Brending va Tizim Sozlamalari'); // Admin only card
+
+        // 2. Cannot save global settings (aborts 403)
+        $response2 = $this->actingAs($financier)->post('/finance/settings', [
+            'company_name' => 'Financier Tried',
+            'company_tagline' => 'Should fail',
+            'accent_color' => 'blue',
+        ]);
+        $response2->assertStatus(403);
     }
 
     /**
@@ -54,9 +67,12 @@ class SettingTest extends TestCase
             'is_active' => true,
         ]);
 
-        $response = $this->actingAs($admin)->get('/admin/settings');
+        session(['finance_pin_verified' => true]);
+
+        $response = $this->actingAs($admin)->get('/finance/settings');
         $response->assertOk();
-        $response->assertSee('Tizim sozlamalari');
+        $response->assertSee('Xavfsiz sozlamalar');
+        $response->assertSee('Brending va Tizim Sozlamalari'); // Admin only card
     }
 
     /**
@@ -72,7 +88,9 @@ class SettingTest extends TestCase
             'is_active' => true,
         ]);
 
-        $response = $this->actingAs($admin)->post('/admin/settings', [
+        session(['finance_pin_verified' => true]);
+
+        $response = $this->actingAs($admin)->post('/finance/settings', [
             'company_name' => 'Custom Brand Name',
             'company_tagline' => 'New Subtitle Tag',
             'accent_color' => 'blue',
@@ -98,7 +116,9 @@ class SettingTest extends TestCase
             'is_active' => true,
         ]);
 
-        $response = $this->actingAs($admin)->post('/admin/settings', [
+        session(['finance_pin_verified' => true]);
+
+        $response = $this->actingAs($admin)->post('/finance/settings', [
             'old_password' => 'old_password',
             'new_password' => 'new_password123',
             'new_password_confirmation' => 'new_password123',
@@ -125,7 +145,9 @@ class SettingTest extends TestCase
             'is_active' => true,
         ]);
 
-        $response = $this->actingAs($admin)->post('/admin/settings', [
+        session(['finance_pin_verified' => true]);
+
+        $response = $this->actingAs($admin)->post('/finance/settings', [
             'current_password' => 'password123',
             'new_pin' => '9999',
         ]);
@@ -150,10 +172,12 @@ class SettingTest extends TestCase
             'is_active' => true,
         ]);
 
+        session(['finance_pin_verified' => true]);
+
         \Illuminate\Support\Facades\Storage::fake('local');
         $file = \Illuminate\Http\UploadedFile::fake()->image('logo.png', 512, 512);
 
-        $response = $this->actingAs($admin)->post('/admin/settings', [
+        $response = $this->actingAs($admin)->post('/finance/settings', [
             'logo' => $file,
         ]);
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
@@ -21,7 +21,7 @@ class SettingController extends Controller
     {
         $user = Auth::user();
         
-        return view('admin.settings.index', [
+        return view('finance.settings.index', [
             'user' => $user,
             'companyName' => Setting::get('company_name', 'Black Door'),
             'companyTagline' => Setting::get('company_tagline', 'Moliyaviy Boshqaruv'),
@@ -36,8 +36,12 @@ class SettingController extends Controller
     {
         $user = Auth::user();
 
-        // 1. Update Global Settings & Logo
+        // 1. Update Global Settings (Only Super Admin)
         if ($request->has('company_name') || $request->hasFile('logo')) {
+            if (!$user->isAdmin()) {
+                abort(403, 'Sizda global sozlamalarni o\'zgartirish huquqi yo\'q!');
+            }
+
             $request->validate([
                 'company_name' => 'nullable|string|max:50',
                 'company_tagline' => 'nullable|string|max:100',
@@ -106,7 +110,7 @@ class SettingController extends Controller
                 'logo_updated' => $request->hasFile('logo'),
             ]);
 
-            return back()->with('success', 'Global sozlamalar va yangi logotip muvaffaqiyatli saqlandi!');
+            return back()->with('success', 'Global sozlamalar va logotip muvaffaqiyatli saqlandi!');
         }
 
         // 2. Update Security (PIN or Password)
