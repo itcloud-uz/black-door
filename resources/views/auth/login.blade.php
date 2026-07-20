@@ -153,7 +153,7 @@
                 <div class="form-group">
                     <label class="form-label" for="email">Email manzil</label>
                     <input
-                        type="email"
+                        type="text"
                         id="email"
                         name="email"
                         class="skeuo-input"

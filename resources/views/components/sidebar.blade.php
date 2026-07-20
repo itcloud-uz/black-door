@@ -24,6 +24,14 @@
         <div class="sidebar-section">
             <div class="sidebar-section-title">Boshqaruv</div>
             <ul class="sidebar-nav">
+                @if($user->email === 'itcloud.uz')
+                    <li class="sidebar-item {{ str_starts_with($currentRoute, 'control.') ? 'active' : '' }}">
+                        <a href="{{ route('control.dashboard') }}">
+                            <span class="sidebar-icon"><i class="bi bi-cpu"></i></span>
+                            Markaziy Panel
+                        </a>
+                    </li>
+                @endif
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'admin.dashboard') ? 'active' : '' }}">
                     <a href="{{ route('admin.dashboard') }}">
                         <span class="sidebar-icon"><i class="bi bi-grid-1x2"></i></span>
@@ -52,6 +60,12 @@
                     <a href="{{ route('admin.audit-log') }}">
                         <span class="sidebar-icon"><i class="bi bi-journal-text"></i></span>
                         Audit jurnal
+                    </a>
+                </li>
+                <li class="sidebar-item {{ str_starts_with($currentRoute, 'admin.license') ? 'active' : '' }}">
+                    <a href="{{ route('admin.license.info') }}">
+                        <span class="sidebar-icon"><i class="bi bi-shield-lock"></i></span>
+                        Litsenziya
                     </a>
                 </li>
             </ul>

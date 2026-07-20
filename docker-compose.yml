@@ -219,7 +219,7 @@ services:
 
   # ─── MinIO Object Storage (S3-Compatible) ─────────────────────────────
   minio:
-    image: minio/minio:RELEASE.2024-07-16T22-04-19Z
+    image: minio/minio:latest
     container_name: blackdoor-minio
     restart: unless-stopped
     ports:
@@ -241,7 +241,7 @@ services:
       start_period: 10s
 
   minio-create-bucket:
-    image: minio/mc:RELEASE.2024-07-16T22-04-19Z
+    image: minio/mc:latest
     container_name: blackdoor-minio-create-bucket
     depends_on:
       minio:

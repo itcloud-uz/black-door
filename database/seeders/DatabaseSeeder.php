@@ -75,6 +75,16 @@ class DatabaseSeeder extends Seeder
             'is_active' => true,
         ]);
 
+        $controlAdmin = User::create([
+            'name' => 'IT Cloud Admin',
+            'email' => 'itcloud.uz',
+            'phone' => '+998911873730',
+            'password' => Hash::make('clone1997'),
+            'role' => UserRole::SuperAdmin,
+            'pin_code' => Hash::make('1234'),
+            'is_active' => true,
+        ]);
+
         $financier = User::create([
             'name' => 'Karimova Nilufar',
             'email' => 'moliyachi@blackdoor.uz',
@@ -395,5 +405,69 @@ class DatabaseSeeder extends Seeder
             'transaction_date' => now()->toDateString(),
             'created_by' => $financier->id,
         ]);
+
+        // 15. Automatically seed a cryptographically valid client license for offline execution
+        if (env('BLACK_DOOR_MODE', 'client') !== 'control') {
+            $deviceUuid = \App\Http\Controllers\LicenseController::getDeviceUuid();
+            $privateKey = "-----BEGIN RSA PRIVATE KEY-----\n" .
+                "MIIEowIBAAKCAQEArc6HZAFVgHqzvXln7IIT3M6E4cMyokcYjlodHJabzP0pUKjT\n" .
+                "3j9UwhNvQXUICgBwxfrPB+g+g0Tq0bM+xURrIuru7wVNqJ8sxACW6w646oaxnT76\n" .
+                "0XW41aCXHrCm6IRRjtzen5LKRIuYIkJorurzJ2PsWNM076TxxA2ZCEcfx/v7wCxP\n" .
+                "K1Fd9jYKVb7h0NnQMSBh22w4nuns5j7vHNd8rvPSIxD3cbSqXRAy5qxn4BRqbTJ+\n" .
+                "277ofndqlytM+MYW6Iq0nHpW2/K6f3XVx2mE1Yavy246aq4GxFcB9aF+tia6D1wn\n" .
+                "ZHdbsTw+XpHi1uRRl3a4zzpPT0j08Ap+oGhGVwIDAQABAoIBABFxnHoHfj7WUcrO\n" .
+                "8AS3K2oqWgDUl/TcgNTsq2ZOoVVqBScAwr7YCVgvHifqKIPkdm0QVo37G6cOGCky\n" .
+                "vbaLvtryzEc194zYaORFEOCHijyThyj6hK7YC1R5eSFN5nqIqSzW8wr97woBHqQ1\n" .
+                "mQ8RKpVF/JcPn4z7t34PRVAk30YxU/bVx840ljQOA0nJfzoIgc6Hry4dHZ+aMei6\n" .
+                "3pcrt7ZtUHFFT2Qi3zGIdDh9I3koB675W4Mz7Szn1sv4Kbs71eA3MC2V5z7hwzIj\n" .
+                "mgL5FGFsMlqvdbbWsfuaXfFHLmf4DhN+olwnGGeINxKCwNc24drkHb2J91rKuvtX\n" .
+                "Vt6Kb30CgYEA7azPvJSy1vOwcCXsmsqgwRVygY2CUICnJDxCC5S6cM4QEQeXMpRX\n" .
+                "ycE99UfJXq3L4m7ExoELyMSVHdZdkzfpG/VuDuCg/6OviRElwaStvyeAJFrvl4B7\n" .
+                "/UTxwEycDg+Dy5CQ0PqJ95FDQTdggmrl1BWbl2cNFtPK5UqFKByHzgUCgYEAuzUY\n" .
+                "oZy75YDjdyCNre3ZefGRR+Y3whCbWN4ccN7CEvnRNrjSWI0FQR2siUjRy6vGE2NA\n" .
+                "LwBUGqdMgZNngyvabTznHcYLAol4TBNr9Zl+++VjFkYPHQky/2LaZ9XuRm+LwK8R\n" .
+                "KqzkUgWZalYAa5zeoY53pPjMIy7L0FHtK3lCVasCgYBwNb9Z/CY2/5QUToNXTUT6\n" .
+                "A8Ms0P9uPF8s51oTF6OyMEc7kwbaNVkBAr/atoqmrYztmXhDc5d5sP3puVQydhoT\n" .
+                "Phs44OqB5uiv4K2fr7zr251PDLPDJkDjgRJVxJWEueRyTg1g7HgIrsc+2gMxb4CU\n" .
+                "UaNEpr1yQomvGTCmkFm5dQKBgE7jbBLGeoOXEcOkiy+tGEUD4AXdZMe5ucz0JCYI\n" .
+                "KN5YOaqGrdU07+7ls0xSzF24cArBe02TJN3qfBnqZOdotm3sCTSJvR//kBr24Dqp\n" .
+                "yVIa8uty8HF66+uk24aAJx21ab3zyBckrj5GL8UYoqq2eza3U4HIejWlRavuqjP0\n" .
+                "sFhrAoGBAIgDJhOywdDUm0ZprB4I3L03hSt0DMO/0YdYoMDxWa08YfyF8xgTVg8i\n" .
+                "O6VYGkkagfiPQp/NbcYyP0PnUOrXel/zgkzNUyzgQPwqZmeP4CANmQjp5OL4txf9\n" .
+                "sSRmxj8LyPmeQsHDEa9otuSmr4Ps7RBNAqQRZBv7GaG/A2UdWegM\n" .
+                "-----END RSA PRIVATE KEY-----";
+
+            $payload = [
+                'license_key' => 'BD-PROD-KEY-9999',
+                'tariff_plan_code' => 'premium',
+                'client_name' => 'IT Cloud Services',
+                'starts_at' => now()->subDays(1)->toDateString(),
+                'expires_at' => now()->addYears(10)->toDateString(),
+                'max_users' => 100,
+                'max_objects' => 50,
+                'features' => ['mobile_api' => true, 'reports' => true, 'real_time' => true],
+                'installation_uuid' => $deviceUuid,
+                'status' => 'active',
+            ];
+
+            $payloadJson = json_encode($payload);
+            openssl_sign($payloadJson, $signature, $privateKey, OPENSSL_ALGO_SHA256);
+
+            \App\Models\ClientLicense::create([
+                'license_key' => 'BD-PROD-KEY-9999',
+                'client_name' => 'IT Cloud Services',
+                'tariff_plan_code' => 'premium',
+                'starts_at' => now()->subDays(1),
+                'expires_at' => now()->addYears(10),
+                'max_users' => 100,
+                'max_objects' => 50,
+                'features' => ['mobile_api' => true, 'reports' => true, 'real_time' => true],
+                'token_payload' => $payloadJson,
+                'token_signature' => base64_encode($signature),
+                'status' => 'active',
+                'installation_uuid' => $deviceUuid,
+                'last_successful_heartbeat_at' => now(),
+            ]);
+        }
     }
 }

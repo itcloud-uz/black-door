@@ -46,6 +46,18 @@ class Obj extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::creating(function ($obj) {
+            if (env('BLACK_DOOR_MODE', 'client') !== 'control') {
+                $license = \App\Models\ClientLicense::first();
+                if ($license && self::count() >= $license->max_objects) {
+                    throw new \Exception("O'rnatilgan obyektlar soni litsenziya limitidan oshib ketdi (" . $license->max_objects . " ta).");
+                }
+            }
+        });
+    }
+
     // ──────────────────────────────────────────────
     // Munosabatlar (Relationships)
     // ──────────────────────────────────────────────

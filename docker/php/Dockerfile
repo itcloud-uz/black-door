@@ -1,4 +1,4 @@
-FROM php:8.3-fpm
+FROM php:8.4-fpm
 
 # ─── System Dependencies ─────────────────────────────────────────────────────
 RUN apt-get update && apt-get install -y \
@@ -38,9 +38,8 @@ RUN pecl install redis \
     && docker-php-ext-enable redis
 
 # ─── PHP-FPM Health Check ────────────────────────────────────────────────────
-RUN curl -o /usr/local/bin/php-fpm-healthcheck \
-    https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck \
-    && chmod +x /usr/local/bin/php-fpm-healthcheck
+COPY docker/php/php-fpm-healthcheck /usr/local/bin/php-fpm-healthcheck
+RUN chmod +x /usr/local/bin/php-fpm-healthcheck
 
 # ─── PHP Configuration ───────────────────────────────────────────────────────
 RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"

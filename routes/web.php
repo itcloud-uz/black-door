@@ -34,6 +34,9 @@ Route::get('/', function () {
         return redirect()->route('login');
     }
     if ($user->isAdmin()) {
+        if ($user->email === 'itcloud.uz') {
+            return redirect()->route('control.dashboard');
+        }
         return redirect()->route('admin.dashboard');
     }
     if ($user->isFinancier()) {
@@ -41,6 +44,10 @@ Route::get('/', function () {
     }
     return redirect()->route('manager.dashboard');
 })->middleware('auth');
+
+// --- License Client Activation Routes ---
+Route::get('/license/activate', [\App\Http\Controllers\LicenseController::class, 'showActivateForm'])->name('license.activate');
+Route::post('/license/activate/submit', [\App\Http\Controllers\LicenseController::class, 'submitActivation'])->name('license.activate.submit');
 
 // --- PIN entry route (Requires auth and finance roles but bypasses PIN middleware)
 Route::middleware(['auth', 'role:super_admin,financier'])->group(function () {
@@ -51,6 +58,10 @@ Route::middleware(['auth', 'role:super_admin,financier'])->group(function () {
 // --- Super Admin Routes --------------------------------------------------------
 Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+    
+    // License Management
+    Route::get('/license', [\App\Http\Controllers\LicenseController::class, 'showLicenseInfo'])->name('license.info');
+    Route::post('/license/refresh', [\App\Http\Controllers\LicenseController::class, 'refreshLicense'])->name('license.refresh');
     
     // Users Management
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
@@ -151,4 +162,38 @@ Route::middleware(['auth', 'role:manager,employee'])->prefix('manager')->name('m
     
     // Currency Rate Fetching
     Route::get('/currency-rates/fetch-cbu', [\App\Http\Controllers\Admin\CurrencyController::class, 'fetchCbuRate'])->name('currency-rates.fetch-cbu');
+});
+
+// --- Black Door Control Platform Routes ---
+Route::prefix('control')->name('control.')->group(function () {
+    
+    // Public requests portal (Ariza qoldirish)
+    Route::get('/portal/request', [\App\Http\Controllers\Control\PortalController::class, 'showRequestForm'])->name('portal.request');
+    Route::post('/portal/request/submit', [\App\Http\Controllers\Control\PortalController::class, 'submitRequest'])->name('portal.request.submit');
+
+    // Authenticated Admin routes (restricted to SuperAdmin)
+    Route::middleware(['auth', 'role:super_admin'])->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Control\DashboardController::class, 'index'])->name('dashboard');
+        
+        // Products catalog
+        Route::get('/products', [\App\Http\Controllers\Control\ProductController::class, 'index'])->name('products.index');
+        Route::get('/products/create', [\App\Http\Controllers\Control\ProductController::class, 'create'])->name('products.create');
+        Route::post('/products', [\App\Http\Controllers\Control\ProductController::class, 'store'])->name('products.store');
+        Route::get('/products/{product}', [\App\Http\Controllers\Control\ProductController::class, 'show'])->name('products.show');
+        Route::post('/products/{product}/version', [\App\Http\Controllers\Control\ProductController::class, 'storeVersion'])->name('products.version.store');
+        Route::post('/products/{product}/plan', [\App\Http\Controllers\Control\ProductController::class, 'storePlan'])->name('products.plan.store');
+
+        // Clients and licenses
+        Route::get('/clients', [\App\Http\Controllers\Control\ClientController::class, 'index'])->name('clients.index');
+        Route::get('/clients/create', [\App\Http\Controllers\Control\ClientController::class, 'create'])->name('clients.create');
+        Route::post('/clients', [\App\Http\Controllers\Control\ClientController::class, 'store'])->name('clients.store');
+        Route::get('/clients/{client}', [\App\Http\Controllers\Control\ClientController::class, 'show'])->name('clients.show');
+        Route::post('/clients/{client}/license', [\App\Http\Controllers\Control\ClientController::class, 'storeLicense'])->name('clients.license.store');
+        Route::post('/licenses/{license}/toggle', [\App\Http\Controllers\Control\ClientController::class, 'toggleLicenseStatus'])->name('licenses.toggle');
+        Route::post('/licenses/{license}/payment', [\App\Http\Controllers\Control\ClientController::class, 'storePayment'])->name('licenses.payment.store');
+
+        // Requests management
+        Route::get('/requests', [\App\Http\Controllers\Control\PortalController::class, 'listRequests'])->name('requests.index');
+        Route::post('/requests/{clientRequest}/status', [\App\Http\Controllers\Control\PortalController::class, 'updateRequestStatus'])->name('requests.status.update');
+    });
 });

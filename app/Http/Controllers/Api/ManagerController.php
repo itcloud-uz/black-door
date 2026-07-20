@@ -687,8 +687,6 @@ class ManagerController extends Controller
 
                         AuditLogger::log('warehouse_outgoing', $mvt, null, $mvt->toArray());
                     }
-                }
-            });
 
                     // Check for low stock alert
                     if ($stock->quantity < ($product->min_limit ?? 0)) {

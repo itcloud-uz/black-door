@@ -16,6 +16,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleAccess::class,
             'finance.pin' => \App\Http\Middleware\FinancePinVerified::class,
         ]);
+
+        $middleware->web(append: [
+            \App\Http\Middleware\LicenseShield::class,
+        ]);
+
+        $middleware->api(append: [
+            \App\Http\Middleware\LicenseShield::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
