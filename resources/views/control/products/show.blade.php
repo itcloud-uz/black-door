@@ -9,9 +9,21 @@
             <h2 style="margin: 0; font-weight: 800; text-transform: uppercase; color: var(--text-primary);">{{ $product->name }}</h2>
             <p class="text-muted">Kodi: <strong style="font-family: monospace;">{{ $product->code }}</strong> | Boshqaruv paneli</p>
         </div>
-        <a href="{{ route('control.products.index') }}" class="skeuo-btn text-muted">
-            <i class="bi bi-arrow-left"></i> Katalogga qaytish
-        </a>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <a href="{{ route('control.products.edit', $product->id) }}" class="skeuo-btn skeuo-btn-primary">
+                <i class="bi bi-pencil"></i> Tahrirlash
+            </a>
+            <form action="{{ route('control.products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Haqiqatdan ham ushbu mahsulotni o\'chirmoqchimisiz? Barcha tariflar, versiyalar va litsenziyalar ham o\'chib ketadi!')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="skeuo-btn skeuo-btn-red">
+                    <i class="bi bi-trash"></i> O'chirish
+                </button>
+            </form>
+            <a href="{{ route('control.products.index') }}" class="skeuo-btn text-muted">
+                <i class="bi bi-arrow-left"></i> Katalogga qaytish
+            </a>
+        </div>
     </div>
 
     @if(session('success'))

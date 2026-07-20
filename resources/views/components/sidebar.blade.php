@@ -73,7 +73,7 @@
 
         {{-- Admin Finance Access --}}
         <div class="sidebar-section">
-            <div class="sidebar-section-title"><i class="bi bi-lock"></i> Moliya (Qora Daftar)</div>
+            <div class="sidebar-section-title"><i class="bi bi-lock"></i> Moliya</div>
             <ul class="sidebar-nav">
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'finance.dashboard') ? 'active' : '' }}">
                     <a href="{{ route('finance.dashboard') }}">

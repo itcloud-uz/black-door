@@ -132,4 +132,32 @@ class ClientController extends Controller
 
         return back()->with('success', 'To\'lov muvaffaqiyatli qayd etildi.');
     }
+
+    public function edit(Client $client)
+    {
+        return view('control.clients.edit', compact('client'));
+    }
+
+    public function update(Request $request, Client $client)
+    {
+        $request->validate([
+            'company_name' => 'required|string|max:255',
+            'contact_name' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:255',
+            'telegram' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'address' => 'nullable|string',
+            'notes' => 'nullable|string',
+        ]);
+
+        $client->update($request->all());
+
+        return redirect()->route('control.clients.show', $client->id)->with('success', 'Mijoz ma\'lumotlari muvaffaqiyatli yangilandi.');
+    }
+
+    public function destroy(Client $client)
+    {
+        $client->delete();
+        return redirect()->route('control.clients.index')->with('success', 'Mijoz muvaffaqiyatli o\'chirildi.');
+    }
 }

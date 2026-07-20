@@ -62,9 +62,14 @@ class PinController extends Controller
                 'pin_locked_until' => null,
             ]);
 
-            session()->put('finance_pin_verified', true);
-
             AuditLogger::log('pin_verify_success', $user);
+
+            if ($user->face_id_enabled && $user->hasFaceId()) {
+                session()->put('finance_pin_verified_temp', true);
+                return redirect()->route('finance.face');
+            }
+
+            session()->put('finance_pin_verified', true);
 
             return redirect()->route('finance.dashboard');
         }

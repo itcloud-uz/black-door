@@ -101,4 +101,28 @@ class ProductController extends Controller
 
         return back()->with('success', 'Tarif rejasi muvaffaqiyatli yaratildi.');
     }
+
+    public function edit(Product $product)
+    {
+        return view('control.products.edit', compact('product'));
+    }
+
+    public function update(Request $request, Product $product)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:255|unique:control_products,code,' . $product->id,
+            'description' => 'nullable|string',
+        ]);
+
+        $product->update($request->all());
+
+        return redirect()->route('control.products.show', $product->id)->with('success', 'Mahsulot muvaffaqiyatli yangilandi.');
+    }
+
+    public function destroy(Product $product)
+    {
+        $product->delete();
+        return redirect()->route('control.products.index')->with('success', 'Mahsulot muvaffaqiyatli o\'chirildi.');
+    }
 }

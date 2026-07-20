@@ -53,6 +53,13 @@ Route::post('/license/activate/submit', [\App\Http\Controllers\LicenseController
 Route::middleware(['auth', 'role:super_admin,financier'])->group(function () {
     Route::get('/finance/pin', [PinController::class, 'showPinForm'])->name('finance.pin');
     Route::post('/finance/pin/verify', [PinController::class, 'verifyPin'])->name('finance.pin.verify');
+    
+    // Biometric / Face ID
+    Route::get('/finance/face', [\App\Http\Controllers\Auth\BiometricController::class, 'showFaceAuthForm'])->name('finance.face');
+    Route::post('/finance/face/verify', [\App\Http\Controllers\Auth\BiometricController::class, 'verify'])->name('finance.face.verify');
+    Route::post('/finance/face/register', [\App\Http\Controllers\Auth\BiometricController::class, 'register'])->name('finance.face.register');
+    Route::post('/finance/face/delete', [\App\Http\Controllers\Auth\BiometricController::class, 'delete'])->name('finance.face.delete');
+    Route::post('/finance/face/toggle', [\App\Http\Controllers\Auth\BiometricController::class, 'toggle'])->name('finance.face.toggle');
 });
 
 // --- Super Admin Routes --------------------------------------------------------
@@ -102,7 +109,7 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')
     Route::get('/audit-log', [AdminAuditController::class, 'index'])->name('audit-log');
 });
 
-// --- Finance (Qora Daftar) Routes ----------------------------------------------
+// --- Finance Routes ----------------------------------------------
 Route::middleware(['auth', 'role:super_admin,financier', 'finance.pin'])->prefix('finance')->name('finance.')->group(function () {
     Route::get('/', [FinanceDashboardController::class, 'index'])->name('dashboard');
     
@@ -180,6 +187,9 @@ Route::prefix('control')->name('control.')->group(function () {
         Route::get('/products/create', [\App\Http\Controllers\Control\ProductController::class, 'create'])->name('products.create');
         Route::post('/products', [\App\Http\Controllers\Control\ProductController::class, 'store'])->name('products.store');
         Route::get('/products/{product}', [\App\Http\Controllers\Control\ProductController::class, 'show'])->name('products.show');
+        Route::get('/products/{product}/edit', [\App\Http\Controllers\Control\ProductController::class, 'edit'])->name('products.edit');
+        Route::put('/products/{product}', [\App\Http\Controllers\Control\ProductController::class, 'update'])->name('products.update');
+        Route::delete('/products/{product}', [\App\Http\Controllers\Control\ProductController::class, 'destroy'])->name('products.destroy');
         Route::post('/products/{product}/version', [\App\Http\Controllers\Control\ProductController::class, 'storeVersion'])->name('products.version.store');
         Route::post('/products/{product}/plan', [\App\Http\Controllers\Control\ProductController::class, 'storePlan'])->name('products.plan.store');
 
@@ -188,6 +198,9 @@ Route::prefix('control')->name('control.')->group(function () {
         Route::get('/clients/create', [\App\Http\Controllers\Control\ClientController::class, 'create'])->name('clients.create');
         Route::post('/clients', [\App\Http\Controllers\Control\ClientController::class, 'store'])->name('clients.store');
         Route::get('/clients/{client}', [\App\Http\Controllers\Control\ClientController::class, 'show'])->name('clients.show');
+        Route::get('/clients/{client}/edit', [\App\Http\Controllers\Control\ClientController::class, 'edit'])->name('clients.edit');
+        Route::put('/clients/{client}', [\App\Http\Controllers\Control\ClientController::class, 'update'])->name('clients.update');
+        Route::delete('/clients/{client}', [\App\Http\Controllers\Control\ClientController::class, 'destroy'])->name('clients.destroy');
         Route::post('/clients/{client}/license', [\App\Http\Controllers\Control\ClientController::class, 'storeLicense'])->name('clients.license.store');
         Route::post('/licenses/{license}/toggle', [\App\Http\Controllers\Control\ClientController::class, 'toggleLicenseStatus'])->name('licenses.toggle');
         Route::post('/licenses/{license}/payment', [\App\Http\Controllers\Control\ClientController::class, 'storePayment'])->name('licenses.payment.store');

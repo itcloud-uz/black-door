@@ -5,7 +5,7 @@
     {{-- Metal Clasp --}}
     <div class="metal-clasp">
         <span class="clasp-icon"><i class="bi bi-lock"></i></span>
-        <span class="clasp-text">Moliya Bo'limi — Qora Daftar</span>
+        <span class="clasp-text">Moliya Bo'limi</span>
     </div>
 
     {{-- Notebook Rings --}}

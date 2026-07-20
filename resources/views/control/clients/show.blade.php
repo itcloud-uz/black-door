@@ -41,6 +41,19 @@
                 <div><span class="text-muted">Email:</span> <br><strong>{{ $client->email ?? '—' }}</strong></div>
                 <div><span class="text-muted">Manzil:</span> <br><strong>{{ $client->address ?? '—' }}</strong></div>
                 <div><span class="text-muted">Eslatmalar:</span> <br><span class="text-muted">{{ $client->notes ?? '—' }}</span></div>
+                
+                <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px;">
+                    <a href="{{ route('control.clients.edit', $client->id) }}" class="skeuo-btn skeuo-btn-sm skeuo-btn-primary" style="flex: 1; text-align: center;">
+                        <i class="bi bi-pencil"></i> Tahrirlash
+                    </a>
+                    <form action="{{ route('control.clients.destroy', $client->id) }}" method="POST" style="flex: 1;" onsubmit="return confirm('Haqiqatdan ham ushbu mijozni o\'chirmoqchimisiz? Barcha litsenziyalari ham o\'chib ketadi!')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="skeuo-btn skeuo-btn-sm skeuo-btn-red w-full">
+                            <i class="bi bi-trash"></i> O'chirish
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
 

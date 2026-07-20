@@ -22,6 +22,8 @@ class User extends Authenticatable
     use Notifiable;
     use SoftDeletes;
 
+    public static bool $resolvingUser = false;
+
     /**
      * @var list<string>
      */
@@ -37,6 +39,10 @@ class User extends Authenticatable
         'locked_until',
         'failed_pin_attempts',
         'pin_locked_until',
+        'face_id_enabled',
+        'face_embedding',
+        'failed_face_attempts',
+        'face_locked_until',
     ];
 
     /**
@@ -60,12 +66,18 @@ class User extends Authenticatable
         });
 
         static::addGlobalScope('exclude_itcloud_user', function ($builder) {
-            if (app()->runningInConsole()) {
+            if (app()->runningInConsole() || static::$resolvingUser) {
                 return;
             }
-            $user = auth()->user();
-            if ($user && $user->email === 'itcloud.uz') {
-                return;
+            
+            static::$resolvingUser = true;
+            try {
+                $user = auth()->user();
+                if ($user && $user->email === 'itcloud.uz') {
+                    return;
+                }
+            } finally {
+                static::$resolvingUser = false;
             }
             
             $wheres = $builder->getQuery()->wheres;
@@ -91,6 +103,8 @@ class User extends Authenticatable
             'pin_locked_until' => 'datetime',
             'password' => 'hashed',
             'email_verified_at' => 'datetime',
+            'face_id_enabled' => 'boolean',
+            'face_locked_until' => 'datetime',
         ];
     }
 
@@ -267,5 +281,34 @@ class User extends Authenticatable
         }
 
         return Hash::check($pin, $this->pin_code);
+    }
+
+    /**
+     * Foydalanuvchi yuzi ro'yxatdan o'tganligini tekshirish.
+     */
+    public function hasFaceId(): bool
+    {
+        return !empty($this->face_embedding);
+    }
+
+    public function setFaceEmbedding(string $embedding): void
+    {
+        $this->update([
+            'face_embedding' => \Illuminate\Support\Facades\Crypt::encryptString($embedding),
+            'face_id_enabled' => true
+        ]);
+    }
+
+    public function getFaceEmbedding(): ?string
+    {
+        if (empty($this->face_embedding)) {
+            return null;
+        }
+
+        try {
+            return \Illuminate\Support\Facades\Crypt::decryptString($this->face_embedding);
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 }

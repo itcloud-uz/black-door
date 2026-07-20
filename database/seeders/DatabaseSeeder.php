@@ -342,7 +342,7 @@ class DatabaseSeeder extends Seeder
             'quantity' => 200,
         ]);
 
-        // 11. Moliya (Qora Daftar) Cash Accounts & Balances
+        // 11. Moliya Cash Accounts & Balances
         $financeCash1 = CashAccount::create([
             'name' => 'Asosiy naqd kassa',
             'type' => CashAccountType::Cash,
@@ -467,6 +467,62 @@ class DatabaseSeeder extends Seeder
                 'status' => 'active',
                 'installation_uuid' => $deviceUuid,
                 'last_successful_heartbeat_at' => now(),
+            ]);
+
+            // 16. Seed Control Panel tables to mirror the active client license
+            $controlProduct = \App\Models\Control\Product::create([
+                'name' => 'Black Door',
+                'code' => 'blackdoor',
+                'description' => 'Black Door Enterprise Financial System',
+                'is_active' => true,
+            ]);
+
+            $controlPlan = \App\Models\Control\TariffPlan::create([
+                'product_id' => $controlProduct->id,
+                'name' => 'Premium',
+                'code' => 'premium',
+                'duration_days' => 365,
+                'price' => 1000000, // 10 000.00 USD
+                'currency' => 'USD',
+                'max_users' => 100,
+                'max_objects' => 50,
+                'features' => ['mobile_api' => true, 'reports' => true, 'real_time' => true],
+                'is_active' => true,
+            ]);
+
+            $controlClient = \App\Models\Control\Client::create([
+                'company_name' => 'IT Cloud Services',
+                'contact_name' => 'Sardor Abdullayev',
+                'phone' => '+998911873730',
+                'email' => 'itclouduz@gmail.com',
+                'telegram' => '@ITclouduz_me',
+                'address' => 'Samarqand, Urgut',
+                'is_active' => true,
+            ]);
+
+            $controlLicense = \App\Models\Control\License::create([
+                'client_id' => $controlClient->id,
+                'product_id' => $controlProduct->id,
+                'tariff_plan_id' => $controlPlan->id,
+                'license_key' => 'BD-PROD-KEY-9999',
+                'status' => 'active',
+                'starts_at' => now()->subDays(1),
+                'expires_at' => now()->addYears(10),
+                'activation_limit' => 1,
+                'installations_count' => 1,
+                'last_heartbeat_at' => now(),
+            ]);
+
+            \App\Models\Control\Installation::create([
+                'license_id' => $controlLicense->id,
+                'hardware_uuid' => $deviceUuid,
+                'domain' => 'blackdoor.uz',
+                'ip_address' => '100.70.240.43',
+                'last_seen_at' => now(),
+                'metadata' => [
+                    'users_count' => 8,
+                    'objects_count' => 2,
+                ],
             ]);
         }
     }

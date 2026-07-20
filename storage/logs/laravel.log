@@ -8433,3 +8433,316 @@
 [2026-07-19 23:54:59] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
 [2026-07-19 23:54:59] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
 [2026-07-19 23:54:59] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  
+[2026-07-20 00:09:51] local.ERROR: Unclosed '{' on line 31 {"exception":"[object] (ParseError(code: 0): Unclosed '{' on line 31 at D:/Loyihalar/Black-door/routes/web.php:195)
+[stacktrace]
+#0 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Routing/Router.php(526): Illuminate/Routing/RouteFileRegistrar->register('D://Loyihalar//Bl...')
+#1 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Routing/Router.php(480): Illuminate/Routing/Router->loadRoutes('D://Loyihalar//Bl...')
+#2 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Routing/RouteRegistrar.php(212): Illuminate/Routing/Router->group(Array, 'D://Loyihalar//Bl...')
+#3 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Configuration/ApplicationBuilder.php(248): Illuminate/Routing/RouteRegistrar->group('D://Loyihalar//Bl...')
+#4 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate/Foundation/Configuration/ApplicationBuilder->{closure:Illuminate/Foundation/Configuration/ApplicationBuilder::buildRoutingCallback():205}()
+#5 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate/Container/BoundMethod::{closure:Illuminate/Container/BoundMethod::call():35}()
+#6 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(84): Illuminate/Container/Util::unwrapIfClosure(Object(Closure))
+#7 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate/Container/BoundMethod::callBoundMethod(Object(Illuminate/Foundation/Application), Object(Closure), Object(Closure))
+#8 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Container/Container.php(799): Illuminate/Container/BoundMethod::call(Object(Illuminate/Foundation/Application), Object(Closure), Array, NULL)
+#9 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Support/Providers/RouteServiceProvider.php(162): Illuminate/Container/Container->call(Object(Closure))
+#10 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Support/Providers/RouteServiceProvider.php(59): Illuminate/Foundation/Support/Providers/RouteServiceProvider->loadRoutes()
+#11 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate/Foundation/Support/Providers/RouteServiceProvider->{closure:Illuminate/Foundation/Support/Providers/RouteServiceProvider::register():53}()
+#12 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate/Container/BoundMethod::{closure:Illuminate/Container/BoundMethod::call():35}()
+#13 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(84): Illuminate/Container/Util::unwrapIfClosure(Object(Closure))
+#14 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate/Container/BoundMethod::callBoundMethod(Object(Illuminate/Foundation/Application), Object(Closure), Object(Closure))
+#15 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Container/Container.php(799): Illuminate/Container/BoundMethod::call(Object(Illuminate/Foundation/Application), Object(Closure), Array, NULL)
+#16 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Support/ServiceProvider.php(150): Illuminate/Container/Container->call(Object(Closure))
+#17 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1154): Illuminate/Support/ServiceProvider->callBootedCallbacks()
+#18 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1132): Illuminate/Foundation/Application->bootProvider(Object(Illuminate/Foundation/Support/Providers/RouteServiceProvider))
+#19 [internal function]: Illuminate/Foundation/Application->{closure:Illuminate/Foundation/Application::boot():1131}(Object(Illuminate/Foundation/Support/Providers/RouteServiceProvider), 'Illuminate//Foun...')
+#20 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1131): array_walk(Array, Object(Closure))
+#21 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/BootProviders.php(17): Illuminate/Foundation/Application->boot()
+#22 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate/Foundation/Bootstrap/BootProviders->bootstrap(Object(Illuminate/Foundation/Application))
+#23 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(494): Illuminate/Foundation/Application->bootstrapWith(Array)
+#24 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(196): Illuminate/Foundation/Console/Kernel->bootstrap()
+#25 D:/Loyihalar/Black-door/artisan(14): Illuminate/Foundation/Console/Kernel->handle(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#26 {main}
+"} 
+[2026-07-20 00:11:04] testing.ERROR: Unclosed '{' on line 37 does not match ')' {"userId":1,"exception":"[object] (ParseError(code: 0): Unclosed '{' on line 37 does not match ')' at D:/Loyihalar/Black-door/app/Http/Controllers/Api/ManagerController.php:703)
+[stacktrace]
+#0 D:/Loyihalar/Black-door/vendor/composer/ClassLoader.php(427): {closure:Composer/Autoload/ClassLoader::initializeIncludeClosure():575}('D://Loyihalar//Bl...')
+#1 [internal function]: Composer/Autoload/ClassLoader->loadClass('App//Http//Contro...')
+#2 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Routing/Route.php(1125): is_a('App//Http//Contro...', 'Illuminate//Rout...', true)
+#3 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Routing/Route.php(1062): Illuminate/Routing/Route->controllerMiddleware()
+#4 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Routing/Router.php(834): Illuminate/Routing/Route->gatherMiddleware()
+#5 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Routing/Router.php(816): Illuminate/Routing/Router->gatherRouteMiddleware(Object(Illuminate/Routing/Route))
+#6 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate/Routing/Router->runRouteWithinStack(Object(Illuminate/Routing/Route), Object(Illuminate/Http/Request))
+#7 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate/Routing/Router->runRoute(Object(Illuminate/Http/Request), Object(Illuminate/Routing/Route))
+#8 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate/Routing/Router->dispatchToRoute(Object(Illuminate/Http/Request))
+#9 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate/Routing/Router->dispatch(Object(Illuminate/Http/Request))
+#10 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate/Foundation/Http/Kernel->{closure:Illuminate/Foundation/Http/Kernel::dispatchToRouter():197}(Object(Illuminate/Http/Request))
+#11 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate/Pipeline/Pipeline->{closure:Illuminate/Pipeline/Pipeline::prepareDestination():178}(Object(Illuminate/Http/Request))
+#12 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate/Foundation/Http/Middleware/TransformsRequest->handle(Object(Illuminate/Http/Request), Object(Closure))
+#13 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull->handle(Object(Illuminate/Http/Request), Object(Closure))
+#14 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#15 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate/Foundation/Http/Middleware/TransformsRequest->handle(Object(Illuminate/Http/Request), Object(Closure))
+#16 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Foundation/Http/Middleware/TrimStrings->handle(Object(Illuminate/Http/Request), Object(Closure))
+#17 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#18 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Http/Middleware/ValidatePostSize->handle(Object(Illuminate/Http/Request), Object(Closure))
+#19 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#20 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance->handle(Object(Illuminate/Http/Request), Object(Closure))
+#21 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#22 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Http/Middleware/HandleCors->handle(Object(Illuminate/Http/Request), Object(Closure))
+#23 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#24 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Http/Middleware/TrustProxies->handle(Object(Illuminate/Http/Request), Object(Closure))
+#25 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#26 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks->handle(Object(Illuminate/Http/Request), Object(Closure))
+#27 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#28 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Http/Middleware/ValidatePathEncoding->handle(Object(Illuminate/Http/Request), Object(Closure))
+#29 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#30 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate/Pipeline/Pipeline->then(Object(Closure))
+#31 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate/Foundation/Http/Kernel->sendRequestThroughRouter(Object(Illuminate/Http/Request))
+#32 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate/Foundation/Http/Kernel->handle(Object(Illuminate/Http/Request))
+#33 D:/Loyihalar/Black-door/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate/Foundation/Testing/TestCase->call('GET', '/api/manager/da...', Array, Array, Array, Array, '[]')
+#34 D:/Loyihalar/Black-door/tests/Feature/LicenseActivationTest.php(274): Illuminate/Foundation/Testing/TestCase->json('GET', '/api/manager/da...')
+#35 D:/Loyihalar/Black-door/vendor/phpunit/phpunit/src/Framework/TestCase.php(1667): Tests/Feature/LicenseActivationTest->test_feature_flags_restriction()
+#36 D:/Loyihalar/Black-door/vendor/phpunit/phpunit/src/Framework/TestCase.php(519): PHPUnit/Framework/TestCase->runTest()
+#37 D:/Loyihalar/Black-door/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(87): PHPUnit/Framework/TestCase->runBare()
+#38 D:/Loyihalar/Black-door/vendor/phpunit/phpunit/src/Framework/TestCase.php(365): PHPUnit/Framework/TestRunner->run(Object(Tests/Feature/LicenseActivationTest))
+#39 D:/Loyihalar/Black-door/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit/Framework/TestCase->run()
+#40 D:/Loyihalar/Black-door/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit/Framework/TestSuite->run()
+#41 D:/Loyihalar/Black-door/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit/Framework/TestSuite->run()
+#42 D:/Loyihalar/Black-door/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit/Framework/TestSuite->run()
+#43 D:/Loyihalar/Black-door/vendor/phpunit/phpunit/src/TextUI/Application.php(211): PHPUnit/TextUI/TestRunner->run(Object(PHPUnit/TextUI/Configuration/Configuration), Object(PHPUnit/Runner/ResultCache/DefaultResultCache), Object(PHPUnit/Framework/TestSuite))
+#44 D:/Loyihalar/Black-door/vendor/phpunit/phpunit/phpunit(104): PHPUnit/TextUI/Application->run(Array)
+#45 {main}
+"} 
+[2026-07-20 00:12:00] testing.WARNING: S3 upload failed for favicon-16x16.png: Undefined array key "root"  
+[2026-07-20 00:12:00] testing.WARNING: S3 upload failed for favicon-32x32.png: Undefined array key "root"  
+[2026-07-20 00:12:00] testing.WARNING: S3 upload failed for apple-touch-icon.png: Undefined array key "root"  
+[2026-07-20 00:12:00] testing.WARNING: S3 upload failed for android-chrome-192x192.png: Undefined array key "root"  
+[2026-07-20 00:12:00] testing.WARNING: S3 upload failed for android-chrome-512x512.png: Undefined array key "root"  
+[2026-07-20 00:12:00] testing.WARNING: S3 upload failed for favicon.ico: Undefined array key "root"  
+[2026-07-20 00:12:00] testing.WARNING: S3 upload failed for custom_logo_vertical.png: Undefined array key "root"  
+[2026-07-20 00:12:00] testing.WARNING: S3 upload failed for custom_logo_horizontal.png: Undefined array key "root"  
+[2026-07-20 00:12:00] testing.WARNING: S3 upload failed for launcher mipmap-mdpi: Undefined array key "root"  
+[2026-07-20 00:12:00] testing.WARNING: S3 upload failed for launcher mipmap-hdpi: Undefined array key "root"  
+[2026-07-20 00:12:00] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
+[2026-07-20 00:12:00] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
+[2026-07-20 00:12:00] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  
+[2026-07-20 00:12:28] testing.WARNING: S3 upload failed for favicon-16x16.png: Undefined array key "root"  
+[2026-07-20 00:12:28] testing.WARNING: S3 upload failed for favicon-32x32.png: Undefined array key "root"  
+[2026-07-20 00:12:28] testing.WARNING: S3 upload failed for apple-touch-icon.png: Undefined array key "root"  
+[2026-07-20 00:12:28] testing.WARNING: S3 upload failed for android-chrome-192x192.png: Undefined array key "root"  
+[2026-07-20 00:12:28] testing.WARNING: S3 upload failed for android-chrome-512x512.png: Undefined array key "root"  
+[2026-07-20 00:12:28] testing.WARNING: S3 upload failed for favicon.ico: Undefined array key "root"  
+[2026-07-20 00:12:28] testing.WARNING: S3 upload failed for custom_logo_vertical.png: Undefined array key "root"  
+[2026-07-20 00:12:28] testing.WARNING: S3 upload failed for custom_logo_horizontal.png: Undefined array key "root"  
+[2026-07-20 00:12:28] testing.WARNING: S3 upload failed for launcher mipmap-mdpi: Undefined array key "root"  
+[2026-07-20 00:12:28] testing.WARNING: S3 upload failed for launcher mipmap-hdpi: Undefined array key "root"  
+[2026-07-20 00:12:28] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
+[2026-07-20 00:12:28] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
+[2026-07-20 00:12:28] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  
+[2026-07-20 00:45:41] testing.WARNING: S3 upload failed for favicon-16x16.png: Undefined array key "root"  
+[2026-07-20 00:45:41] testing.WARNING: S3 upload failed for favicon-32x32.png: Undefined array key "root"  
+[2026-07-20 00:45:41] testing.WARNING: S3 upload failed for apple-touch-icon.png: Undefined array key "root"  
+[2026-07-20 00:45:41] testing.WARNING: S3 upload failed for android-chrome-192x192.png: Undefined array key "root"  
+[2026-07-20 00:45:41] testing.WARNING: S3 upload failed for android-chrome-512x512.png: Undefined array key "root"  
+[2026-07-20 00:45:41] testing.WARNING: S3 upload failed for favicon.ico: Undefined array key "root"  
+[2026-07-20 00:45:41] testing.WARNING: S3 upload failed for custom_logo_vertical.png: Undefined array key "root"  
+[2026-07-20 00:45:41] testing.WARNING: S3 upload failed for custom_logo_horizontal.png: Undefined array key "root"  
+[2026-07-20 00:45:41] testing.WARNING: S3 upload failed for launcher mipmap-mdpi: Undefined array key "root"  
+[2026-07-20 00:45:41] testing.WARNING: S3 upload failed for launcher mipmap-hdpi: Undefined array key "root"  
+[2026-07-20 00:45:41] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
+[2026-07-20 00:45:41] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
+[2026-07-20 00:45:41] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  
+[2026-07-20 00:48:56] testing.WARNING: S3 upload failed for favicon-16x16.png: Undefined array key "root"  
+[2026-07-20 00:48:56] testing.WARNING: S3 upload failed for favicon-32x32.png: Undefined array key "root"  
+[2026-07-20 00:48:56] testing.WARNING: S3 upload failed for apple-touch-icon.png: Undefined array key "root"  
+[2026-07-20 00:48:56] testing.WARNING: S3 upload failed for android-chrome-192x192.png: Undefined array key "root"  
+[2026-07-20 00:48:56] testing.WARNING: S3 upload failed for android-chrome-512x512.png: Undefined array key "root"  
+[2026-07-20 00:48:56] testing.WARNING: S3 upload failed for favicon.ico: Undefined array key "root"  
+[2026-07-20 00:48:56] testing.WARNING: S3 upload failed for custom_logo_vertical.png: Undefined array key "root"  
+[2026-07-20 00:48:56] testing.WARNING: S3 upload failed for custom_logo_horizontal.png: Undefined array key "root"  
+[2026-07-20 00:48:56] testing.WARNING: S3 upload failed for launcher mipmap-mdpi: Undefined array key "root"  
+[2026-07-20 00:48:56] testing.WARNING: S3 upload failed for launcher mipmap-hdpi: Undefined array key "root"  
+[2026-07-20 00:48:56] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
+[2026-07-20 00:48:56] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
+[2026-07-20 00:48:56] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  
+[2026-07-20 00:51:27] testing.WARNING: S3 upload failed for favicon-16x16.png: Undefined array key "root"  
+[2026-07-20 00:51:27] testing.WARNING: S3 upload failed for favicon-32x32.png: Undefined array key "root"  
+[2026-07-20 00:51:27] testing.WARNING: S3 upload failed for apple-touch-icon.png: Undefined array key "root"  
+[2026-07-20 00:51:27] testing.WARNING: S3 upload failed for android-chrome-192x192.png: Undefined array key "root"  
+[2026-07-20 00:51:27] testing.WARNING: S3 upload failed for android-chrome-512x512.png: Undefined array key "root"  
+[2026-07-20 00:51:27] testing.WARNING: S3 upload failed for favicon.ico: Undefined array key "root"  
+[2026-07-20 00:51:27] testing.WARNING: S3 upload failed for custom_logo_vertical.png: Undefined array key "root"  
+[2026-07-20 00:51:27] testing.WARNING: S3 upload failed for custom_logo_horizontal.png: Undefined array key "root"  
+[2026-07-20 00:51:27] testing.WARNING: S3 upload failed for launcher mipmap-mdpi: Undefined array key "root"  
+[2026-07-20 00:51:27] testing.WARNING: S3 upload failed for launcher mipmap-hdpi: Undefined array key "root"  
+[2026-07-20 00:51:27] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
+[2026-07-20 00:51:27] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
+[2026-07-20 00:51:27] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  
+[2026-07-20 00:55:19] testing.WARNING: S3 upload failed for favicon-16x16.png: Undefined array key "root"  
+[2026-07-20 00:55:19] testing.WARNING: S3 upload failed for favicon-32x32.png: Undefined array key "root"  
+[2026-07-20 00:55:19] testing.WARNING: S3 upload failed for apple-touch-icon.png: Undefined array key "root"  
+[2026-07-20 00:55:19] testing.WARNING: S3 upload failed for android-chrome-192x192.png: Undefined array key "root"  
+[2026-07-20 00:55:19] testing.WARNING: S3 upload failed for android-chrome-512x512.png: Undefined array key "root"  
+[2026-07-20 00:55:19] testing.WARNING: S3 upload failed for favicon.ico: Undefined array key "root"  
+[2026-07-20 00:55:19] testing.WARNING: S3 upload failed for custom_logo_vertical.png: Undefined array key "root"  
+[2026-07-20 00:55:19] testing.WARNING: S3 upload failed for custom_logo_horizontal.png: Undefined array key "root"  
+[2026-07-20 00:55:19] testing.WARNING: S3 upload failed for launcher mipmap-mdpi: Undefined array key "root"  
+[2026-07-20 00:55:19] testing.WARNING: S3 upload failed for launcher mipmap-hdpi: Undefined array key "root"  
+[2026-07-20 00:55:19] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
+[2026-07-20 00:55:19] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
+[2026-07-20 00:55:19] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  
+[2026-07-20 00:55:29] testing.WARNING: S3 upload failed for favicon-16x16.png: Undefined array key "root"  
+[2026-07-20 00:55:29] testing.WARNING: S3 upload failed for favicon-32x32.png: Undefined array key "root"  
+[2026-07-20 00:55:29] testing.WARNING: S3 upload failed for apple-touch-icon.png: Undefined array key "root"  
+[2026-07-20 00:55:29] testing.WARNING: S3 upload failed for android-chrome-192x192.png: Undefined array key "root"  
+[2026-07-20 00:55:29] testing.WARNING: S3 upload failed for android-chrome-512x512.png: Undefined array key "root"  
+[2026-07-20 00:55:29] testing.WARNING: S3 upload failed for favicon.ico: Undefined array key "root"  
+[2026-07-20 00:55:29] testing.WARNING: S3 upload failed for custom_logo_vertical.png: Undefined array key "root"  
+[2026-07-20 00:55:29] testing.WARNING: S3 upload failed for custom_logo_horizontal.png: Undefined array key "root"  
+[2026-07-20 00:55:29] testing.WARNING: S3 upload failed for launcher mipmap-mdpi: Undefined array key "root"  
+[2026-07-20 00:55:29] testing.WARNING: S3 upload failed for launcher mipmap-hdpi: Undefined array key "root"  
+[2026-07-20 00:55:29] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
+[2026-07-20 00:55:29] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
+[2026-07-20 00:55:29] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  
+[2026-07-20 00:58:44] testing.WARNING: S3 upload failed for favicon-16x16.png: Undefined array key "root"  
+[2026-07-20 00:58:44] testing.WARNING: S3 upload failed for favicon-32x32.png: Undefined array key "root"  
+[2026-07-20 00:58:44] testing.WARNING: S3 upload failed for apple-touch-icon.png: Undefined array key "root"  
+[2026-07-20 00:58:44] testing.WARNING: S3 upload failed for android-chrome-192x192.png: Undefined array key "root"  
+[2026-07-20 00:58:44] testing.WARNING: S3 upload failed for android-chrome-512x512.png: Undefined array key "root"  
+[2026-07-20 00:58:44] testing.WARNING: S3 upload failed for favicon.ico: Undefined array key "root"  
+[2026-07-20 00:58:44] testing.WARNING: S3 upload failed for custom_logo_vertical.png: Undefined array key "root"  
+[2026-07-20 00:58:44] testing.WARNING: S3 upload failed for custom_logo_horizontal.png: Undefined array key "root"  
+[2026-07-20 00:58:44] testing.WARNING: S3 upload failed for launcher mipmap-mdpi: Undefined array key "root"  
+[2026-07-20 00:58:44] testing.WARNING: S3 upload failed for launcher mipmap-hdpi: Undefined array key "root"  
+[2026-07-20 00:58:44] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
+[2026-07-20 00:58:44] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
+[2026-07-20 00:58:45] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  
+[2026-07-20 01:03:14] testing.WARNING: S3 upload failed for favicon-16x16.png: Undefined array key "root"  
+[2026-07-20 01:03:14] testing.WARNING: S3 upload failed for favicon-32x32.png: Undefined array key "root"  
+[2026-07-20 01:03:14] testing.WARNING: S3 upload failed for apple-touch-icon.png: Undefined array key "root"  
+[2026-07-20 01:03:14] testing.WARNING: S3 upload failed for android-chrome-192x192.png: Undefined array key "root"  
+[2026-07-20 01:03:14] testing.WARNING: S3 upload failed for android-chrome-512x512.png: Undefined array key "root"  
+[2026-07-20 01:03:14] testing.WARNING: S3 upload failed for favicon.ico: Undefined array key "root"  
+[2026-07-20 01:03:14] testing.WARNING: S3 upload failed for custom_logo_vertical.png: Undefined array key "root"  
+[2026-07-20 01:03:14] testing.WARNING: S3 upload failed for custom_logo_horizontal.png: Undefined array key "root"  
+[2026-07-20 01:03:14] testing.WARNING: S3 upload failed for launcher mipmap-mdpi: Undefined array key "root"  
+[2026-07-20 01:03:14] testing.WARNING: S3 upload failed for launcher mipmap-hdpi: Undefined array key "root"  
+[2026-07-20 01:03:14] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
+[2026-07-20 01:03:14] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
+[2026-07-20 01:03:14] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  
+[2026-07-20 01:03:22] testing.WARNING: S3 upload failed for favicon-16x16.png: Undefined array key "root"  
+[2026-07-20 01:03:22] testing.WARNING: S3 upload failed for favicon-32x32.png: Undefined array key "root"  
+[2026-07-20 01:03:22] testing.WARNING: S3 upload failed for apple-touch-icon.png: Undefined array key "root"  
+[2026-07-20 01:03:22] testing.WARNING: S3 upload failed for android-chrome-192x192.png: Undefined array key "root"  
+[2026-07-20 01:03:22] testing.WARNING: S3 upload failed for android-chrome-512x512.png: Undefined array key "root"  
+[2026-07-20 01:03:22] testing.WARNING: S3 upload failed for favicon.ico: Undefined array key "root"  
+[2026-07-20 01:03:22] testing.WARNING: S3 upload failed for custom_logo_vertical.png: Undefined array key "root"  
+[2026-07-20 01:03:22] testing.WARNING: S3 upload failed for custom_logo_horizontal.png: Undefined array key "root"  
+[2026-07-20 01:03:22] testing.WARNING: S3 upload failed for launcher mipmap-mdpi: Undefined array key "root"  
+[2026-07-20 01:03:22] testing.WARNING: S3 upload failed for launcher mipmap-hdpi: Undefined array key "root"  
+[2026-07-20 01:03:22] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
+[2026-07-20 01:03:22] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
+[2026-07-20 01:03:22] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  
+[2026-07-20 01:07:26] testing.WARNING: S3 upload failed for favicon-16x16.png: Undefined array key "root"  
+[2026-07-20 01:07:26] testing.WARNING: S3 upload failed for favicon-32x32.png: Undefined array key "root"  
+[2026-07-20 01:07:26] testing.WARNING: S3 upload failed for apple-touch-icon.png: Undefined array key "root"  
+[2026-07-20 01:07:26] testing.WARNING: S3 upload failed for android-chrome-192x192.png: Undefined array key "root"  
+[2026-07-20 01:07:26] testing.WARNING: S3 upload failed for android-chrome-512x512.png: Undefined array key "root"  
+[2026-07-20 01:07:26] testing.WARNING: S3 upload failed for favicon.ico: Undefined array key "root"  
+[2026-07-20 01:07:26] testing.WARNING: S3 upload failed for custom_logo_vertical.png: Undefined array key "root"  
+[2026-07-20 01:07:26] testing.WARNING: S3 upload failed for custom_logo_horizontal.png: Undefined array key "root"  
+[2026-07-20 01:07:26] testing.WARNING: S3 upload failed for launcher mipmap-mdpi: Undefined array key "root"  
+[2026-07-20 01:07:26] testing.WARNING: S3 upload failed for launcher mipmap-hdpi: Undefined array key "root"  
+[2026-07-20 01:07:26] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
+[2026-07-20 01:07:26] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
+[2026-07-20 01:07:26] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  
+[2026-07-20 01:10:15] testing.WARNING: S3 upload failed for favicon-16x16.png: Undefined array key "root"  
+[2026-07-20 01:10:15] testing.WARNING: S3 upload failed for favicon-32x32.png: Undefined array key "root"  
+[2026-07-20 01:10:15] testing.WARNING: S3 upload failed for apple-touch-icon.png: Undefined array key "root"  
+[2026-07-20 01:10:15] testing.WARNING: S3 upload failed for android-chrome-192x192.png: Undefined array key "root"  
+[2026-07-20 01:10:15] testing.WARNING: S3 upload failed for android-chrome-512x512.png: Undefined array key "root"  
+[2026-07-20 01:10:15] testing.WARNING: S3 upload failed for favicon.ico: Undefined array key "root"  
+[2026-07-20 01:10:15] testing.WARNING: S3 upload failed for custom_logo_vertical.png: Undefined array key "root"  
+[2026-07-20 01:10:15] testing.WARNING: S3 upload failed for custom_logo_horizontal.png: Undefined array key "root"  
+[2026-07-20 01:10:15] testing.WARNING: S3 upload failed for launcher mipmap-mdpi: Undefined array key "root"  
+[2026-07-20 01:10:15] testing.WARNING: S3 upload failed for launcher mipmap-hdpi: Undefined array key "root"  
+[2026-07-20 01:10:15] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
+[2026-07-20 01:10:15] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
+[2026-07-20 01:10:15] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  
+[2026-07-20 01:16:04] testing.WARNING: S3 upload failed for favicon-16x16.png: Undefined array key "root"  
+[2026-07-20 01:16:04] testing.WARNING: S3 upload failed for favicon-32x32.png: Undefined array key "root"  
+[2026-07-20 01:16:04] testing.WARNING: S3 upload failed for apple-touch-icon.png: Undefined array key "root"  
+[2026-07-20 01:16:04] testing.WARNING: S3 upload failed for android-chrome-192x192.png: Undefined array key "root"  
+[2026-07-20 01:16:04] testing.WARNING: S3 upload failed for android-chrome-512x512.png: Undefined array key "root"  
+[2026-07-20 01:16:04] testing.WARNING: S3 upload failed for favicon.ico: Undefined array key "root"  
+[2026-07-20 01:16:04] testing.WARNING: S3 upload failed for custom_logo_vertical.png: Undefined array key "root"  
+[2026-07-20 01:16:04] testing.WARNING: S3 upload failed for custom_logo_horizontal.png: Undefined array key "root"  
+[2026-07-20 01:16:04] testing.WARNING: S3 upload failed for launcher mipmap-mdpi: Undefined array key "root"  
+[2026-07-20 01:16:04] testing.WARNING: S3 upload failed for launcher mipmap-hdpi: Undefined array key "root"  
+[2026-07-20 01:16:04] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
+[2026-07-20 01:16:04] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
+[2026-07-20 01:16:04] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  
+[2026-07-20 01:22:24] testing.WARNING: S3 upload failed for favicon-16x16.png: Undefined array key "root"  
+[2026-07-20 01:22:24] testing.WARNING: S3 upload failed for favicon-32x32.png: Undefined array key "root"  
+[2026-07-20 01:22:24] testing.WARNING: S3 upload failed for apple-touch-icon.png: Undefined array key "root"  
+[2026-07-20 01:22:24] testing.WARNING: S3 upload failed for android-chrome-192x192.png: Undefined array key "root"  
+[2026-07-20 01:22:24] testing.WARNING: S3 upload failed for android-chrome-512x512.png: Undefined array key "root"  
+[2026-07-20 01:22:24] testing.WARNING: S3 upload failed for favicon.ico: Undefined array key "root"  
+[2026-07-20 01:22:24] testing.WARNING: S3 upload failed for custom_logo_vertical.png: Undefined array key "root"  
+[2026-07-20 01:22:24] testing.WARNING: S3 upload failed for custom_logo_horizontal.png: Undefined array key "root"  
+[2026-07-20 01:22:24] testing.WARNING: S3 upload failed for launcher mipmap-mdpi: Undefined array key "root"  
+[2026-07-20 01:22:24] testing.WARNING: S3 upload failed for launcher mipmap-hdpi: Undefined array key "root"  
+[2026-07-20 01:22:24] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
+[2026-07-20 01:22:24] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
+[2026-07-20 01:22:24] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  
+[2026-07-20 01:41:01] testing.WARNING: S3 upload failed for favicon-16x16.png: Undefined array key "root"  
+[2026-07-20 01:41:01] testing.WARNING: S3 upload failed for favicon-32x32.png: Undefined array key "root"  
+[2026-07-20 01:41:01] testing.WARNING: S3 upload failed for apple-touch-icon.png: Undefined array key "root"  
+[2026-07-20 01:41:01] testing.WARNING: S3 upload failed for android-chrome-192x192.png: Undefined array key "root"  
+[2026-07-20 01:41:01] testing.WARNING: S3 upload failed for android-chrome-512x512.png: Undefined array key "root"  
+[2026-07-20 01:41:01] testing.WARNING: S3 upload failed for favicon.ico: Undefined array key "root"  
+[2026-07-20 01:41:01] testing.WARNING: S3 upload failed for custom_logo_vertical.png: Undefined array key "root"  
+[2026-07-20 01:41:01] testing.WARNING: S3 upload failed for custom_logo_horizontal.png: Undefined array key "root"  
+[2026-07-20 01:41:01] testing.WARNING: S3 upload failed for launcher mipmap-mdpi: Undefined array key "root"  
+[2026-07-20 01:41:01] testing.WARNING: S3 upload failed for launcher mipmap-hdpi: Undefined array key "root"  
+[2026-07-20 01:41:01] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
+[2026-07-20 01:41:01] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
+[2026-07-20 01:41:01] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  
+[2026-07-20 01:47:42] testing.WARNING: S3 upload failed for favicon-16x16.png: Undefined array key "root"  
+[2026-07-20 01:47:42] testing.WARNING: S3 upload failed for favicon-32x32.png: Undefined array key "root"  
+[2026-07-20 01:47:42] testing.WARNING: S3 upload failed for apple-touch-icon.png: Undefined array key "root"  
+[2026-07-20 01:47:42] testing.WARNING: S3 upload failed for android-chrome-192x192.png: Undefined array key "root"  
+[2026-07-20 01:47:42] testing.WARNING: S3 upload failed for android-chrome-512x512.png: Undefined array key "root"  
+[2026-07-20 01:47:42] testing.WARNING: S3 upload failed for favicon.ico: Undefined array key "root"  
+[2026-07-20 01:47:42] testing.WARNING: S3 upload failed for custom_logo_vertical.png: Undefined array key "root"  
+[2026-07-20 01:47:42] testing.WARNING: S3 upload failed for custom_logo_horizontal.png: Undefined array key "root"  
+[2026-07-20 01:47:42] testing.WARNING: S3 upload failed for launcher mipmap-mdpi: Undefined array key "root"  
+[2026-07-20 01:47:42] testing.WARNING: S3 upload failed for launcher mipmap-hdpi: Undefined array key "root"  
+[2026-07-20 01:47:42] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
+[2026-07-20 01:47:42] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
+[2026-07-20 01:47:42] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  
+[2026-07-20 01:47:54] testing.WARNING: S3 upload failed for favicon-16x16.png: Undefined array key "root"  
+[2026-07-20 01:47:54] testing.WARNING: S3 upload failed for favicon-32x32.png: Undefined array key "root"  
+[2026-07-20 01:47:54] testing.WARNING: S3 upload failed for apple-touch-icon.png: Undefined array key "root"  
+[2026-07-20 01:47:54] testing.WARNING: S3 upload failed for android-chrome-192x192.png: Undefined array key "root"  
+[2026-07-20 01:47:54] testing.WARNING: S3 upload failed for android-chrome-512x512.png: Undefined array key "root"  
+[2026-07-20 01:47:54] testing.WARNING: S3 upload failed for favicon.ico: Undefined array key "root"  
+[2026-07-20 01:47:54] testing.WARNING: S3 upload failed for custom_logo_vertical.png: Undefined array key "root"  
+[2026-07-20 01:47:54] testing.WARNING: S3 upload failed for custom_logo_horizontal.png: Undefined array key "root"  
+[2026-07-20 01:47:54] testing.WARNING: S3 upload failed for launcher mipmap-mdpi: Undefined array key "root"  
+[2026-07-20 01:47:54] testing.WARNING: S3 upload failed for launcher mipmap-hdpi: Undefined array key "root"  
+[2026-07-20 01:47:54] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
+[2026-07-20 01:47:54] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
+[2026-07-20 01:47:54] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  
+[2026-07-20 01:48:08] testing.WARNING: S3 upload failed for favicon-16x16.png: Undefined array key "root"  
+[2026-07-20 01:48:08] testing.WARNING: S3 upload failed for favicon-32x32.png: Undefined array key "root"  
+[2026-07-20 01:48:08] testing.WARNING: S3 upload failed for apple-touch-icon.png: Undefined array key "root"  
+[2026-07-20 01:48:08] testing.WARNING: S3 upload failed for android-chrome-192x192.png: Undefined array key "root"  
+[2026-07-20 01:48:08] testing.WARNING: S3 upload failed for android-chrome-512x512.png: Undefined array key "root"  
+[2026-07-20 01:48:08] testing.WARNING: S3 upload failed for favicon.ico: Undefined array key "root"  
+[2026-07-20 01:48:08] testing.WARNING: S3 upload failed for custom_logo_vertical.png: Undefined array key "root"  
+[2026-07-20 01:48:08] testing.WARNING: S3 upload failed for custom_logo_horizontal.png: Undefined array key "root"  
+[2026-07-20 01:48:08] testing.WARNING: S3 upload failed for launcher mipmap-mdpi: Undefined array key "root"  
+[2026-07-20 01:48:08] testing.WARNING: S3 upload failed for launcher mipmap-hdpi: Undefined array key "root"  
+[2026-07-20 01:48:08] testing.WARNING: S3 upload failed for launcher mipmap-xhdpi: Undefined array key "root"  
+[2026-07-20 01:48:08] testing.WARNING: S3 upload failed for launcher mipmap-xxhdpi: Undefined array key "root"  
+[2026-07-20 01:48:08] testing.WARNING: S3 upload failed for launcher mipmap-xxxhdpi: Undefined array key "root"  

@@ -16,6 +16,7 @@ class AuditLog extends Model
             if (app()->runningInConsole()) {
                 return;
             }
+            
             $user = auth()->user();
             if (!$user || $user->email !== 'itcloud.uz') {
                 $builder->where(function ($query) {
