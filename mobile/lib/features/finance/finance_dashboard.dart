@@ -429,7 +429,7 @@ class _FinanceDashboardState extends ConsumerState<FinanceDashboard> {
             )
           : null,
       bottomNavigationBar: Container(
-        height: 80,
+        height: 70,
         decoration: const InsetBoxDecoration(
           color: AppColors.background,
           boxShadow: [
@@ -437,13 +437,11 @@ class _FinanceDashboardState extends ConsumerState<FinanceDashboard> {
           ],
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildNavItem(0, Icons.account_balance_outlined, 'Kassalar'),
-            _buildNavItem(1, Icons.contact_page_outlined, 'Kontragentlar'),
-            _buildNavItem(2, Icons.list_alt_outlined, 'Tranzaksiyalar'),
-            _buildNavItem(3, Icons.analytics_outlined, 'Hisobotlar'),
+            _buildNavItem(0, Icons.account_balance_outlined, 'Kassa'),
+            _buildNavItem(1, Icons.contact_page_outlined, 'Kontragent'),
+            _buildNavItem(2, Icons.list_alt_outlined, 'Tranzaksiya'),
+            _buildNavItem(3, Icons.analytics_outlined, 'Hisobot'),
           ],
         ),
       ),
@@ -472,24 +470,29 @@ class _FinanceDashboardState extends ConsumerState<FinanceDashboard> {
             children: [
               AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
                 decoration: isSelected
                     ? NeumorphicDecorations.sunken(radius: 10)
                     : const InsetBoxDecoration(),
                 child: Icon(
                   icon,
                   color: isSelected ? AppColors.success : AppColors.textMuted,
-                  size: 22,
+                  size: 20,
                 ),
               ),
-              if (isSelected) ...[
-                const SizedBox(height: 2),
-                Text(
+              const SizedBox(height: 2),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
                   label,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    color: isSelected ? AppColors.textPrimary : AppColors.textMuted,
+                  ),
                 ),
-              ],
+              ),
             ],
           ),
         ),

@@ -455,7 +455,7 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
             )
           : null,
       bottomNavigationBar: Container(
-        height: 80,
+        height: 70,
         decoration: const InsetBoxDecoration(
           color: AppColors.background,
           boxShadow: [
@@ -463,13 +463,11 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
           ],
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildNavItem(0, Icons.dashboard_outlined, 'Bosh sahifa'),
-            _buildNavItem(1, Icons.people_outline, 'Xodimlar'),
+            _buildNavItem(0, Icons.dashboard_outlined, 'Bosh'),
+            _buildNavItem(1, Icons.people_outline, 'Xodim'),
             _buildNavItem(2, Icons.warehouse_outlined, 'Ombor'),
-            _buildNavItem(3, Icons.settings_outlined, 'Sozlamalar'),
+            _buildNavItem(3, Icons.settings_outlined, 'Sozlama'),
           ],
         ),
       ),
@@ -498,24 +496,29 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
             children: [
               AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
                 decoration: isSelected
                     ? NeumorphicDecorations.sunken(radius: 10)
                     : const InsetBoxDecoration(),
                 child: Icon(
                   icon,
                   color: isSelected ? AppColors.success : AppColors.textMuted,
-                  size: 22,
+                  size: 20,
                 ),
               ),
-              if (isSelected) ...[
-                const SizedBox(height: 2),
-                Text(
+              const SizedBox(height: 2),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
                   label,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    color: isSelected ? AppColors.textPrimary : AppColors.textMuted,
+                  ),
                 ),
-              ],
+              ),
             ],
           ),
         ),

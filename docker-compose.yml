@@ -14,6 +14,8 @@ services:
       - /var/www/html/vendor
     env_file:
       - .env
+    environment:
+      AWS_ENDPOINT: http://minio:9000
     depends_on:
       postgres:
         condition: service_healthy
@@ -106,6 +108,11 @@ services:
       DB_USERNAME: ${DB_USERNAME:-blackdoor}
       DB_PASSWORD: ${DB_PASSWORD:-secret}
       REPORT_FILES_DIR: /app/generated_reports
+      AWS_ENDPOINT: http://minio:9000
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-minioadmin}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-minioadminpassword}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-us-east-1}
+      AWS_BUCKET: ${AWS_BUCKET:-blackdoor}
     volumes:
       - ./services/reports:/app
       - ./public/branding:/app/branding:ro
@@ -138,6 +145,8 @@ services:
       - /var/www/html/vendor
     env_file:
       - .env
+    environment:
+      AWS_ENDPOINT: http://minio:9000
     ports:
       - "8080:8080"
     depends_on:
@@ -166,6 +175,8 @@ services:
       - /var/www/html/vendor
     env_file:
       - .env
+    environment:
+      AWS_ENDPOINT: http://minio:9000
     depends_on:
       app:
         condition: service_healthy
@@ -186,23 +197,64 @@ services:
     container_name: blackdoor-queue
     restart: unless-stopped
     working_dir: /var/www/html
-    command: php artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
+    command: php artisan horizon
     volumes:
       - .:/var/www/html
       - /var/www/html/vendor
     env_file:
       - .env
+    environment:
+      AWS_ENDPOINT: http://minio:9000
     depends_on:
       app:
         condition: service_healthy
     networks:
       - blackdoor-network
     healthcheck:
-      test: ["CMD-SHELL", "ps aux | grep 'queue:work' | grep -v grep || exit 1"]
+      test: ["CMD-SHELL", "ps aux | grep 'horizon' | grep -v grep || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 10s
+
+  # ─── MinIO Object Storage (S3-Compatible) ─────────────────────────────
+  minio:
+    image: minio/minio:RELEASE.2024-07-16T22-04-19Z
+    container_name: blackdoor-minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${AWS_ACCESS_KEY_ID:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${AWS_SECRET_ACCESS_KEY:-minioadminpassword}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - blackdoor-network
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  minio-create-bucket:
+    image: minio/mc:RELEASE.2024-07-16T22-04-19Z
+    container_name: blackdoor-minio-create-bucket
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set myminio http://minio:9000 ${AWS_ACCESS_KEY_ID:-minioadmin} ${AWS_SECRET_ACCESS_KEY:-minioadminpassword};
+      mc mb --ignore-existing myminio/${AWS_BUCKET:-blackdoor};
+      mc anonymous set public myminio/${AWS_BUCKET:-blackdoor};
+      exit 0;
+      "
+    networks:
+      - blackdoor-network
 
 networks:
   blackdoor-network:
@@ -214,4 +266,6 @@ volumes:
   redis-data:
     driver: local
   report-files:
+    driver: local
+  minio-data:
     driver: local

@@ -20,8 +20,16 @@ yarn-error.log
 /storage/framework/sessions/*
 /storage/framework/testing/*
 /storage/app/public/*
+/storage/app/backups/
 
 # Custom User Branding
 /branding/custom_*
 /public/branding/custom_*
 /mobile/assets/branding/custom_*
+
+# Local PostgreSQL Data & Logs
+/database/postgres-data/
+/database/postgres.log
+
+# Temporary test folders
+/storage/app/temp_branding_*

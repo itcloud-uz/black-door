@@ -23,8 +23,21 @@ class ObjectTransactionController extends Controller
     {
         $user = Auth::user();
         if ($user->role->value === 'manager') {
-            $mgr = ObjectManager::where('user_id', $user->id)->first();
-            return $mgr ? $mgr->object : null;
+            $managedIds = $user->getManagedObjectIds();
+            if (empty($managedIds)) {
+                return null;
+            }
+            
+            $id = request('object_id') ?: request()->header('X-Object-ID');
+            if (!$id && request()->hasSession()) {
+                $id = session('active_object_id');
+            }
+            
+            if ($id && in_array((int)$id, $managedIds)) {
+                return \App\Models\Obj::find((int)$id);
+            }
+            
+            return \App\Models\Obj::find($managedIds[0]);
         }
         $emp = ObjectEmployee::where('user_id', $user->id)->first();
         return $emp ? $emp->object : null;
@@ -103,12 +116,17 @@ class ObjectTransactionController extends Controller
             $createdTransactions = [];
 
             DB::transaction(function () use ($request, $object, $type, $currencyVal, $amountCents, $cashAccountId, &$createdTransactions) {
+                ObjectCashBalance::firstOrCreate([
+                    'object_cash_account_id' => $cashAccountId,
+                    'currency' => $currencyVal,
+                ], ['balance' => 0]);
+
                 $cashBalance = ObjectCashBalance::where('object_cash_account_id', $cashAccountId)
                     ->where('currency', $currencyVal)
-                    ->firstOrCreate([
-                        'object_cash_account_id' => $cashAccountId,
-                        'currency' => $currencyVal,
-                    ], ['balance' => 0]);
+                    ->lockForUpdate()
+                    ->first();
+
+                $asSubManager = \App\Models\ObjectSubManager::isCurrentUserSubManager((int)$object->id);
 
                 if ($type === 'income') {
                     $newBalance = $cashBalance->balance + $amountCents;
@@ -127,6 +145,7 @@ class ObjectTransactionController extends Controller
                         'note' => $request->note,
                         'created_by' => Auth::id(),
                         'transaction_date' => now()->toDateString(),
+                        'as_sub_manager' => $asSubManager,
                     ]);
 
                     $createdTransactions[] = $tx;
@@ -153,6 +172,7 @@ class ObjectTransactionController extends Controller
                         'note' => $request->note,
                         'created_by' => Auth::id(),
                         'transaction_date' => now()->toDateString(),
+                        'as_sub_manager' => $asSubManager,
                     ]);
 
                     $createdTransactions[] = $tx;

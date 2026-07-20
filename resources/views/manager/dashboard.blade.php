@@ -16,18 +16,36 @@
 
 {{-- Object Info --}}
 <div class="skeuo-card mb-xl">
-    <div class="d-flex items-center gap-md">
-        <span style="font-size: 3rem;">
-            @switch($object->type->value)
-                @case('factory') <i class="bi bi-building-gear"></i> @break
-                @case('construction') <i class="bi bi-cone-striped"></i> @break
-                @case('warehouse') <i class="bi bi-shop"></i> @break
-            @endswitch
-        </span>
-        <div>
-            <h1 class="page-title" style="margin: 0;">{{ $object->name }}</h1>
-            <p class="text-muted" style="margin: 4px 0 0 0;">📍 {{ $object->address ?? "Manzil ko'rsatilmagan" }} | Turi: {{ $object->type->label() }}</p>
+    <div class="d-flex items-center gap-md" style="flex-wrap: wrap; width: 100%;">
+        <div class="d-flex items-center gap-md">
+            <span style="font-size: 3rem;">
+                @switch($object->type->value)
+                    @case('factory') <i class="bi bi-building-gear"></i> @break
+                    @case('construction') <i class="bi bi-cone-striped"></i> @break
+                    @case('warehouse') <i class="bi bi-shop"></i> @break
+                @endswitch
+            </span>
+            <div>
+                <h1 class="page-title" style="margin: 0;">{{ $object->name }}</h1>
+                <p class="text-muted" style="margin: 4px 0 0 0;">📍 {{ $object->address ?? "Manzil ko'rsatilmagan" }} | Turi: {{ $object->type->label() }}</p>
+            </div>
         </div>
+        
+        @if(isset($managedObjects) && count($managedObjects) > 1)
+            <div style="margin-left: auto;">
+                <form action="{{ route('manager.switch-object') }}" method="POST" id="switch-object-form" class="d-flex items-center gap-xs">
+                    @csrf
+                    <span class="text-xs text-muted mr-xs uppercase font-bold" style="font-size: 0.75rem;">Obyekt:</span>
+                    <select name="object_id" onchange="document.getElementById('switch-object-form').submit();" class="skeuo-input-style" style="padding: 6px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; width: auto; background: var(--surface);">
+                        @foreach($managedObjects as $mObj)
+                            <option value="{{ $mObj->id }}" {{ $object->id === $mObj->id ? 'selected' : '' }}>
+                                {{ $mObj->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+            </div>
+        @endif
     </div>
 </div>
 

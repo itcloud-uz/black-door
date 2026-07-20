@@ -78,6 +78,10 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')
     Route::post('/objects/{object}/employees', [AdminObjectController::class, 'storeEmployee'])->name('objects.employees.store');
     Route::delete('/objects/{object}/employees/{employee}', [AdminObjectController::class, 'destroyEmployee'])->name('objects.employees.destroy');
     
+    // Sub-managers under Objects
+    Route::post('/objects/{object}/sub-managers', [\App\Http\Controllers\Admin\ObjectSubManagerController::class, 'store'])->name('objects.sub-managers.store');
+    Route::delete('/objects/{object}/sub-managers/{subManager}', [\App\Http\Controllers\Admin\ObjectSubManagerController::class, 'destroy'])->name('objects.sub-managers.destroy');
+    
     // Currency Rates Management
     Route::get('/currency-rates', [AdminCurrencyController::class, 'index'])->name('currency-rates');
     Route::post('/currency-rates', [AdminCurrencyController::class, 'store'])->name('currency-rates.store');
@@ -127,6 +131,7 @@ Route::middleware(['auth', 'role:super_admin,financier', 'finance.pin'])->prefix
 // --- Operational (Manager / Employee) Routes ----------------------------------
 Route::middleware(['auth', 'role:manager,employee'])->prefix('manager')->name('manager.')->group(function () {
     Route::get('/', [ManagerDashboardController::class, 'index'])->name('dashboard');
+    Route::post('/switch-object', [ManagerDashboardController::class, 'switchObject'])->name('switch-object');
     
     // Employees Management (within assigned object)
     Route::get('/employees', [ManagerEmployeeController::class, 'index'])->name('employees.index');

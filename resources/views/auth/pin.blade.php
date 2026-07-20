@@ -12,23 +12,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
-    {{-- Theme Accent Custom Override --}}
-    <style>
-        :root {
-            @php
-                $accent = \App\Models\Setting::get('accent_color', 'green');
-                if ($accent === 'blue') {
-                    echo '--accent-green: var(--accent-blue) !important; ';
-                    echo '--accent-green-start: var(--accent-blue-start) !important; ';
-                    echo '--accent-green-end: var(--accent-blue-end) !important; ';
-                } elseif ($accent === 'red') {
-                    echo '--accent-green: var(--accent-red) !important; ';
-                    echo '--accent-green-start: var(--accent-red-start) !important; ';
-                    echo '--accent-green-end: var(--accent-red-end) !important; ';
-                }
-            @endphp
-        }
-    </style>
+    {{-- Theme Accent Custom Override (Cache-Friendly Static CSS) --}}
+    <link rel="stylesheet" href="{{ asset('css/theme.css') }}?v={{ \App\Models\Setting::get('theme_css_version', '1') }}">
 
     {{-- Favicons --}}
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">

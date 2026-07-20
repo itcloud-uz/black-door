@@ -32,6 +32,7 @@ class ObjectTransaction extends Model
         'attachment_path',
         'created_by',
         'transaction_date',
+        'as_sub_manager',
     ];
 
     /**
@@ -45,6 +46,7 @@ class ObjectTransaction extends Model
             'amount' => 'integer',
             'balance_after' => 'integer',
             'transaction_date' => 'date',
+            'as_sub_manager' => 'boolean',
         ];
     }
 

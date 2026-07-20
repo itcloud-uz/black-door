@@ -145,10 +145,20 @@ php artisan serve
 Tizimga brauzer orqali `http://127.0.0.1:8000` manzilida kiring.
 
 ### 6. Testlarni ishga tushirish:
-Tizimning barcha ruxsatnomalari va moliyaviy balans amallari to'g'ri ishlayotganligini tekshirish uchun testlarni ishga tushiring:
+Tizimda testlarni yurgizishning ikkita rejimi mavjud:
+
+#### A. Tezkor Lokal Testlar (SQLite - xotirada)
+Ishlab chiqish jarayonida testlarni tezkorlik bilan yurgizib ko'rish uchun SQLite :memory: ishlatiladi:
 ```bash
 php artisan test
 ```
+
+#### B. Ishlab Chiqarishdan Oldingi Majburiy Testlar (PostgreSQL)
+Loyiha ishlab chiqarishga (production) topshirilishidan oldin, PostgreSQL muhiti bilan mosligini to'liq tekshirish uchun alohida test bazasi va konfiguratsiyasidan foydalaniladi:
+```bash
+php artisan test --configuration phpunit.pgsql.xml
+```
+*Eslatma: Ushbu testlarni yurgizishdan oldin PostgreSQL test bazasi (sukut bo'yicha: `blackdoor_test`) yaratilgan va ishga tushirilgan bo'lishi lozim.*
 
 ---
 *Loyihaning Neumorphic (Soft UI) dizayni to'liq yakunlandi va foydalanishga tayyor.*

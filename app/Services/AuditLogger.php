@@ -19,6 +19,11 @@ class AuditLogger
         $ipAddress = Request::ip();
         $userAgent = Request::header('User-Agent');
 
+        $asSubManager = false;
+        if (auth()->check() && isset($model->object_id)) {
+            $asSubManager = \App\Models\ObjectSubManager::isCurrentUserSubManager((int)$model->object_id);
+        }
+
         AuditLog::create([
             'user_id' => $userId,
             'action' => $action,
@@ -28,6 +33,7 @@ class AuditLogger
             'new_values' => $newValues,
             'ip_address' => $ipAddress,
             'user_agent' => $userAgent,
+            'as_sub_manager' => $asSubManager,
         ]);
     }
 }

@@ -117,7 +117,8 @@ class ObjectController extends Controller
             'transactions.cashAccount',
             'transactions.category',
             'warehouseStocks.product',
-            'employees.user'
+            'employees.user',
+            'subManagers.user'
         ]);
 
         // Calculate total balances across all object cash accounts
@@ -135,8 +136,12 @@ class ObjectController extends Controller
             ->whereNotIn('id', $object->employees->pluck('user_id')->toArray())
             ->orderBy('name')
             ->get();
+        $availableManagers = User::where('role', UserRole::Manager->value)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
 
-        return view('admin.objects.show', compact('object', 'totalUZS', 'totalUSD', 'availableProducts', 'availableEmployees'));
+        return view('admin.objects.show', compact('object', 'totalUZS', 'totalUSD', 'availableProducts', 'availableEmployees', 'availableManagers'));
     }
 
     /**

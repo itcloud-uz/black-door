@@ -24,6 +24,7 @@ class InventoryCheck extends Model
         'note',
         'approved_by',
         'approved_at',
+        'as_sub_manager',
     ];
 
     /**
@@ -34,6 +35,7 @@ class InventoryCheck extends Model
         return [
             'checked_at' => 'datetime',
             'approved_at' => 'datetime',
+            'as_sub_manager' => 'boolean',
         ];
     }
 

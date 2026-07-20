@@ -25,7 +25,14 @@ class DashboardController extends Controller
         $usersCount = User::count();
         
         $cashAccounts = CashAccount::with('balances')->get();
-        $objects = Obj::with(['activeManager.user'])->get();
+        $objects = Obj::with([
+            'activeManager.user',
+            'subManagers' => function($query) {
+                $query->where('start_date', '<=', now()->toDateString())
+                      ->where('end_date', '>=', now()->toDateString())
+                      ->with('user');
+            }
+        ])->get();
         
         $recentTransactions = Transaction::with('cashAccount')
             ->orderBy('created_at', 'desc')

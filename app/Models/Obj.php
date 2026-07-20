@@ -90,6 +90,14 @@ class Obj extends Model
     }
 
     /**
+     * Obyektning vaqtinchalik o'rinbosar menejerlari.
+     */
+    public function subManagers(): HasMany
+    {
+        return $this->hasMany(ObjectSubManager::class, 'object_id');
+    }
+
+    /**
      * Obyekt xodimlari.
      */
     public function employees(): HasMany

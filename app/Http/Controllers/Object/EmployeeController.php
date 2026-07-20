@@ -28,8 +28,21 @@ class EmployeeController extends Controller
     {
         $user = Auth::user();
         if ($user->role->value === 'manager') {
-            $mgr = ObjectManager::where('user_id', $user->id)->first();
-            return $mgr ? $mgr->object : null;
+            $managedIds = $user->getManagedObjectIds();
+            if (empty($managedIds)) {
+                return null;
+            }
+            
+            $id = request('object_id') ?: request()->header('X-Object-ID');
+            if (!$id && request()->hasSession()) {
+                $id = session('active_object_id');
+            }
+            
+            if ($id && in_array((int)$id, $managedIds)) {
+                return \App\Models\Obj::find((int)$id);
+            }
+            
+            return \App\Models\Obj::find($managedIds[0]);
         }
         $emp = ObjectEmployee::where('user_id', $user->id)->first();
         return $emp ? $emp->object : null;
@@ -214,14 +227,17 @@ class EmployeeController extends Controller
             $tx = null;
 
             DB::transaction(function () use ($request, $object, $employee, $cashAccountId, $currencyVal, $amountCents, &$tx) {
-                // 1. Get cash balance
+                // 1. Get cash balance with lock
                 $cashBalance = ObjectCashBalance::where('object_cash_account_id', $cashAccountId)
                     ->where('currency', $currencyVal)
+                    ->lockForUpdate()
                     ->first();
 
                 if (!$cashBalance || $cashBalance->balance < $amountCents) {
                     throw new \Exception('Kassada yetarli mablag\' mavjud emas.');
                 }
+
+                $asSubManager = \App\Models\ObjectSubManager::isCurrentUserSubManager((int)$object->id);
 
                 // 2. Deduct cash balance
                 $newBalance = $cashBalance->balance - $amountCents;
@@ -255,6 +271,7 @@ class EmployeeController extends Controller
                     'note' => $request->note ?? ($request->type === 'salary' ? 'Oylik to\'lovi' : 'Avans to\'lovi'),
                     'created_by' => Auth::id(),
                     'transaction_date' => now()->toDateString(),
+                    'as_sub_manager' => $asSubManager,
                 ]);
 
                 // 5. Create SalaryPayment
@@ -265,9 +282,11 @@ class EmployeeController extends Controller
                     'amount' => $amountCents,
                     'period_start' => $request->period_start,
                     'period_end' => $request->period_end,
+                    'type' => $request->type,
                     'note' => $request->note,
                     'paid_at' => now(),
                     'created_by' => Auth::id(),
+                    'as_sub_manager' => $asSubManager,
                 ]);
 
                 AuditLogger::log('create_salary_payment', $payment, null, $payment->toArray());

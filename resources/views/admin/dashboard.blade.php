@@ -103,6 +103,9 @@
                     @if($object->activeManager)
                         <span class="text-sm text-muted">{{ $object->activeManager->user->name ?? '—' }}</span>
                     @endif
+                    @if($object->subManagers->isNotEmpty())
+                        <span class="text-xs text-red font-bold" title="Vaqtinchalik o'rinbosar">(O'r: {{ $object->subManagers->first()->user->name }})</span>
+                    @endif
                     <span class="skeuo-badge {{ $object->is_active ? 'skeuo-badge-green' : 'skeuo-badge-red' }}">
                         {{ $object->is_active ? 'Faol' : 'Nofaol' }}
                     </span>

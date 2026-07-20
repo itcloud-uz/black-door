@@ -17,25 +17,42 @@ use Illuminate\Support\Facades\Auth;
 
 class ManagerDashboardController extends Controller
 {
+    protected function getObject()
+    {
+        $user = Auth::user();
+        if ($user->role->value === 'manager') {
+            $managedIds = $user->getManagedObjectIds();
+            if (empty($managedIds)) {
+                return null;
+            }
+            
+            $id = request('object_id') ?: request()->header('X-Object-ID');
+            if (!$id && request()->hasSession()) {
+                $id = session('active_object_id');
+            }
+            
+            if ($id && in_array((int)$id, $managedIds)) {
+                return \App\Models\Obj::find((int)$id);
+            }
+            
+            return \App\Models\Obj::find($managedIds[0]);
+        }
+        $emp = ObjectEmployee::where('user_id', $user->id)->first();
+        return $emp ? $emp->object : null;
+    }
+
     public function index()
     {
         $user = Auth::user();
-        $object = null;
-
-        if ($user->role->value === 'manager') {
-            $mgr = ObjectManager::where('user_id', $user->id)->first();
-            if ($mgr) {
-                $object = $mgr->object;
-            }
-        } elseif ($user->role->value === 'employee') {
-            $emp = ObjectEmployee::where('user_id', $user->id)->first();
-            if ($emp) {
-                $object = $emp->object;
-            }
-        }
+        $object = $this->getObject();
 
         if (! $object) {
             return view('manager.no_object');
+        }
+
+        $managedObjects = [];
+        if ($user->role->value === 'manager') {
+            $managedObjects = \App\Models\Obj::whereIn('id', $user->getManagedObjectIds())->get();
         }
 
         // Stats
@@ -88,7 +105,28 @@ class ManagerDashboardController extends Controller
             'cashAccounts',
             'lowStockCount',
             'recentTransactions',
-            'recentMovements'
+            'recentMovements',
+            'managedObjects'
         ));
+    }
+
+    public function switchObject(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'object_id' => 'required|exists:objects,id',
+        ]);
+        
+        $user = Auth::user();
+        if ($user->role->value === 'manager') {
+            $managedIds = $user->getManagedObjectIds();
+            $id = (int)$request->object_id;
+            
+            if (in_array($id, $managedIds)) {
+                session(['active_object_id' => $id]);
+                return back()->with('success', 'Obyekt muvaffaqiyatli almashtirildi.');
+            }
+        }
+        
+        return back()->withErrors(['object_id' => 'Sizda ushbu obyektni boshqarish huquqi yo\'q.']);
     }
 }

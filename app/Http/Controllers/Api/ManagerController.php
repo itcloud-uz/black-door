@@ -42,8 +42,21 @@ class ManagerController extends Controller
     {
         $user = Auth::user();
         if ($user->role->value === 'manager') {
-            $mgr = ObjectManager::where('user_id', $user->id)->first();
-            return $mgr ? $mgr->object : null;
+            $managedIds = $user->getManagedObjectIds();
+            if (empty($managedIds)) {
+                return null;
+            }
+            
+            $id = request('object_id') ?: request()->header('X-Object-ID');
+            if (!$id && request()->hasSession()) {
+                $id = session('active_object_id');
+            }
+            
+            if ($id && in_array((int)$id, $managedIds)) {
+                return \App\Models\Obj::find((int)$id);
+            }
+            
+            return \App\Models\Obj::find($managedIds[0]);
         }
         $emp = ObjectEmployee::where('user_id', $user->id)->first();
         return $emp ? $emp->object : null;
@@ -315,11 +328,14 @@ class ManagerController extends Controller
             DB::transaction(function () use ($request, $object, $employee, $cashAccountId, $currencyVal, $amountCents, &$tx) {
                 $cashBalance = ObjectCashBalance::where('object_cash_account_id', $cashAccountId)
                     ->where('currency', $currencyVal)
+                    ->lockForUpdate()
                     ->first();
 
                 if (!$cashBalance || $cashBalance->balance < $amountCents) {
                     throw new \Exception('Kassada yetarli mablag\' mavjud emas.');
                 }
+
+                $asSubManager = \App\Models\ObjectSubManager::isCurrentUserSubManager((int)$object->id);
 
                 $newBalance = $cashBalance->balance - $amountCents;
                 $cashBalance->balance = $newBalance;
@@ -350,6 +366,7 @@ class ManagerController extends Controller
                     'note' => $request->note ?? ($request->type === 'salary' ? 'Oylik to\'lovi' : 'Avans to\'lovi'),
                     'created_by' => Auth::id(),
                     'transaction_date' => now()->toDateString(),
+                    'as_sub_manager' => $asSubManager,
                 ]);
 
                 $payment = SalaryPayment::create([
@@ -362,6 +379,7 @@ class ManagerController extends Controller
                     'note' => $request->note,
                     'paid_at' => now(),
                     'created_by' => Auth::id(),
+                    'as_sub_manager' => $asSubManager,
                 ]);
 
                 AuditLogger::log('create_salary_payment', $payment, null, $payment->toArray());
@@ -434,12 +452,17 @@ class ManagerController extends Controller
 
         try {
             $tx = DB::transaction(function () use ($request, $object, $type, $amountCents, $currencyVal, $cashAccountId) {
+                ObjectCashBalance::firstOrCreate([
+                    'object_cash_account_id' => $cashAccountId,
+                    'currency' => $currencyVal,
+                ], ['balance' => 0]);
+
                 $cashBalance = ObjectCashBalance::where('object_cash_account_id', $cashAccountId)
                     ->where('currency', $currencyVal)
-                    ->firstOrCreate([
-                        'object_cash_account_id' => $cashAccountId,
-                        'currency' => $currencyVal,
-                    ], ['balance' => 0]);
+                    ->lockForUpdate()
+                    ->first();
+
+                $asSubManager = \App\Models\ObjectSubManager::isCurrentUserSubManager((int)$object->id);
 
                 if ($type === 'income') {
                     $newBalance = $cashBalance->balance + $amountCents;
@@ -466,6 +489,7 @@ class ManagerController extends Controller
                     'note' => $request->note,
                     'created_by' => Auth::id(),
                     'transaction_date' => now()->toDateString(),
+                    'as_sub_manager' => $asSubManager,
                 ]);
 
                 AuditLogger::log('create_object_transaction', $transaction, null, $transaction->toArray());
@@ -536,80 +560,39 @@ class ManagerController extends Controller
 
         try {
             DB::transaction(function () use ($request, $object, $productId, $type, $qty) {
-                $stock = WarehouseStock::where('object_id', $object->id)
-                    ->where('product_id', $productId)
-                    ->firstOrCreate([
-                        'object_id' => $object->id,
-                        'product_id' => $productId,
-                    ], ['quantity' => 0]);
-
                 $product = Product::findOrFail($productId);
+                $asSubManager = \App\Models\ObjectSubManager::isCurrentUserSubManager((int)$object->id);
 
-                if ($type === 'incoming') {
-                    $stock->quantity += $qty;
-                    $stock->save();
-
-                    $mvt = WarehouseMovement::create([
-                        'object_id' => $object->id,
-                        'product_id' => $productId,
-                        'type' => WarehouseMovementType::Incoming->value,
-                        'quantity' => $qty,
-                        'note' => $request->note,
-                        'recipient_name' => $request->recipient_name,
-                        'created_by' => Auth::id(),
-                        'movement_date' => now()->toDateString(),
-                    ]);
-
-                    AuditLogger::log('warehouse_incoming', $mvt, null, $mvt->toArray());
-
-                } elseif ($type === 'outgoing') {
-                    if ($stock->quantity < $qty) {
-                        throw new \Exception('Omborda yetarli mahsulot mavjud emas.');
-                    }
-
-                    $stock->quantity -= $qty;
-                    $stock->save();
-
-                    $mvt = WarehouseMovement::create([
-                        'object_id' => $object->id,
-                        'product_id' => $productId,
-                        'type' => WarehouseMovementType::Outgoing->value,
-                        'quantity' => $qty,
-                        'note' => $request->note,
-                        'recipient_name' => $request->recipient_name,
-                        'created_by' => Auth::id(),
-                        'movement_date' => now()->toDateString(),
-                    ]);
-
-                    AuditLogger::log('warehouse_outgoing', $mvt, null, $mvt->toArray());
-
-                    // Check for low stock alert
-                    if ($stock->quantity < ($product->min_limit ?? 0)) {
-                        broadcast(new LowStockWarning([
-                            'object_name' => $object->name,
-                            'product_name' => $product->name,
-                            'quantity' => $stock->quantity,
-                            'min_limit' => $product->min_limit
-                        ]))->toOthers();
-                    }
-
-                } elseif ($type === 'transfer') {
+                if ($type === 'transfer') {
                     $toObjectId = (int)$request->to_object_id;
                     if ($toObjectId === $object->id) {
                         throw new \Exception('O\'tkazish uchun boshqa obyekt tanlanishi kerak.');
                     }
+
+                    $objectIds = [$object->id, $toObjectId];
+                    sort($objectIds);
+
+                    $stocks = [];
+                    foreach ($objectIds as $oid) {
+                        WarehouseStock::firstOrCreate([
+                            'object_id' => $oid,
+                            'product_id' => $productId,
+                        ], ['quantity' => 0]);
+
+                        $stocks[$oid] = WarehouseStock::where('object_id', $oid)
+                            ->where('product_id', $productId)
+                            ->lockForUpdate()
+                            ->first();
+                    }
+
+                    $stock = $stocks[$object->id];
+                    $destStock = $stocks[$toObjectId];
 
                     if ($stock->quantity < $qty) {
                         throw new \Exception('Omborda yetarli mahsulot mavjud emas.');
                     }
 
                     $toObject = Obj::findOrFail($toObjectId);
-                    $destStock = WarehouseStock::where('object_id', $toObjectId)
-                        ->where('product_id', $productId)
-                        ->firstOrCreate([
-                            'object_id' => $toObjectId,
-                            'product_id' => $productId,
-                        ], ['quantity' => 0]);
 
                     // Deduct source
                     $stock->quantity -= $qty;
@@ -631,6 +614,7 @@ class ManagerController extends Controller
                         'recipient_name' => $request->recipient_name,
                         'created_by' => Auth::id(),
                         'movement_date' => now()->toDateString(),
+                        'as_sub_manager' => $asSubManager,
                     ]);
 
                     $mvtIn = WarehouseMovement::create([
@@ -644,12 +628,67 @@ class ManagerController extends Controller
                         'recipient_name' => $request->recipient_name,
                         'created_by' => Auth::id(),
                         'movement_date' => now()->toDateString(),
+                        'as_sub_manager' => $asSubManager,
                     ]);
 
                     AuditLogger::log('warehouse_transfer', $mvtOut, null, [
                         'source' => $mvtOut->toArray(),
                         'destination' => $mvtIn->toArray()
                     ]);
+
+                } else {
+                    WarehouseStock::firstOrCreate([
+                        'object_id' => $object->id,
+                        'product_id' => $productId,
+                    ], ['quantity' => 0]);
+
+                    $stock = WarehouseStock::where('object_id', $object->id)
+                        ->where('product_id', $productId)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if ($type === 'incoming') {
+                        $stock->quantity += $qty;
+                        $stock->save();
+
+                        $mvt = WarehouseMovement::create([
+                            'object_id' => $object->id,
+                            'product_id' => $productId,
+                            'type' => WarehouseMovementType::Incoming->value,
+                            'quantity' => $qty,
+                            'note' => $request->note,
+                            'recipient_name' => $request->recipient_name,
+                            'created_by' => Auth::id(),
+                            'movement_date' => now()->toDateString(),
+                            'as_sub_manager' => $asSubManager,
+                        ]);
+
+                        AuditLogger::log('warehouse_incoming', $mvt, null, $mvt->toArray());
+
+                    } elseif ($type === 'outgoing') {
+                        if ($stock->quantity < $qty) {
+                            throw new \Exception('Omborda yetarli mahsulot mavjud emas.');
+                        }
+
+                        $stock->quantity -= $qty;
+                        $stock->save();
+
+                        $mvt = WarehouseMovement::create([
+                            'object_id' => $object->id,
+                            'product_id' => $productId,
+                            'type' => WarehouseMovementType::Outgoing->value,
+                            'quantity' => $qty,
+                            'note' => $request->note,
+                            'recipient_name' => $request->recipient_name,
+                            'created_by' => Auth::id(),
+                            'movement_date' => now()->toDateString(),
+                            'as_sub_manager' => $asSubManager,
+                        ]);
+
+                        AuditLogger::log('warehouse_outgoing', $mvt, null, $mvt->toArray());
+                    }
+                }
+            });
 
                     // Check for low stock alert
                     if ($stock->quantity < ($product->min_limit ?? 0)) {
@@ -694,6 +733,8 @@ class ManagerController extends Controller
 
         try {
             DB::transaction(function () use ($request, $object) {
+                $asSubManager = \App\Models\ObjectSubManager::isCurrentUserSubManager((int)$object->id);
+
                 $check = InventoryCheck::create([
                     'object_id' => $object->id,
                     'checked_by' => Auth::id(),
@@ -702,18 +743,22 @@ class ManagerController extends Controller
                     'note' => $request->input('note', 'Tizimli inventarizatsiya (mobil).'),
                     'approved_by' => Auth::id(),
                     'approved_at' => now(),
+                    'as_sub_manager' => $asSubManager,
                 ]);
 
                 foreach ($request->items as $itemData) {
                     $productId = (int)$itemData['product_id'];
                     $actualQty = (int)$itemData['actual_qty'];
 
+                    WarehouseStock::firstOrCreate([
+                        'object_id' => $object->id,
+                        'product_id' => $productId,
+                    ], ['quantity' => 0]);
+
                     $stock = WarehouseStock::where('object_id', $object->id)
                         ->where('product_id', $productId)
-                        ->firstOrCreate([
-                            'object_id' => $object->id,
-                            'product_id' => $productId,
-                        ], ['quantity' => 0]);
+                        ->lockForUpdate()
+                        ->first();
 
                     $expectedQty = $stock->quantity;
                     $diff = $actualQty - $expectedQty;
@@ -739,6 +784,7 @@ class ManagerController extends Controller
                             'note' => "Inventarizatsiya farqi: " . ($diff > 0 ? "+{$diff}" : "{$diff}"),
                             'created_by' => Auth::id(),
                             'movement_date' => now()->toDateString(),
+                            'as_sub_manager' => $asSubManager,
                         ]);
                     }
                 }

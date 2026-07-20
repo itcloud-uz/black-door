@@ -29,6 +29,7 @@ class WarehouseMovement extends Model
         'recipient_name',
         'created_by',
         'movement_date',
+        'as_sub_manager',
     ];
 
     /**
@@ -40,6 +41,7 @@ class WarehouseMovement extends Model
             'type' => WarehouseMovementType::class,
             'quantity' => 'integer',
             'movement_date' => 'date',
+            'as_sub_manager' => 'boolean',
         ];
     }
 

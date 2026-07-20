@@ -106,6 +106,12 @@
                 @click="activeTab = 'txs'">
             <i class="bi bi-cash-stack" :style="activeTab === 'txs' ? 'color: #9b59b6;' : ''"></i> Tranzaksiyalar ({{ $object->transactions->count() }})
         </button>
+        
+        <button type="button" class="skeuo-btn" style="flex: 1; min-width: 160px; border: none; padding: 12px 16px; border-radius: var(--radius-md); font-weight: 700; cursor: pointer; transition: all 0.25s ease; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem;"
+                :style="activeTab === 'submanagers' ? 'background: var(--surface); color: var(--text-primary); box-shadow: var(--shadow-raised-sm); border: 1px solid rgba(255,255,255,0.5);' : 'background: transparent; color: var(--text-muted); box-shadow: none; border: 1px solid transparent;'"
+                @click="activeTab = 'submanagers'">
+            <i class="bi bi-person-gear" :style="activeTab === 'submanagers' ? 'color: #e74c3c;' : ''"></i> O'rinbosarlar ({{ $object->subManagers->count() }})
+        </button>
     </div>
 
     {{-- Tab Content --}}
@@ -384,6 +390,74 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        {{-- Sub-managers Tab --}}
+        <div x-show="activeTab === 'submanagers'" class="skeuo-card" style="box-shadow: var(--shadow-neutral-sm);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; font-size: 1.25rem;"><i class="bi bi-person-gear text-red"></i> Vaqtinchalik o'rinbosarlar</h3>
+                <span class="text-xs text-muted">Obyektga vaqtinchalik biriktirilgan boshqaruvchilar</span>
+            </div>
+
+            <div class="grid-2 mb-xl" style="align-items: start;">
+                {{-- List of Sub-managers --}}
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    @forelse($object->subManagers->sortByDesc('start_date') as $sub)
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-neutral-sm);">
+                            <div>
+                                <strong style="font-size: 0.95rem; color: var(--text-primary);">{{ $sub->user->name }}</strong>
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px;">
+                                    Muddati: {{ $sub->start_date->format('d.m.Y') }} - {{ $sub->end_date->format('d.m.Y') }}
+                                    @if($sub->isActive())
+                                        <span class="skeuo-badge skeuo-badge-green" style="font-size: 0.65rem; padding: 2px 6px; margin-left: 6px;">Faol</span>
+                                    @else
+                                        <span class="skeuo-badge skeuo-badge-red" style="font-size: 0.65rem; padding: 2px 6px; margin-left: 6px;">Muddati o'tgan</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div>
+                                <form action="{{ route('admin.objects.sub-managers.destroy', [$object->id, $sub->id]) }}" method="POST" onsubmit="return confirm('Ushbu o\'rinbosarlikni bekor qilmoqchimisiz?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="skeuo-btn text-red" style="border: none; background: transparent; cursor: pointer; padding: 8px; box-shadow: none;">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center text-muted py-lg">Vaqtinchalik o'rinbosarlar belgilanmagan.</div>
+                    @endforelse
+                </div>
+
+                {{-- Add Sub-manager Form --}}
+                <div class="skeuo-card-inner" style="padding: 20px; border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-pressed-sm);">
+                    <h4 style="margin: 0 0 16px 0; font-size: 1rem;"><i class="bi bi-plus-circle"></i> Yangi o'rinbosar tayinlash</h4>
+                    <form action="{{ route('admin.objects.sub-managers.store', $object->id) }}" method="POST">
+                        @csrf
+                        <div class="mb-sm">
+                            <label class="text-xs text-muted block mb-xs uppercase" style="font-weight: 700;">Menejer</label>
+                            <select name="user_id" class="skeuo-input-style" style="width: 100%;" required>
+                                <option value="">Menejerni tanlang...</option>
+                                @foreach($availableManagers as $mgr)
+                                    <option value="{{ $mgr->id }}">{{ $mgr->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-sm">
+                            <label class="text-xs text-muted block mb-xs uppercase" style="font-weight: 700;">Boshlanish sanasi</label>
+                            <input type="date" name="start_date" class="skeuo-input-style" style="width: 100%;" required min="{{ now()->toDateString() }}">
+                        </div>
+                        <div class="mb-sm">
+                            <label class="text-xs text-muted block mb-xs uppercase" style="font-weight: 700;">Tugash sanasi</label>
+                            <input type="date" name="end_date" class="skeuo-input-style" style="width: 100%;" required min="{{ now()->toDateString() }}">
+                        </div>
+                        <button type="submit" class="skeuo-btn skeuo-btn-green w-100" style="margin-top: 12px; font-weight: 700; border: none; padding: 12px; border-radius: var(--radius-md); width: 100%; cursor: pointer;">
+                            Tayinlash
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
 

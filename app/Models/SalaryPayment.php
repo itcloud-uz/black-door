@@ -29,6 +29,7 @@ class SalaryPayment extends Model
         'note',
         'paid_at',
         'created_by',
+        'as_sub_manager',
     ];
 
     /**
@@ -42,6 +43,7 @@ class SalaryPayment extends Model
             'period_start' => 'date',
             'period_end' => 'date',
             'paid_at' => 'datetime',
+            'as_sub_manager' => 'boolean',
         ];
     }
 

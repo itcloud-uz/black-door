@@ -61,10 +61,16 @@ class DatabaseBackup extends Command
 
             $backupFile = "{$backupDir}/blackdoor_{$timestamp}.sql.gz";
 
+            $pgDumpPath = 'pg_dump';
+            $winPgDump = 'C:\\Program Files\\PostgreSQL\\16\\bin\\pg_dump.exe';
+            if (File::exists($winPgDump)) {
+                $pgDumpPath = $winPgDump;
+            }
+
             // pg_dump command with gzip compression
             // Set password environment variable for pg_dump to read securely
             $cmd = [
-                'pg_dump',
+                $pgDumpPath,
                 '-h', $host,
                 '-p', (string)$port,
                 '-U', $username,

@@ -76,6 +76,37 @@ class User extends Authenticatable
     }
 
     /**
+     * Foydalanuvchining o'rinbosarlik munosabatlari.
+     */
+    public function subManagers(): HasMany
+    {
+        return $this->hasMany(ObjectSubManager::class, 'user_id');
+    }
+
+    /**
+     * Foydalanuvchiga biriktirilgan barcha faol (asosiy va vaqtinchalik) obyekt IDlarini olish.
+     */
+    public function getManagedObjectIds(): array
+    {
+        $ids = [];
+        
+        $primary = ObjectManager::where('user_id', $this->id)->value('object_id');
+        if ($primary) {
+            $ids[] = (int)$primary;
+        }
+        
+        $today = today();
+        $subManaged = ObjectSubManager::where('user_id', $this->id)
+            ->where('start_date', '<=', $today)
+            ->where('end_date', '>=', $today)
+            ->pluck('object_id')
+            ->map(fn($val) => (int)$val)
+            ->toArray();
+            
+        return array_unique(array_merge($ids, $subManaged));
+    }
+
+    /**
      * Foydalanuvchi obyektdagi xodim sifatida.
      */
     public function objectEmployee(): HasOne

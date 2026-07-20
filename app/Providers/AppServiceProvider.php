@@ -50,7 +50,12 @@ class AppServiceProvider extends ServiceProvider
             if ($user->role === UserRole::Manager) {
                 // Check if this manager is assigned to the object
                 $managerAssignment = $object->currentManager;
-                return $managerAssignment && (int)$managerAssignment->user_id === (int)$user->id;
+                if ($managerAssignment && (int)$managerAssignment->user_id === (int)$user->id) {
+                    return true;
+                }
+
+                // Check if this manager is currently an active sub-manager
+                return \App\Models\ObjectSubManager::isCurrentUserSubManager((int)$object->id);
             }
 
             if ($user->role === UserRole::Employee) {
@@ -61,5 +66,14 @@ class AppServiceProvider extends ServiceProvider
 
             return false;
         });
+
+        // Generate theme.css on boot if missing
+        if (!file_exists(public_path('css/theme.css'))) {
+            try {
+                \App\Services\ThemeService::generateThemeCss();
+            } catch (\Throwable $e) {
+                // Ignore if db is not migrated or ready
+            }
+        }
     }
 }

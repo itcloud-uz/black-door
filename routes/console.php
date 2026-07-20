@@ -23,3 +23,5 @@ Schedule::call(function () {
 
 Schedule::command('currency:sync-cbu')->dailyAt('09:00');
 Schedule::command('db:backup')->dailyAt('02:00');
+Schedule::command('submanagers:expire')->dailyAt('00:05');
+

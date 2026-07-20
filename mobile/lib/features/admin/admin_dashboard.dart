@@ -706,7 +706,7 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
             )
           : null,
       bottomNavigationBar: Container(
-        height: 75,
+        height: 70,
         decoration: const InsetBoxDecoration(
           color: AppColors.background,
           boxShadow: [
@@ -714,11 +714,9 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
           ],
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             _buildNavItem(0, Icons.dashboard_outlined, 'Bosh'),
-            _buildNavItem(1, Icons.people_outline, 'Userlar'),
+            _buildNavItem(1, Icons.people_outline, 'User'),
             _buildNavItem(2, Icons.business_outlined, 'Obyekt'),
             _buildNavItem(3, Icons.inventory_2_outlined, 'Mahsulot'),
             _buildNavItem(4, Icons.settings_outlined, 'Sozlama'),
@@ -751,14 +749,27 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
             children: [
               AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
                 decoration: isSelected
                     ? NeumorphicDecorations.sunken(radius: 10)
                     : const InsetBoxDecoration(),
                 child: Icon(
                   icon,
                   color: isSelected ? AppColors.success : AppColors.textMuted,
-                  size: 22,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(height: 2),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    color: isSelected ? AppColors.textPrimary : AppColors.textMuted,
+                  ),
                 ),
               ),
             ],

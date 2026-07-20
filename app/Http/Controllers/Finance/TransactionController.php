@@ -83,81 +83,40 @@ class TransactionController extends Controller
 
             DB::transaction(function () use ($request, $type, $amountCents, $currencyVal, $cashAccountId, &$createdTransactions) {
                 $cashAccount = CashAccount::findOrFail($cashAccountId);
-                $cashBalance = CashBalance::where('cash_account_id', $cashAccountId)
-                    ->where('currency', $currencyVal)
-                    ->firstOrCreate([
-                        'cash_account_id' => $cashAccountId,
-                        'currency' => $currencyVal,
-                    ], ['balance' => 0]);
-
                 $latestRate = \App\Models\CurrencyRate::latest('effective_date')->latest('id')->first();
                 $rateTiyin = $latestRate ? $latestRate->rate_uzs_per_usd : null;
 
-                if ($type === 'income') {
-                    $newBalance = $cashBalance->balance + $amountCents;
-                    $cashBalance->balance = $newBalance;
-                    $cashBalance->save();
-
-                    $tx = Transaction::create([
-                        'cash_account_id' => $cashAccountId,
-                        'counterparty_id' => $request->counterparty_id,
-                        'category_id' => $request->category_id,
-                        'type' => TransactionType::Income->value,
-                        'currency' => $currencyVal,
-                        'amount' => $amountCents,
-                        'balance_after' => $newBalance,
-                        'note' => $request->note,
-                        'created_by' => Auth::id(),
-                        'transaction_date' => now()->toDateString(),
-                        'exchange_rate' => $rateTiyin,
-                    ]);
-
-                    $createdTransactions[] = $tx;
-                    AuditLogger::log('create_transaction', $tx, null, $tx->toArray());
-
-                } elseif ($type === 'expense') {
-                    if ($cashBalance->balance < $amountCents) {
-                        throw new \Exception('Kassada yetarli mablag\' mavjud emas.');
-                    }
-
-                    $newBalance = $cashBalance->balance - $amountCents;
-                    $cashBalance->balance = $newBalance;
-                    $cashBalance->save();
-
-                    $tx = Transaction::create([
-                        'cash_account_id' => $cashAccountId,
-                        'counterparty_id' => $request->counterparty_id,
-                        'category_id' => $request->category_id,
-                        'type' => TransactionType::Expense->value,
-                        'currency' => $currencyVal,
-                        'amount' => $amountCents,
-                        'balance_after' => $newBalance,
-                        'note' => $request->note,
-                        'created_by' => Auth::id(),
-                        'transaction_date' => now()->toDateString(),
-                        'exchange_rate' => $rateTiyin,
-                    ]);
-
-                    $createdTransactions[] = $tx;
-                    AuditLogger::log('create_transaction', $tx, null, $tx->toArray());
-
-                } elseif ($type === 'transfer') {
+                if ($type === 'transfer') {
                     $destAccountId = (int)$request->destination_cash_account_id;
                     if ($cashAccountId === $destAccountId) {
                         throw new \Exception('Yuboruvchi va qabul qiluvchi kassa bir xil bo\'lmasligi kerak.');
                     }
+
+                    // Sort cash account IDs to prevent deadlocks
+                    $accountIds = [$cashAccountId, $destAccountId];
+                    sort($accountIds);
+
+                    $balances = [];
+                    foreach ($accountIds as $accId) {
+                        CashBalance::firstOrCreate([
+                            'cash_account_id' => $accId,
+                            'currency' => $currencyVal,
+                        ], ['balance' => 0]);
+
+                        $balances[$accId] = CashBalance::where('cash_account_id', $accId)
+                            ->where('currency', $currencyVal)
+                            ->lockForUpdate()
+                            ->first();
+                    }
+
+                    $cashBalance = $balances[$cashAccountId];
+                    $destBalance = $balances[$destAccountId];
 
                     if ($cashBalance->balance < $amountCents) {
                         throw new \Exception('Yuboruvchi kassada yetarli mablag\' mavjud emas.');
                     }
 
                     $destAccount = CashAccount::findOrFail($destAccountId);
-                    $destBalance = CashBalance::where('cash_account_id', $destAccountId)
-                        ->where('currency', $currencyVal)
-                        ->firstOrCreate([
-                            'cash_account_id' => $destAccountId,
-                            'currency' => $currencyVal,
-                        ], ['balance' => 0]);
 
                     // Update source balance
                     $sourceNewBalance = $cashBalance->balance - $amountCents;
@@ -207,6 +166,66 @@ class TransactionController extends Controller
                         'source_transaction' => $txOut->toArray(),
                         'destination_transaction' => $txIn->toArray()
                     ]);
+
+                } else {
+                    CashBalance::firstOrCreate([
+                        'cash_account_id' => $cashAccountId,
+                        'currency' => $currencyVal,
+                    ], ['balance' => 0]);
+
+                    $cashBalance = CashBalance::where('cash_account_id', $cashAccountId)
+                        ->where('currency', $currencyVal)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if ($type === 'income') {
+                        $newBalance = $cashBalance->balance + $amountCents;
+                        $cashBalance->balance = $newBalance;
+                        $cashBalance->save();
+
+                        $tx = Transaction::create([
+                            'cash_account_id' => $cashAccountId,
+                            'counterparty_id' => $request->counterparty_id,
+                            'category_id' => $request->category_id,
+                            'type' => TransactionType::Income->value,
+                            'currency' => $currencyVal,
+                            'amount' => $amountCents,
+                            'balance_after' => $newBalance,
+                            'note' => $request->note,
+                            'created_by' => Auth::id(),
+                            'transaction_date' => now()->toDateString(),
+                            'exchange_rate' => $rateTiyin,
+                        ]);
+
+                        $createdTransactions[] = $tx;
+                        AuditLogger::log('create_transaction', $tx, null, $tx->toArray());
+
+                    } elseif ($type === 'expense') {
+                        if ($cashBalance->balance < $amountCents) {
+                            throw new \Exception('Kassada yetarli mablag\' mavjud emas.');
+                        }
+
+                        $newBalance = $cashBalance->balance - $amountCents;
+                        $cashBalance->balance = $newBalance;
+                        $cashBalance->save();
+
+                        $tx = Transaction::create([
+                            'cash_account_id' => $cashAccountId,
+                            'counterparty_id' => $request->counterparty_id,
+                            'category_id' => $request->category_id,
+                            'type' => TransactionType::Expense->value,
+                            'currency' => $currencyVal,
+                            'amount' => $amountCents,
+                            'balance_after' => $newBalance,
+                            'note' => $request->note,
+                            'created_by' => Auth::id(),
+                            'transaction_date' => now()->toDateString(),
+                            'exchange_rate' => $rateTiyin,
+                        ]);
+
+                        $createdTransactions[] = $tx;
+                        AuditLogger::log('create_transaction', $tx, null, $tx->toArray());
+                    }
                 }
             });
 

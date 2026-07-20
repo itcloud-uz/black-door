@@ -25,8 +25,21 @@ class WarehouseController extends Controller
     {
         $user = Auth::user();
         if ($user->role->value === 'manager') {
-            $mgr = ObjectManager::where('user_id', $user->id)->first();
-            return $mgr ? $mgr->object : null;
+            $managedIds = $user->getManagedObjectIds();
+            if (empty($managedIds)) {
+                return null;
+            }
+            
+            $id = request('object_id') ?: request()->header('X-Object-ID');
+            if (!$id && request()->hasSession()) {
+                $id = session('active_object_id');
+            }
+            
+            if ($id && in_array((int)$id, $managedIds)) {
+                return \App\Models\Obj::find((int)$id);
+            }
+            
+            return \App\Models\Obj::find($managedIds[0]);
         }
         $emp = ObjectEmployee::where('user_id', $user->id)->first();
         return $emp ? $emp->object : null;
@@ -83,83 +96,38 @@ class WarehouseController extends Controller
         try {
             DB::transaction(function () use ($request, $object, $productId, $type, $qty) {
                 $product = Product::findOrFail($productId);
+                $asSubManager = \App\Models\ObjectSubManager::isCurrentUserSubManager((int)$object->id);
 
-                $stock = WarehouseStock::where('object_id', $object->id)
-                    ->where('product_id', $productId)
-                    ->firstOrCreate([
-                        'object_id' => $object->id,
-                        'product_id' => $productId,
-                    ], ['quantity' => 0]);
-
-                if ($type === 'incoming') {
-                    $stock->quantity += $qty;
-                    $stock->save();
-
-                    $mvt = WarehouseMovement::create([
-                        'object_id' => $object->id,
-                        'product_id' => $productId,
-                        'type' => WarehouseMovementType::Incoming->value,
-                        'quantity' => $qty,
-                        'note' => $request->note,
-                        'recipient_name' => $request->recipient_name,
-                        'created_by' => Auth::id(),
-                        'movement_date' => now()->toDateString(),
-                    ]);
-
-                    AuditLogger::log('warehouse_incoming', $mvt, null, $mvt->toArray());
-
-                } elseif ($type === 'outgoing') {
-                    if ($stock->quantity < $qty) {
-                        throw new \Exception('Omborda yetarli mahsulot mavjud emas.');
-                    }
-
-                    $stock->quantity -= $qty;
-                    $stock->save();
-
-                    $mvt = WarehouseMovement::create([
-                        'object_id' => $object->id,
-                        'product_id' => $productId,
-                        'type' => WarehouseMovementType::Outgoing->value,
-                        'quantity' => $qty,
-                        'note' => $request->note,
-                        'recipient_name' => $request->recipient_name,
-                        'created_by' => Auth::id(),
-                        'movement_date' => now()->toDateString(),
-                    ]);
-
-                    AuditLogger::log('warehouse_outgoing', $mvt, null, $mvt->toArray());
-
-                    // Check for low stock alert
-                    if ($stock->quantity < ($product->min_stock_level ?? 0)) {
-                        try {
-                            broadcast(new \App\Events\LowStockWarning([
-                                'object_name' => $object->name,
-                                'product_name' => $product->name,
-                                'quantity' => $stock->quantity,
-                                'min_limit' => $product->min_stock_level
-                            ]))->toOthers();
-                        } catch (\Throwable $e) {
-                            // Ignore broadcast failures
-                        }
-                    }
-
-                } elseif ($type === 'transfer') {
+                if ($type === 'transfer') {
                     $toObjectId = (int)$request->to_object_id;
                     if ($toObjectId === $object->id) {
                         throw new \Exception('O\'tkazish uchun boshqa obyekt tanlanishi kerak.');
                     }
+
+                    $objectIds = [$object->id, $toObjectId];
+                    sort($objectIds);
+
+                    $stocks = [];
+                    foreach ($objectIds as $oid) {
+                        WarehouseStock::firstOrCreate([
+                            'object_id' => $oid,
+                            'product_id' => $productId,
+                        ], ['quantity' => 0]);
+
+                        $stocks[$oid] = WarehouseStock::where('object_id', $oid)
+                            ->where('product_id', $productId)
+                            ->lockForUpdate()
+                            ->first();
+                    }
+
+                    $stock = $stocks[$object->id];
+                    $destStock = $stocks[$toObjectId];
 
                     if ($stock->quantity < $qty) {
                         throw new \Exception('Omborda yetarli mahsulot mavjud emas.');
                     }
 
                     $toObject = Obj::findOrFail($toObjectId);
-                    $destStock = WarehouseStock::where('object_id', $toObjectId)
-                        ->where('product_id', $productId)
-                        ->firstOrCreate([
-                            'object_id' => $toObjectId,
-                            'product_id' => $productId,
-                        ], ['quantity' => 0]);
 
                     // Deduct source
                     $stock->quantity -= $qty;
@@ -181,6 +149,7 @@ class WarehouseController extends Controller
                         'recipient_name' => $request->recipient_name,
                         'created_by' => Auth::id(),
                         'movement_date' => now()->toDateString(),
+                        'as_sub_manager' => $asSubManager,
                     ]);
 
                     // Log movement for destination object
@@ -195,6 +164,7 @@ class WarehouseController extends Controller
                         'recipient_name' => $request->recipient_name,
                         'created_by' => Auth::id(),
                         'movement_date' => now()->toDateString(),
+                        'as_sub_manager' => $asSubManager,
                     ]);
 
                     AuditLogger::log('warehouse_transfer', $mvtOut, null, [
@@ -202,8 +172,60 @@ class WarehouseController extends Controller
                         'destination_movement' => $mvtIn->toArray()
                     ]);
 
+                } else {
+                    WarehouseStock::firstOrCreate([
+                        'object_id' => $object->id,
+                        'product_id' => $productId,
+                    ], ['quantity' => 0]);
+
+                    $stock = WarehouseStock::where('object_id', $object->id)
+                        ->where('product_id', $productId)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if ($type === 'incoming') {
+                        $stock->quantity += $qty;
+                        $stock->save();
+
+                        $mvt = WarehouseMovement::create([
+                            'object_id' => $object->id,
+                            'product_id' => $productId,
+                            'type' => WarehouseMovementType::Incoming->value,
+                            'quantity' => $qty,
+                            'note' => $request->note,
+                            'recipient_name' => $request->recipient_name,
+                            'created_by' => Auth::id(),
+                            'movement_date' => now()->toDateString(),
+                            'as_sub_manager' => $asSubManager,
+                        ]);
+
+                        AuditLogger::log('warehouse_incoming', $mvt, null, $mvt->toArray());
+
+                    } elseif ($type === 'outgoing') {
+                        if ($stock->quantity < $qty) {
+                            throw new \Exception('Omborda yetarli mahsulot mavjud emas.');
+                        }
+
+                        $stock->quantity -= $qty;
+                        $stock->save();
+
+                        $mvt = WarehouseMovement::create([
+                            'object_id' => $object->id,
+                            'product_id' => $productId,
+                            'type' => WarehouseMovementType::Outgoing->value,
+                            'quantity' => $qty,
+                            'note' => $request->note,
+                            'recipient_name' => $request->recipient_name,
+                            'created_by' => Auth::id(),
+                            'movement_date' => now()->toDateString(),
+                            'as_sub_manager' => $asSubManager,
+                        ]);
+
+                        AuditLogger::log('warehouse_outgoing', $mvt, null, $mvt->toArray());
+                    }
+
                     // Check for low stock alert
-                    if ($stock->quantity < ($product->min_stock_level ?? 0)) {
+                    if (isset($stock) && $stock->quantity < ($product->min_stock_level ?? 0)) {
                         try {
                             broadcast(new \App\Events\LowStockWarning([
                                 'object_name' => $object->name,

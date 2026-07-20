@@ -1,0 +1,6 @@
+/* Black Door Generated Theme CSS */
+:root {
+    --accent-green: var(--accent-blue) !important;
+    --accent-green-start: var(--accent-blue-start) !important;
+    --accent-green-end: var(--accent-blue-end) !important;
+}

@@ -5,6 +5,9 @@ All monetary values are stored as integers (cents/tiyin) and displayed divided b
 """
 
 import os
+import time
+import boto3
+from botocore.client import Config
 from datetime import datetime
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
@@ -38,15 +41,70 @@ def _cents_to_display(value: int | None) -> str:
     return f"{amount:,.2f}"
 
 
+_logo_cache_path = None
+_logo_last_fetched = 0
+CACHE_DURATION_SECS = 60
+
+def _download_logo_from_s3() -> str | None:
+    global _logo_cache_path, _logo_last_fetched
+    now = time.time()
+    
+    if _logo_cache_path and os.path.exists(_logo_cache_path) and (now - _logo_last_fetched < CACHE_DURATION_SECS):
+        return _logo_cache_path
+        
+    try:
+        endpoint_url = os.getenv("AWS_ENDPOINT")
+        access_key = os.getenv("AWS_ACCESS_KEY_ID")
+        secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
+        bucket = os.getenv("AWS_BUCKET", "blackdoor")
+        
+        if not access_key or not secret_key:
+            return None
+            
+        s3 = boto3.client(
+            "s3",
+            aws_access_key_id=access_key,
+            aws_secret_access_key=secret_key,
+            region_name=os.getenv("AWS_DEFAULT_REGION", "us-east-1"),
+            endpoint_url=endpoint_url,
+            config=Config(signature_version="s3v4")
+        )
+        
+        temp_path = "/tmp/logo_vertical.png"
+        os.makedirs(os.path.dirname(temp_path), exist_ok=True)
+        
+        try:
+            s3.download_file(bucket, "branding/custom_logo_vertical.png", temp_path)
+        except Exception:
+            try:
+                s3.download_file(bucket, "branding/logo_vertical.png", temp_path)
+            except Exception:
+                return None
+                
+        _logo_cache_path = temp_path
+        _logo_last_fetched = now
+        return _logo_cache_path
+    except Exception as e:
+        print(f"Error downloading logo from S3: {e}")
+        return None
+
+
 def _get_logo_flowable(width_mm: float = 30.0, height_mm: float = 30.0) -> Image | None:
-    """Load the custom vertical logo or fallback vertical logo if it exists."""
+    """Load the custom vertical logo from S3/MinIO with a local cache fallback."""
+    s3_path = _download_logo_from_s3()
+    if s3_path and os.path.exists(s3_path):
+        try:
+            return Image(s3_path, width=width_mm * mm, height=height_mm * mm)
+        except Exception as e:
+            print(f"Error loading S3 logo: {e}")
+
+    # Fallback to local paths
     for path in ["/app/branding/custom_logo_vertical.png", "/app/branding/logo_vertical.png"]:
         if os.path.exists(path):
             try:
-                # Returns the Image flowable
                 return Image(path, width=width_mm * mm, height=height_mm * mm)
             except Exception as e:
-                print(f"Error loading logo {path}: {e}")
+                print(f"Error loading local fallback logo: {e}")
     return None
 
 
