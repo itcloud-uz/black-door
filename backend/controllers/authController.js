@@ -118,7 +118,6 @@ exports.googleLogin = async (req, res) => {
 };
 
 exports.telegramRequest = async (req, res) => {
-  // Can be called using temporary token or authenticated user
   const userId = req.user.id;
 
   try {
@@ -129,22 +128,41 @@ exports.telegramRequest = async (req, res) => {
 
     const user = userRes.rows[0];
 
-    // Generate deep linking token and 6-digit code
+    // Check if Telegram ID is added and verified. If not, generate a start link for linking!
+    if (!user.telegram_id || !user.is_telegram_verified) {
+      const token = require('crypto').randomUUID();
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+      await db.query(
+        "INSERT INTO verification_tokens (user_id, token, type, expires_at) VALUES ($1, $2, 'telegram', $3)",
+        [user.id, token, expiresAt]
+      );
+      const botUsername = process.env.TELEGRAM_BOT_USERNAME || 'blackdoor_2fa_bot';
+      const startLink = `https://t.me/${botUsername}?start=${token}`;
+      return res.status(200).json({
+        message: 'Telegram 2FA faollashtirilmagan. Ulanish uchun quyidagi botni bosing.',
+        requireSetup: true,
+        botUsername,
+        startLink
+      });
+    }
+
     const token = require('crypto').randomUUID();
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
-    // Save token to verification_tokens
     await db.query(
       "INSERT INTO verification_tokens (user_id, token, type, telegram_code, expires_at) VALUES ($1, $2, 'telegram', $3, $4)",
       [user.id, token, code, expiresAt]
     );
 
+    // Send code directly to user's Telegram Chat ID!
+    const sent = await telegramBot.send2FACode(user.telegram_id, code);
+
     const botUsername = process.env.TELEGRAM_BOT_USERNAME || 'blackdoor_2fa_bot';
     const startLink = `https://t.me/${botUsername}?start=${token}`;
 
     return res.status(200).json({
-      message: 'Telegram 2FA verification initialized.',
+      message: sent ? 'Kodi Telegram raqamingizga yuborildi.' : 'Telegram xabarini yuborishda xatolik yuz berdi.',
       botUsername,
       startLink,
       mockCode: code // Returned for testing purposes in case bot is not running
@@ -262,13 +280,54 @@ exports.logout = async (req, res) => {
 
 exports.verifySession = async (req, res) => {
   try {
-    const userRes = await db.query("SELECT id, email, full_name, role, is_telegram_verified FROM users WHERE id = $1", [req.user.id]);
+    const userRes = await db.query(
+      "SELECT id, email, full_name, role, telegram_id, is_telegram_verified FROM users WHERE id = $1", 
+      [req.user.id]
+    );
     if (userRes.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
     return res.status(200).json({ user: userRes.rows[0] });
   } catch (err) {
     console.error("Error verifying session:", err);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+exports.updateSettings = async (req, res) => {
+  const userId = req.user.id;
+  const { telegram_id, full_name } = req.body;
+
+  try {
+    const userRes = await db.query("SELECT * FROM users WHERE id = $1", [userId]);
+    if (userRes.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const user = userRes.rows[0];
+    const newName = full_name !== undefined ? full_name : user.full_name;
+    const newTgId = telegram_id !== undefined ? telegram_id : user.telegram_id;
+    const tgVerified = newTgId ? true : false;
+
+    const result = await db.query(
+      "UPDATE users SET full_name = $1, telegram_id = $2, is_telegram_verified = $3, updated_at = NOW() WHERE id = $4 RETURNING *",
+      [newName, newTgId || null, tgVerified, userId]
+    );
+
+    return res.status(200).json({
+      message: 'Sozlamalar muvaffaqiyatli saqlandi',
+      user: {
+        id: result.rows[0].id,
+        email: result.rows[0].email,
+        fullName: result.rows[0].full_name,
+        role: result.rows[0].role,
+        telegramId: result.rows[0].telegram_id,
+        isTelegramVerified: result.rows[0].is_telegram_verified
+      }
+    });
+
+  } catch (err) {
+    console.error("Error updating user settings:", err);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
