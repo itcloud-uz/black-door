@@ -5,6 +5,9 @@ const rateLimit = require('express-rate-limit');
 const db = require('./db');
 require('dotenv').config();
 
+// Start Telegram 2FA Bot Service
+require('./services/telegramBot');
+
 // Route Modules
 const authRoutes = require('./routes/auth');
 const transactionRoutes = require('./routes/transactions');
