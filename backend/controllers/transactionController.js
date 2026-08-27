@@ -265,16 +265,23 @@ exports.deleteTransaction = async (req, res) => {
 };
 
 exports.exportTransactions = async (req, res) => {
-  const { format } = req.query; // 'excel' or 'pdf'
+  const { format, personId } = req.query; // 'excel' or 'pdf'
 
   try {
-    const txRes = await db.query(`
+    let queryText = `
       SELECT t.*, a.account_holder_name as person_name, f.name as factory_name 
       FROM transactions t
       LEFT JOIN accounts a ON t.person_id = a.id
       LEFT JOIN factories f ON t.factory_id = f.id
-      ORDER BY t.created_at DESC
-    `);
+    `;
+    const params = [];
+    if (personId) {
+      queryText += ` WHERE t.person_id = $1`;
+      params.push(personId);
+    }
+    queryText += ` ORDER BY t.created_at DESC`;
+
+    const txRes = await db.query(queryText, params);
     const transactions = txRes.rows;
 
     if (format === 'excel') {

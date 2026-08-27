@@ -275,7 +275,8 @@ export default function AdminDashboard({ user, onLogout }) {
   };
 
   const handleExport = (format) => {
-    window.open(`${api.defaults.baseURL}/admin/transactions/export?format=${format}`, '_blank');
+    const token = localStorage.getItem('accessToken');
+    window.open(`${api.defaults.baseURL}/admin/transactions/export?format=${format}&token=${token}`, '_blank');
   };
 
   return (

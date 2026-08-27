@@ -16,6 +16,11 @@ export default function AccountManager({
   const [adjustCurrency, setAdjustCurrency] = useState('UZS');
   const [adjustRate, setAdjustRate] = useState('12800');
 
+  // Account History / Statement States
+  const [historyAcc, setHistoryAcc] = useState(null);
+  const [historyTxList, setHistoryTxList] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+
   const handleEditClick = (acc) => {
     setEditingAcc({ ...acc });
     setError('');
@@ -60,6 +65,25 @@ export default function AccountManager({
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleViewHistory = async (acc) => {
+    setHistoryAcc(acc);
+    setHistoryLoading(true);
+    try {
+      const res = await api.get(`/admin/transactions?personId=${acc.id}`);
+      setHistoryTxList(res.data);
+    } catch (err) {
+      console.error("History fetch error:", err);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const handleExportHistory = (format) => {
+    if (!historyAcc) return;
+    const token = localStorage.getItem('accessToken');
+    window.open(`${api.defaults.baseURL}/admin/transactions/export?format=${format}&personId=${historyAcc.id}&token=${token}`, '_blank');
   };
 
   const handleUpdateAcc = async (e) => {
@@ -390,6 +414,87 @@ export default function AccountManager({
         </div>
       )}
 
+      {/* Account History / Statement Modal Overlay */}
+      {historyAcc && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-4xl p-8 skeuo-convex border border-white/10 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+              <div>
+                <h3 className="text-lg font-black text-slate-100">📋 Hisob Varaqasi (Statement)</h3>
+                <p className="text-xs text-slate-400 mt-1 font-mono">
+                  {historyAcc.account_holder_name} ({historyAcc.account_number}) | Balans: {parseFloat(historyAcc.current_balance).toLocaleString()} {historyAcc.currency}
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => handleExportHistory('excel')}
+                  className="py-1.5 px-4 skeuo-btn text-xs font-bold text-emerald-400 hover:text-emerald-300 active:scale-95"
+                >
+                  Excel Yuklash
+                </button>
+                <button
+                  onClick={() => handleExportHistory('pdf')}
+                  className="py-1.5 px-4 skeuo-btn text-xs font-bold text-rose-400 hover:text-rose-300 active:scale-95"
+                >
+                  PDF Yuklash
+                </button>
+                <button
+                  onClick={() => setHistoryAcc(null)}
+                  className="py-1.5 px-4 skeuo-btn text-xs font-bold text-slate-300 hover:text-white active:scale-95"
+                >
+                  Yopish
+                </button>
+              </div>
+            </div>
+
+            {historyLoading ? (
+              <div className="py-10 text-center text-slate-400 text-sm italic">Yuklanmoqda...</div>
+            ) : historyTxList.length === 0 ? (
+              <div className="py-10 text-center text-slate-400 text-sm italic">Ushbu hisob bo'yicha hech qanday tranzaksiyalar topilmadi.</div>
+            ) : (
+              <div className="overflow-x-auto font-sans">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-white/10 text-slate-400 uppercase font-extrabold tracking-wider">
+                      <th className="py-3 px-4">Kvitansiya #</th>
+                      <th className="py-3 px-4">Turi</th>
+                      <th className="py-3 px-4">Summa</th>
+                      <th className="py-3 px-4">Yo'nalish (From - To)</th>
+                      <th className="py-3 px-4">Izoh / Tavsif</th>
+                      <th className="py-3 px-4">Sana va Vaqt</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {historyTxList.map(t => (
+                      <tr key={t.id} className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-3 px-4 font-mono font-bold text-slate-300">{t.receipt_number}</td>
+                        <td className="py-3 px-4">
+                          <span className={`px-2.5 py-1 rounded text-[10px] font-bold border ${
+                            ['cash_deposit', 'product_sale', 'factory_rental'].includes(t.transaction_type)
+                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                              : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                          }`}>
+                            {t.transaction_type}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 font-black text-slate-100">
+                          {parseFloat(t.amount).toLocaleString()} {t.currency}
+                        </td>
+                        <td className="py-3 px-4 text-slate-300 font-mono">
+                          {t.from_account || '—'} &rarr; {t.to_account || '—'}
+                        </td>
+                        <td className="py-3 px-4 text-slate-400">{t.description}</td>
+                        <td className="py-3 px-4 text-slate-300">{new Date(t.created_at).toLocaleString('uz-UZ')}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* List accounts */}
       <div className="skeuo-convex p-6 border border-white/5 shadow-lg">
         <h3 className="font-bold text-slate-200 text-sm mb-4">Barcha Hisoblar va Balanslar</h3>
@@ -403,7 +508,13 @@ export default function AccountManager({
                     acc.account_status === 'active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
                   }`}>{acc.account_status}</span>
                 </div>
-                <h4 className="font-extrabold text-sm text-slate-100 mb-1">{acc.account_holder_name}</h4>
+                <h4 
+                  onClick={() => handleViewHistory(acc)}
+                  className="font-extrabold text-sm text-slate-100 mb-1 cursor-pointer hover:underline hover:text-indigo-400 duration-150 flex items-center gap-1"
+                  title="Tranzaksiyalar tarixini ko'rish"
+                >
+                  📋 {acc.account_holder_name}
+                </h4>
                 <p className="font-mono text-xs text-slate-400 mb-4">{acc.account_number}</p>
               </div>
 
