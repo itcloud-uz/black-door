@@ -3,6 +3,18 @@
 -- Enable UUID generation
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+-- Drop tables if they exist (for clean setup)
+DROP TABLE IF EXISTS audit_log CASCADE;
+DROP TABLE IF EXISTS warehouse_operations CASCADE;
+DROP TABLE IF EXISTS warehouse_inventory CASCADE;
+DROP TABLE IF EXISTS factory_products CASCADE;
+DROP TABLE IF EXISTS transactions CASCADE;
+DROP TABLE IF EXISTS accounts CASCADE;
+DROP TABLE IF EXISTS products CASCADE;
+DROP TABLE IF EXISTS factories CASCADE;
+DROP TABLE IF EXISTS verification_tokens CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+
 -- Drop custom types if they exist (for clean setup)
 DROP TYPE IF EXISTS user_role CASCADE;
 DROP TYPE IF EXISTS verification_type CASCADE;
