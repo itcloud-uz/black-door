@@ -33,12 +33,13 @@ services:
       - db
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        - VITE_API_BASE_URL=/api
+        - VITE_TELEGRAM_BOT_USERNAME=Itcloudvertifikatsiya_bot
     container_name: blackdoor_frontend
     restart: always
-    environment:
-      - VITE_API_BASE_URL=/api
-      - VITE_TELEGRAM_BOT_USERNAME=Itcloudvertifikatsiya_bot
     depends_on:
       - backend
 
