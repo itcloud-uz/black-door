@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Black Door ERP</title>
   </head>
-  <body class="bg-[#EEF2F7] text-[#2D3748] antialiased min-h-screen">
+  <body class="bg-slate-950 text-slate-100 antialiased min-h-screen overflow-x-hidden">
+    <!-- Glowing background blobs for Apple Glassmorphism effect -->
+    <div class="fixed top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-indigo-500/20 blur-[120px] pointer-events-none z-[-1]"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-rose-500/10 blur-[140px] pointer-events-none z-[-1]"></div>
+    <div class="fixed top-[30%] right-[20%] w-[40vw] h-[40vw] rounded-full bg-cyan-500/15 blur-[120px] pointer-events-none z-[-1]"></div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
