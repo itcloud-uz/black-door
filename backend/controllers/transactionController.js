@@ -104,17 +104,34 @@ exports.createTransaction = async (req, res) => {
 
     // If transaction status is completed and person_id is linked, adjust their account balance!
     if (newTx.status === 'completed' && person_id) {
-      // Determine if we should add or subtract based on transaction type
-      const isIncome = [
-        'cash_deposit', 'product_sale', 'factory_commission', 'factory_rental'
-      ].includes(transaction_type);
+      // Fetch account details to know its currency
+      const accRes = await client.query("SELECT currency FROM accounts WHERE id = $1", [person_id]);
+      if (accRes.rows.length > 0) {
+        const accountCurrency = accRes.rows[0].currency;
+        let finalAmount = parseFloat(amount);
 
-      const changeAmount = isIncome ? amount : -amount;
+        // If currencies mismatch, convert using exchange_rate
+        if (currency !== accountCurrency) {
+          const rate = parseFloat(req.body.exchange_rate) || 12800;
+          if (currency === 'USD' && accountCurrency === 'UZS') {
+            finalAmount = finalAmount * rate;
+          } else if (currency === 'UZS' && accountCurrency === 'USD') {
+            finalAmount = finalAmount / rate;
+          }
+        }
 
-      await client.query(
-        "UPDATE accounts SET current_balance = current_balance + $1, updated_at = NOW() WHERE id = $2",
-        [changeAmount, person_id]
-      );
+        // Determine if we should add or subtract based on transaction type
+        const isIncome = [
+          'cash_deposit', 'product_sale', 'factory_commission', 'factory_rental'
+        ].includes(transaction_type);
+
+        const changeAmount = isIncome ? finalAmount : -finalAmount;
+
+        await client.query(
+          "UPDATE accounts SET current_balance = current_balance + $1, updated_at = NOW() WHERE id = $2",
+          [changeAmount, person_id]
+        );
+      }
     }
 
     // Adjust product quantity if it's product_sale or product_purchase

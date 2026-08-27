@@ -1,21 +1,73 @@
 import React, { useState } from 'react';
 import api from '../../services/api';
 
-export default function FactoryManager({ factories, facForm, setFacForm, onCreateFac, onRefresh }) {
+export default function FactoryManager({ factories, onRefresh }) {
   const [editingFac, setEditingFac] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
+  // Local state for adding factories
+  const [createForm, setCreateForm] = useState({
+    name: '',
+    address: '',
+    phone: '',
+    manager_name: '',
+    equipment_type: '',
+    rental_rate_per_day: '0',
+    production_commission_percent: '0',
+    currency: 'USD',
+    exchange_rate: '12800'
+  });
+
+  // Local state for editing factories
+  const [editCurrency, setEditCurrency] = useState('USD');
+  const [editExchangeRate, setEditExchangeRate] = useState('12800');
+
   const handleEditClick = (fac) => {
     setEditingFac({ ...fac });
+    setEditCurrency('USD');
+    setEditExchangeRate('12800');
     setError('');
   };
 
-  const handleCreateSubmit = (e) => {
+  const handleCreateSubmit = async (e) => {
     e.preventDefault();
-    onCreateFac(e);
-    setShowCreateModal(false);
+    setError('');
+    setLoading(true);
+    try {
+      let rateUSD = parseFloat(createForm.rental_rate_per_day) || 0;
+      if (createForm.currency === 'UZS') {
+        const rate = parseFloat(createForm.exchange_rate) || 12800;
+        rateUSD = rateUSD / rate;
+      }
+      await api.post('/admin/factories', {
+        name: createForm.name,
+        address: createForm.address,
+        phone: createForm.phone,
+        manager_name: createForm.manager_name,
+        equipment_type: createForm.equipment_type,
+        rental_rate_per_day: rateUSD,
+        production_commission_percent: parseFloat(createForm.production_commission_percent) || 0
+      });
+      setCreateForm({
+        name: '',
+        address: '',
+        phone: '',
+        manager_name: '',
+        equipment_type: '',
+        rental_rate_per_day: '0',
+        production_commission_percent: '0',
+        currency: 'USD',
+        exchange_rate: '12800'
+      });
+      setShowCreateModal(false);
+      if (onRefresh) onRefresh();
+    } catch (err) {
+      setError(err.response?.data?.error || 'Zavod qo\'shishda xatolik yuz berdi');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleUpdateFac = async (e) => {
@@ -23,13 +75,18 @@ export default function FactoryManager({ factories, facForm, setFacForm, onCreat
     setError('');
     setLoading(true);
     try {
+      let rateUSD = parseFloat(editingFac.rental_rate_per_day) || 0;
+      if (editCurrency === 'UZS') {
+        const rate = parseFloat(editExchangeRate) || 12800;
+        rateUSD = rateUSD / rate;
+      }
       await api.put(`/admin/factories/${editingFac.id}`, {
         name: editingFac.name,
         address: editingFac.address,
         phone: editingFac.phone,
         manager_name: editingFac.manager_name,
         equipment_type: editingFac.equipment_type,
-        rental_rate_per_day: parseFloat(editingFac.rental_rate_per_day) || 0,
+        rental_rate_per_day: rateUSD,
         production_commission_percent: parseFloat(editingFac.production_commission_percent) || 0,
         is_active: editingFac.is_active
       });
@@ -71,13 +128,18 @@ export default function FactoryManager({ factories, facForm, setFacForm, onCreat
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
           <div className="w-full max-w-lg p-8 skeuo-convex border border-white/10 shadow-2xl overflow-y-auto max-h-[90vh]">
             <h3 className="text-lg font-black text-slate-100 mb-6">➕ Yangi zavod qo'shish</h3>
+            {error && (
+              <div className="mb-4 p-3 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold">
+                ⚠️ {error}
+              </div>
+            )}
             <form onSubmit={handleCreateSubmit} className="space-y-6">
               <div>
                 <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Zavod nomi</label>
                 <input
                   type="text"
-                  value={facForm.name}
-                  onChange={(e) => setFacForm({ ...facForm, name: e.target.value })}
+                  value={createForm.name}
+                  onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
                   className="w-full skeuo-input"
                   placeholder="Toshkent Armatura Zavodi"
                   required
@@ -88,8 +150,8 @@ export default function FactoryManager({ factories, facForm, setFacForm, onCreat
                 <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Manzil</label>
                 <input
                   type="text"
-                  value={facForm.address}
-                  onChange={(e) => setFacForm({ ...facForm, address: e.target.value })}
+                  value={createForm.address}
+                  onChange={(e) => setCreateForm({ ...createForm, address: e.target.value })}
                   className="w-full skeuo-input"
                   placeholder="Sergeli 4-mavze"
                   required
@@ -100,8 +162,8 @@ export default function FactoryManager({ factories, facForm, setFacForm, onCreat
                 <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Telefon</label>
                 <input
                   type="text"
-                  value={facForm.phone}
-                  onChange={(e) => setFacForm({ ...facForm, phone: e.target.value })}
+                  value={createForm.phone}
+                  onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
                   className="w-full skeuo-input"
                   placeholder="+998712345678"
                   required
@@ -112,8 +174,8 @@ export default function FactoryManager({ factories, facForm, setFacForm, onCreat
                 <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Menejer (F.I.Sh)</label>
                 <input
                   type="text"
-                  value={facForm.manager_name}
-                  onChange={(e) => setFacForm({ ...facForm, manager_name: e.target.value })}
+                  value={createForm.manager_name}
+                  onChange={(e) => setCreateForm({ ...createForm, manager_name: e.target.value })}
                   className="w-full skeuo-input"
                   placeholder="Temur Olimov"
                   required
@@ -124,8 +186,8 @@ export default function FactoryManager({ factories, facForm, setFacForm, onCreat
                 <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Jihoz/Uskunalar turi</label>
                 <input
                   type="text"
-                  value={facForm.equipment_type}
-                  onChange={(e) => setFacForm({ ...facForm, equipment_type: e.target.value })}
+                  value={createForm.equipment_type}
+                  onChange={(e) => setCreateForm({ ...createForm, equipment_type: e.target.value })}
                   className="w-full skeuo-input"
                   placeholder="Qoliplash uskunalari"
                   required
@@ -133,11 +195,39 @@ export default function FactoryManager({ factories, facForm, setFacForm, onCreat
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Ijara stavkasi (Kunlik, USD)</label>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Ijara stavkasi valyutasi</label>
+                <select
+                  value={createForm.currency}
+                  onChange={(e) => setCreateForm({ ...createForm, currency: e.target.value })}
+                  className="w-full skeuo-input bg-[#131b2e]"
+                >
+                  <option value="USD">USD ($)</option>
+                  <option value="UZS">UZS (so'm)</option>
+                </select>
+              </div>
+
+              {createForm.currency === 'UZS' && (
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Dollar Kursi (1 USD = ... UZS)</label>
+                  <input
+                    type="number"
+                    value={createForm.exchange_rate}
+                    onChange={(e) => setCreateForm({ ...createForm, exchange_rate: e.target.value })}
+                    className="w-full skeuo-input"
+                    placeholder="12800"
+                    required
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">
+                  Ijara stavkasi (Kunlik, {createForm.currency})
+                </label>
                 <input
                   type="number"
-                  value={facForm.rental_rate_per_day}
-                  onChange={(e) => setFacForm({ ...facForm, rental_rate_per_day: e.target.value })}
+                  value={createForm.rental_rate_per_day}
+                  onChange={(e) => setCreateForm({ ...createForm, rental_rate_per_day: e.target.value })}
                   className="w-full skeuo-input"
                 />
               </div>
@@ -147,15 +237,15 @@ export default function FactoryManager({ factories, facForm, setFacForm, onCreat
                 <input
                   type="number"
                   step="0.01"
-                  value={facForm.production_commission_percent}
-                  onChange={(e) => setFacForm({ ...facForm, production_commission_percent: e.target.value })}
+                  value={createForm.production_commission_percent}
+                  onChange={(e) => setCreateForm({ ...createForm, production_commission_percent: e.target.value })}
                   className="w-full skeuo-input"
                 />
               </div>
 
               <div className="flex gap-4 pt-4">
-                <button type="submit" className="flex-1 py-3 skeuo-btn text-indigo-400 font-extrabold text-sm active:scale-95 duration-100">
-                  💾 Saqlash
+                <button type="submit" disabled={loading} className="flex-1 py-3 skeuo-btn text-indigo-400 font-extrabold text-sm active:scale-95 duration-100">
+                  {loading ? "Saqlanmoqda..." : "💾 Saqlash"}
                 </button>
                 <button type="button" onClick={() => setShowCreateModal(false)} className="flex-1 py-3 skeuo-btn text-slate-400 font-extrabold text-sm active:scale-95 duration-100">
                   Bekor qilish
@@ -177,7 +267,7 @@ export default function FactoryManager({ factories, facForm, setFacForm, onCreat
               </div>
             )}
             <form onSubmit={handleUpdateFac} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Zavod nomi</label>
                 <input
                   type="text"
@@ -233,7 +323,35 @@ export default function FactoryManager({ factories, facForm, setFacForm, onCreat
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Kunlik ijara ($)</label>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Ijara stavkasi valyutasi</label>
+                <select
+                  value={editCurrency}
+                  onChange={(e) => setEditCurrency(e.target.value)}
+                  className="w-full skeuo-input bg-[#131b2e]"
+                >
+                  <option value="USD">USD ($)</option>
+                  <option value="UZS">UZS (so'm)</option>
+                </select>
+              </div>
+
+              {editCurrency === 'UZS' && (
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Dollar Kursi (1 USD = ... UZS)</label>
+                  <input
+                    type="number"
+                    value={editExchangeRate}
+                    onChange={(e) => setEditExchangeRate(e.target.value)}
+                    className="w-full skeuo-input"
+                    placeholder="12800"
+                    required
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">
+                  Kunlik ijara ({editCurrency})
+                </label>
                 <input
                   type="number"
                   value={editingFac.rental_rate_per_day}

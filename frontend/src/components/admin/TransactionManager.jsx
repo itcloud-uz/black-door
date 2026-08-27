@@ -85,6 +85,20 @@ export default function TransactionManager({
                 </select>
               </div>
 
+              {txForm.currency !== 'USD' && (
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Dollar Kursi (1 USD = ... UZS)</label>
+                  <input
+                    type="number"
+                    value={txForm.exchange_rate || '12800'}
+                    onChange={(e) => setTxForm({ ...txForm, exchange_rate: e.target.value })}
+                    className="w-full skeuo-input"
+                    placeholder="12800"
+                    required
+                  />
+                </div>
+              )}
+
               <div>
                 <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Kassadan/Kimdan (From)</label>
                 <input

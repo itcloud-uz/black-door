@@ -2,14 +2,19 @@ import React, { useState } from 'react';
 import api from '../../services/api';
 
 export default function AccountManager({ 
-  accounts, accForm, setAccForm, onCreateAcc, selectedAccId, setSelectedAccId, 
-  adjustAmount, setAdjustAmount, adjustDesc, setAdjustDesc, onAdjustBalance,
-  onRefresh
+  accounts, accForm, setAccForm, onCreateAcc, onRefresh
 }) {
   const [editingAcc, setEditingAcc] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+
+  // Local Balance Adjustment States
+  const [localSelectedAccId, setLocalSelectedAccId] = useState(null);
+  const [localAdjustAmount, setLocalAdjustAmount] = useState('');
+  const [localAdjustDesc, setLocalAdjustDesc] = useState('');
+  const [adjustCurrency, setAdjustCurrency] = useState('UZS');
+  const [adjustRate, setAdjustRate] = useState('12800');
 
   const handleEditClick = (acc) => {
     setEditingAcc({ ...acc });
@@ -20,6 +25,41 @@ export default function AccountManager({
     e.preventDefault();
     onCreateAcc(e);
     setShowCreateModal(false);
+  };
+
+  const handleAdjustClick = (acc) => {
+    setLocalSelectedAccId(acc.id);
+    setAdjustCurrency(acc.currency);
+    setAdjustRate('12800');
+    setLocalAdjustAmount('');
+    setLocalAdjustDesc('');
+  };
+
+  const handleAdjustSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const activeAcc = accounts.find(a => a.id === localSelectedAccId);
+      let finalAmt = parseFloat(localAdjustAmount) || 0;
+      if (adjustCurrency !== activeAcc.currency) {
+        const rate = parseFloat(adjustRate) || 12800;
+        if (adjustCurrency === 'USD' && activeAcc.currency === 'UZS') {
+          finalAmt = finalAmt * rate;
+        } else if (adjustCurrency === 'UZS' && activeAcc.currency === 'USD') {
+          finalAmt = finalAmt / rate;
+        }
+      }
+      await api.post(`/admin/accounts/${localSelectedAccId}/adjust-balance`, {
+        adjustmentAmount: finalAmt,
+        description: localAdjustDesc
+      });
+      setLocalSelectedAccId(null);
+      if (onRefresh) onRefresh();
+    } catch (err) {
+      alert(err.response?.data?.error || 'Balansni tuzatishda xatolik yuz berdi');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleUpdateAcc = async (e) => {
@@ -56,6 +96,8 @@ export default function AccountManager({
       alert(err.response?.data?.error || "Hisobni o'chirishda xatolik yuz berdi");
     }
   };
+
+  const selectedAccountObj = accounts.find(a => a.id === localSelectedAccId);
 
   return (
     <div>
@@ -281,36 +323,67 @@ export default function AccountManager({
       )}
 
       {/* Balances Adjust Modal Overlay */}
-      {selectedAccId && (
+      {localSelectedAccId && selectedAccountObj && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
           <div className="w-full max-w-md p-8 skeuo-convex border border-white/10 shadow-2xl">
             <h3 className="text-lg font-black text-slate-100 mb-4">Balansni Tuzatish (Qo'lda)</h3>
-            <form onSubmit={onAdjustBalance}>
-              <div className="mb-4">
-                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Tuzatish Summasi (Farqi)</label>
+            <form onSubmit={handleAdjustSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Tuzatish Valyutasi</label>
+                <select
+                  value={adjustCurrency}
+                  onChange={(e) => setAdjustCurrency(e.target.value)}
+                  className="w-full skeuo-input bg-[#131b2e]"
+                >
+                  <option value="UZS">UZS</option>
+                  <option value="USD">USD</option>
+                </select>
+              </div>
+
+              {adjustCurrency !== selectedAccountObj.currency && (
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Dollar Kursi (1 USD = ... UZS)</label>
+                  <input
+                    type="number"
+                    value={adjustRate}
+                    onChange={(e) => setAdjustRate(e.target.value)}
+                    className="w-full skeuo-input"
+                    placeholder="12800"
+                    required
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">
+                  Tuzatish Summasi (Farqi, {adjustCurrency})
+                </label>
                 <input
                   type="number"
-                  value={adjustAmount}
-                  onChange={(e) => setAdjustAmount(e.target.value)}
+                  value={localAdjustAmount}
+                  onChange={(e) => setLocalAdjustAmount(e.target.value)}
                   className="w-full skeuo-input"
-                  placeholder="Masalan: -500 (Deduct) yoki 1000 (Add)"
+                  placeholder="Masalan: -500 yoki 1000"
                   required
                 />
               </div>
-              <div className="mb-6">
+
+              <div>
                 <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Tuzatish Sababi / Izoh</label>
                 <input
                   type="text"
-                  value={adjustDesc}
-                  onChange={(e) => setAdjustDesc(e.target.value)}
+                  value={localAdjustDesc}
+                  onChange={(e) => setLocalAdjustDesc(e.target.value)}
                   className="w-full skeuo-input"
                   placeholder="Masalan: Kassa kamomad hisobi"
                   required
                 />
               </div>
-              <div className="flex gap-4">
-                <button type="submit" className="flex-1 py-3 skeuo-btn text-emerald-400 font-bold active:scale-95 duration-100">O'zgartirish</button>
-                <button type="button" onClick={() => setSelectedAccId(null)} className="flex-1 py-3 skeuo-btn text-slate-400 active:scale-95 duration-100">Bekor qilish</button>
+              <div className="flex gap-4 pt-4">
+                <button type="submit" disabled={loading} className="flex-1 py-3 skeuo-btn text-emerald-400 font-bold active:scale-95 duration-100">
+                  {loading ? "Tuzatilmoqda..." : "O'zgartirish"}
+                </button>
+                <button type="button" onClick={() => setLocalSelectedAccId(null)} className="flex-1 py-3 skeuo-btn text-slate-400 active:scale-95 duration-100">Bekor qilish</button>
               </div>
             </form>
           </div>
@@ -344,7 +417,7 @@ export default function AccountManager({
                   </div>
 
                   <button
-                    onClick={() => setSelectedAccId(acc.id)}
+                    onClick={() => handleAdjustClick(acc)}
                     className="py-1.5 px-3 skeuo-btn text-xs font-bold text-amber-400 hover:text-amber-300"
                   >
                     ⚖️ Tuzatish

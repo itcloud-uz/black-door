@@ -50,7 +50,8 @@ export default function AdminDashboard({ user, onLogout }) {
   const [txForm, setTxForm] = useState({
     transaction_type: 'cash_deposit', amount: '', currency: 'USD',
     from_account: '', to_account: '', description: '',
-    factory_id: '', product_id: '', person_id: '', status: 'completed'
+    factory_id: '', product_id: '', person_id: '', status: 'completed',
+    exchange_rate: '12800'
   });
   
   const [accForm, setAccForm] = useState({
@@ -188,7 +189,8 @@ export default function AdminDashboard({ user, onLogout }) {
       setTxForm({
         transaction_type: 'cash_deposit', amount: '', currency: 'USD',
         from_account: '', to_account: '', description: '',
-        factory_id: '', product_id: '', person_id: '', status: 'completed'
+        factory_id: '', product_id: '', person_id: '', status: 'completed',
+        exchange_rate: '12800'
       });
       loadAllData();
     } catch (err) {
