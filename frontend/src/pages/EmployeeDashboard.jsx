@@ -311,14 +311,14 @@ export default function EmployeeDashboard({ user, onLogout }) {
         )}
 
         {activeTab === 'settings' && (
-          <div className="max-w-xl mx-auto bg-gray-50 rounded-2xl p-6 skeuo-concave border border-gray-200">
-            <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-              <Settings className="text-blue-600" /> Akkaunt Sozlamalari
+          <div className="max-w-xl mx-auto skeuo-concave border border-white/5 p-6 shadow-xl">
+            <h2 className="text-xl font-bold text-slate-100 mb-6 flex items-center gap-2">
+              <Settings className="text-indigo-400" /> Akkaunt Sozlamalari
             </h2>
             
             <div className="space-y-6">
               <div>
-                <label className="block text-xs font-bold text-gray-500 mb-2">Foydalanuvchi ismi</label>
+                <label className="block text-xs font-bold text-slate-400 mb-2">Foydalanuvchi ismi</label>
                 <input 
                   type="text"
                   value={settingsForm.full_name}
@@ -327,9 +327,9 @@ export default function EmployeeDashboard({ user, onLogout }) {
                 />
               </div>
 
-              <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
-                <h3 className="text-sm font-bold text-blue-800 mb-2">Telegram 2FA Ulanishi</h3>
-                <p className="text-xs text-blue-600 mb-4 leading-relaxed">
+              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                <h3 className="text-sm font-bold text-indigo-400 mb-2">Telegram 2FA Ulanishi</h3>
+                <p className="text-xs text-slate-300 mb-4 leading-relaxed">
                   Tizimga xavfsiz kirish uchun Telegram botimizga start bosing, u yerda ko'rsatilgan <strong>Chat ID</strong>-ni pastdagi maydonga kiriting va saqlang.
                 </p>
                 
@@ -338,15 +338,15 @@ export default function EmployeeDashboard({ user, onLogout }) {
                     href={`https://t.me/Itcloudvertifikatsiya_bot`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 text-xs font-bold text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700 duration-150"
+                    className="px-4 py-2 text-xs font-bold text-white bg-indigo-600 rounded-lg shadow hover:bg-indigo-700 duration-150"
                   >
                     Botni ishga tushirish (Start)
                   </a>
-                  <span className="text-xs text-gray-400">Bot username: @Itcloudvertifikatsiya_bot</span>
+                  <span className="text-xs text-slate-400">Bot username: @Itcloudvertifikatsiya_bot</span>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 mb-2">Sizning Telegram Chat ID</label>
+                  <label className="block text-xs font-bold text-slate-400 mb-2">Sizning Telegram Chat ID</label>
                   <input 
                     type="text"
                     placeholder="Masalan: 1412501744"
@@ -355,16 +355,16 @@ export default function EmployeeDashboard({ user, onLogout }) {
                     className="w-full px-4 py-3 rounded-xl skeuo-input focus:outline-none font-mono"
                   />
                   {user.is_telegram_verified ? (
-                    <span className="inline-block mt-2 text-xs font-bold text-green-600">✓ Telegram 2FA tasdiqlangan va faol</span>
+                    <span className="inline-block mt-2 text-xs font-bold text-emerald-400">✓ Telegram 2FA tasdiqlangan va faol</span>
                   ) : (
-                    <span className="inline-block mt-2 text-xs font-bold text-amber-600">⚠ Telegram 2FA tasdiqlanmagan</span>
+                    <span className="inline-block mt-2 text-xs font-bold text-amber-400">⚠ Telegram 2FA tasdiqlanmagan</span>
                   )}
                 </div>
               </div>
 
               <button 
                 onClick={handleSaveSettings}
-                className="w-full py-3.5 rounded-xl text-sm font-bold text-white bg-green-600 active:scale-95 duration-150 hover:bg-green-700 shadow-lg"
+                className="w-full py-3.5 rounded-xl text-sm font-bold text-white bg-emerald-600 active:scale-95 duration-150 hover:bg-emerald-700 shadow-lg"
               >
                 Sozlamalarni saqlash
               </button>
