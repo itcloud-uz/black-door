@@ -4,59 +4,107 @@
 
 @layer base {
   body {
-    background-color: #EEF2F7;
-    color: #2D3748;
+    background: linear-gradient(135deg, #0b0f19 0%, #1e1b4b 40%, #0b0f19 100%);
+    background-attachment: fixed;
+    color: #e2e8f0;
     font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #f8fafc;
   }
 }
 
-/* Custom Soft UI (Neumorphism) Helpers */
+/* Glassmorphism Design System Helpers */
 @layer utilities {
   .skeuo-flat {
-    background: #EEF2F7;
-    box-shadow: 4px 4px 8px #D1D9E6, -4px -4px 8px #FFFFFF;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .skeuo-convex {
-    background: #EEF2F7;
-    box-shadow: 6px 6px 12px #C5D0E6, -6px -6px 12px #FFFFFF;
-    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.125);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    border-radius: 16px;
   }
 
   .skeuo-concave {
-    background: #EEF2F7;
-    box-shadow: inset 4px 4px 8px #C5D0E6, inset -4px -4px 8px #FFFFFF;
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 2px 10px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
   }
 
   .skeuo-btn {
-    background: #EEF2F7;
-    box-shadow: 3px 3px 6px #C5D0E6, -3px -3px 6px #FFFFFF;
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+    color: #f8fafc;
     transition: all 0.2s ease-in-out;
   }
 
+  .skeuo-btn:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+    transform: translateY(-1px);
+  }
+
   .skeuo-btn:active {
-    box-shadow: inset 2px 2px 5px #C5D0E6, inset -2px -2px 5px #FFFFFF;
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(0);
   }
 
   .skeuo-btn-active {
-    box-shadow: inset 2px 2px 5px #C5D0E6, inset -2px -2px 5px #FFFFFF;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 
   .skeuo-input {
-    background: #EEF2F7;
-    box-shadow: inset 2px 2px 5px #C5D0E6, inset -2px -2px 5px #FFFFFF;
-    border: none;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     outline: none;
-    border-radius: 8px;
-    padding: 10px 14px;
+    border-radius: 10px;
+    padding: 12px 16px;
     font-size: 0.95rem;
-    color: #2D3748;
+    color: #f8fafc;
     transition: all 0.2s;
   }
 
-  .skeuo-input:focus {
-    box-shadow: inset 3px 3px 6px #B0BED4, inset -3px -3px 6px #FFFFFF;
+  .skeuo-input::placeholder {
+    color: #64748b;
   }
+
+  .skeuo-input:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+  }
+}
+
+/* Scrollbar Styling for Dark Theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.15);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
 }

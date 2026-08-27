@@ -275,58 +275,58 @@ export default function AdminDashboard({ user, onLogout }) {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#EEF2F7]">
+    <div className="min-h-screen flex bg-transparent">
       {/* Sidebar Component */}
-      <aside className="w-64 skeuo-flat flex flex-col justify-between p-6">
+      <aside className="w-64 skeuo-flat flex flex-col justify-between p-6 border-r border-white/5">
         <div>
           <div className="flex items-center gap-3 mb-8">
             <span className="text-3xl">🚪</span>
             <div>
-              <h1 className="text-lg font-black text-[#2D3748] tracking-tight">Black Door</h1>
-              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Admin Control</span>
+              <h1 className="text-lg font-black text-slate-100 tracking-tight">Black Door</h1>
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Admin Control</span>
             </div>
           </div>
-
+ 
           <nav className="flex flex-col gap-3">
             <button
               onClick={() => setActiveTab('dashboard')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'dashboard' ? 'skeuo-concave text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'dashboard' ? 'skeuo-concave text-indigo-400' : 'hover:bg-white/10 text-slate-300'}`}
             >
               <LayoutDashboard size={18} /> Asosiy Ko'rinish
             </button>
             <button
               onClick={() => setActiveTab('transactions')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'transactions' ? 'skeuo-concave text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'transactions' ? 'skeuo-concave text-indigo-400' : 'hover:bg-white/10 text-slate-300'}`}
             >
               <DollarSign size={18} /> Tranzaksiyalar
             </button>
             <button
               onClick={() => setActiveTab('accounts')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'accounts' ? 'skeuo-concave text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'accounts' ? 'skeuo-concave text-indigo-400' : 'hover:bg-white/10 text-slate-300'}`}
             >
               <Users size={18} /> Shaxslar (Kassalar)
             </button>
             <button
               onClick={() => setActiveTab('factories')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'factories' ? 'skeuo-concave text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'factories' ? 'skeuo-concave text-indigo-400' : 'hover:bg-white/10 text-slate-300'}`}
             >
               <Building2 size={18} /> Zavodlar
             </button>
             <button
               onClick={() => setActiveTab('products')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'products' ? 'skeuo-concave text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'products' ? 'skeuo-concave text-indigo-400' : 'hover:bg-white/10 text-slate-300'}`}
             >
               <Package size={18} /> Mahsulotlar
             </button>
             <button
               onClick={() => setActiveTab('warehouse')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'warehouse' ? 'skeuo-concave text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'warehouse' ? 'skeuo-concave text-indigo-400' : 'hover:bg-white/10 text-slate-300'}`}
             >
               <Warehouse size={18} /> Omborxona
             </button>
             <button
               onClick={() => setActiveTab('audit')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'audit' ? 'skeuo-concave text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'audit' ? 'skeuo-concave text-indigo-400' : 'hover:bg-white/10 text-slate-300'}`}
             >
               <ClipboardList size={18} /> Audit Log
             </button>
@@ -335,7 +335,7 @@ export default function AdminDashboard({ user, onLogout }) {
                 setActiveTab('settings');
                 setSettingsForm({ telegram_id: user.telegram_id || '', full_name: user.full_name || '' });
               }}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'settings' ? 'skeuo-concave text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'settings' ? 'skeuo-concave text-indigo-400' : 'hover:bg-white/10 text-slate-300'}`}
             >
               <Settings size={18} /> Sozlamalar
             </button>
@@ -405,6 +405,7 @@ export default function AdminDashboard({ user, onLogout }) {
             adjustDesc={adjustDesc}
             setAdjustDesc={setAdjustDesc}
             onAdjustBalance={handleAdjustBalance}
+            onRefresh={loadAllData}
           />
         )}
 
@@ -414,6 +415,7 @@ export default function AdminDashboard({ user, onLogout }) {
             facForm={facForm}
             setFacForm={setFacForm}
             onCreateFac={handleCreateFac}
+            onRefresh={loadAllData}
           />
         )}
 
@@ -423,6 +425,7 @@ export default function AdminDashboard({ user, onLogout }) {
             prodForm={prodForm}
             setProdForm={setProdForm}
             onCreateProd={handleCreateProd}
+            onRefresh={loadAllData}
           />
         )}
 

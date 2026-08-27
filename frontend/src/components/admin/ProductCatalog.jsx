@@ -1,16 +1,61 @@
-import React from 'react';
+import React, { useState } from 'react';
+import api from '../../services/api';
 
-export default function ProductCatalog({ products, prodForm, setProdForm, onCreateProd }) {
+export default function ProductCatalog({ products, prodForm, setProdForm, onCreateProd, onRefresh }) {
+  const [editingProd, setEditingProd] = useState(null);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleEditClick = (prod) => {
+    setEditingProd({ ...prod });
+    setError('');
+  };
+
+  const handleUpdateProd = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      await api.put(`/admin/products/${editingProd.id}`, {
+        name: editingProd.name,
+        unit_type: editingProd.unit_type,
+        base_price: parseFloat(editingProd.base_price) || 0,
+        cost_price: parseFloat(editingProd.cost_price) || 0,
+        category: editingProd.category,
+        manufacturer: editingProd.manufacturer,
+        quantity_in_stock: parseFloat(editingProd.quantity_in_stock) || 0
+      });
+      setEditingProd(null);
+      if (onRefresh) onRefresh();
+    } catch (err) {
+      setError(err.response?.data?.error || 'Mahsulotni yangilashda xatolik yuz berdi');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteClick = async (prodId) => {
+    if (!window.confirm("Haqiqatdan ham ushbu mahsulotni o'chirmoqchisiz? Bu amalni ortga qaytarib bo'lmaydi!")) {
+      return;
+    }
+    try {
+      await api.delete(`/admin/products/${prodId}`);
+      if (onRefresh) onRefresh();
+    } catch (err) {
+      alert(err.response?.data?.error || "Mahsulotni o'chirishda xatolik yuz berdi");
+    }
+  };
+
   return (
     <div>
-      <h2 className="text-2xl font-black text-[#2D3748] mb-8">Mahsulotlar Katalogi</h2>
+      <h2 className="text-2xl font-black text-slate-100 mb-8">Mahsulotlar Katalogi</h2>
 
       {/* Create Product Form */}
-      <div className="p-6 skeuo-convex mb-8">
-        <h3 className="font-bold text-[#2D3748] text-sm mb-6">➕ Yangi mahsulot qo'shish</h3>
+      <div className="p-6 skeuo-convex mb-8 border border-white/5 shadow-lg">
+        <h3 className="font-bold text-slate-200 text-sm mb-6">➕ Yangi mahsulot qo'shish</h3>
         <form onSubmit={onCreateProd} className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Mahsulot nomi</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Mahsulot nomi</label>
             <input
               type="text"
               value={prodForm.name}
@@ -22,11 +67,11 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">O'lchov birligi</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">O'lchov birligi</label>
             <select
               value={prodForm.unit_type}
               onChange={(e) => setProdForm({ ...prodForm, unit_type: e.target.value })}
-              className="w-full skeuo-input"
+              className="w-full skeuo-input bg-[#131b2e]"
             >
               <option value="kg">kilogram (kg)</option>
               <option value="dona">dona (piece)</option>
@@ -38,7 +83,7 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Asosiy narxi (Sotuv, USD)</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Asosiy narxi (Sotuv, USD)</label>
             <input
               type="number"
               value={prodForm.base_price}
@@ -48,7 +93,7 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Tannarxi (Xarid, USD)</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Tannarxi (Xarid, USD)</label>
             <input
               type="number"
               value={prodForm.cost_price}
@@ -58,7 +103,7 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Kategoriya</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Kategoriya</label>
             <input
               type="text"
               value={prodForm.category}
@@ -70,7 +115,7 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Ishlab chiqaruvchi</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Ishlab chiqaruvchi</label>
             <input
               type="text"
               value={prodForm.manufacturer}
@@ -81,7 +126,7 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Ombordagi miqdor</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Ombordagi miqdor</label>
             <input
               type="number"
               value={prodForm.quantity_in_stock}
@@ -91,39 +136,164 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
           </div>
 
           <div className="flex items-end justify-end">
-            <button type="submit" className="py-3 px-8 skeuo-btn text-blue-600 font-extrabold text-sm active:scale-95 duration-100 w-full">
+            <button type="submit" className="py-3 px-8 skeuo-btn text-indigo-400 font-extrabold text-sm active:scale-95 duration-100 w-full">
               💾 Mahsulotni Saqlash
             </button>
           </div>
         </form>
       </div>
 
+      {/* Edit Product Modal */}
+      {editingProd && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-lg p-8 skeuo-convex border border-white/10 shadow-2xl">
+            <h3 className="text-lg font-black text-slate-100 mb-6">📝 Mahsulot ma'lumotlarini tahrirlash</h3>
+            {error && (
+              <div className="mb-4 p-3 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold">
+                ⚠️ {error}
+              </div>
+            )}
+            <form onSubmit={handleUpdateProd} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Mahsulot nomi</label>
+                <input
+                  type="text"
+                  value={editingProd.name}
+                  onChange={(e) => setEditingProd({ ...editingProd, name: e.target.value })}
+                  className="w-full skeuo-input"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">O'lchov birligi</label>
+                <select
+                  value={editingProd.unit_type}
+                  onChange={(e) => setEditingProd({ ...editingProd, unit_type: e.target.value })}
+                  className="w-full skeuo-input bg-[#131b2e]"
+                >
+                  <option value="kg">kilogram (kg)</option>
+                  <option value="dona">dona (piece)</option>
+                  <option value="meter">metr (meter)</option>
+                  <option value="liter">litr (liter)</option>
+                  <option value="box">quti (box)</option>
+                  <option value="ton">tonna (ton)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Sotuv narxi ($)</label>
+                <input
+                  type="number"
+                  value={editingProd.base_price}
+                  onChange={(e) => setEditingProd({ ...editingProd, base_price: e.target.value })}
+                  className="w-full skeuo-input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Tannarxi ($)</label>
+                <input
+                  type="number"
+                  value={editingProd.cost_price}
+                  onChange={(e) => setEditingProd({ ...editingProd, cost_price: e.target.value })}
+                  className="w-full skeuo-input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Kategoriya</label>
+                <input
+                  type="text"
+                  value={editingProd.category}
+                  onChange={(e) => setEditingProd({ ...editingProd, category: e.target.value })}
+                  className="w-full skeuo-input"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Ishlab chiqaruvchi</label>
+                <input
+                  type="text"
+                  value={editingProd.manufacturer || ''}
+                  onChange={(e) => setEditingProd({ ...editingProd, manufacturer: e.target.value })}
+                  className="w-full skeuo-input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Ombordagi miqdor</label>
+                <input
+                  type="number"
+                  value={editingProd.quantity_in_stock}
+                  onChange={(e) => setEditingProd({ ...editingProd, quantity_in_stock: e.target.value })}
+                  className="w-full skeuo-input"
+                />
+              </div>
+
+              <div className="md:col-span-2 flex gap-4 mt-4">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 py-3 skeuo-btn text-emerald-400 font-bold active:scale-95 duration-100"
+                >
+                  {loading ? "Saqlanmoqda..." : "💾 Saqlash"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditingProd(null)}
+                  className="flex-1 py-3 skeuo-btn text-slate-400 font-bold active:scale-95 duration-100"
+                >
+                  Bekor qilish
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* List products */}
-      <div className="skeuo-convex p-6">
-        <h3 className="font-bold text-gray-800 text-sm mb-4">Zaxiradagi Mahsulotlar Katalogi</h3>
+      <div className="skeuo-convex p-6 border border-white/5 shadow-lg">
+        <h3 className="font-bold text-slate-200 text-sm mb-4">Zaxiradagi Mahsulotlar Katalogi</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-gray-300 text-gray-500 uppercase font-extrabold tracking-wider">
+              <tr className="border-b border-white/10 text-slate-400 uppercase font-extrabold tracking-wider">
                 <th className="py-3 px-4">Nomi</th>
                 <th className="py-3 px-4">Kategoriya</th>
                 <th className="py-3 px-4">Sotuv Narxi</th>
                 <th className="py-3 px-4">Tannarxi</th>
                 <th className="py-3 px-4">Qoldiq Miqdor</th>
                 <th className="py-3 px-4">Ishlab chiqaruvchi</th>
+                <th className="py-3 px-4 text-right">Amallar</th>
               </tr>
             </thead>
             <tbody>
               {products.map(p => (
-                <tr key={p.id} className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="py-3 px-4 font-bold text-gray-800">{p.name}</td>
-                  <td className="py-3 px-4 text-gray-500">{p.category}</td>
-                  <td className="py-3 px-4 text-green-600 font-extrabold">${parseFloat(p.base_price).toFixed(2)}</td>
-                  <td className="py-3 px-4 text-red-600 font-extrabold">${parseFloat(p.cost_price).toFixed(2)}</td>
-                  <td className="py-3 px-4 font-black">
+                <tr key={p.id} className="border-b border-white/5 hover:bg-white/5">
+                  <td className="py-3 px-4 font-bold text-slate-100">{p.name}</td>
+                  <td className="py-3 px-4 text-slate-400">{p.category}</td>
+                  <td className="py-3 px-4 text-emerald-400 font-extrabold">${parseFloat(p.base_price).toFixed(2)}</td>
+                  <td className="py-3 px-4 text-red-400 font-extrabold">${parseFloat(p.cost_price).toFixed(2)}</td>
+                  <td className="py-3 px-4 font-black text-slate-200">
                     {parseFloat(p.quantity_in_stock).toLocaleString()} {p.unit_type}
                   </td>
-                  <td className="py-3 px-4 text-gray-400">{p.manufacturer || '—'}</td>
+                  <td className="py-3 px-4 text-slate-400">{p.manufacturer || '—'}</td>
+                  <td className="py-3 px-4 text-right flex justify-end gap-2">
+                    <button
+                      onClick={() => handleEditClick(p)}
+                      className="py-1 px-2.5 text-[10px] font-bold text-indigo-400 hover:text-indigo-300 skeuo-btn active:scale-95 duration-100"
+                    >
+                      ✏️ Tahrirlash
+                    </button>
+                    <button
+                      onClick={() => handleDeleteClick(p.id)}
+                      className="py-1 px-2.5 text-[10px] font-bold text-red-400 hover:text-red-300 skeuo-btn active:scale-95 duration-100"
+                    >
+                      🗑️ O'chirish
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -172,52 +172,52 @@ export default function EmployeeDashboard({ user, onLogout }) {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#EEF2F7]">
+    <div className="min-h-screen flex bg-transparent">
       {/* Sidebar Component */}
-      <aside className="w-64 skeuo-flat flex flex-col justify-between p-6">
+      <aside className="w-64 skeuo-flat flex flex-col justify-between p-6 border-r border-white/5">
         <div>
           <div className="flex items-center gap-3 mb-8">
             <span className="text-3xl">🏬</span>
             <div>
-              <h1 className="text-lg font-black text-[#2D3748] tracking-tight">Black Door</h1>
-              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Ombor Nazorati</span>
+              <h1 className="text-lg font-black text-slate-100 tracking-tight">Black Door</h1>
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Ombor Nazorati</span>
             </div>
           </div>
 
           <nav className="flex flex-col gap-3">
             <button
               onClick={() => setActiveTab('dashboard')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'dashboard' ? 'skeuo-concave text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'dashboard' ? 'skeuo-concave text-indigo-400' : 'hover:bg-white/10 text-slate-300'}`}
             >
               <Warehouse size={18} /> Bosh sahifa
             </button>
             <button
               onClick={() => setActiveTab('receive')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'receive' ? 'skeuo-concave text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'receive' ? 'skeuo-concave text-indigo-400' : 'hover:bg-white/10 text-slate-300'}`}
             >
               <ArrowDownLeft size={18} /> Qabul qilish
             </button>
             <button
               onClick={() => setActiveTab('dispatch')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'dispatch' ? 'skeuo-concave text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'dispatch' ? 'skeuo-concave text-indigo-400' : 'hover:bg-white/10 text-slate-300'}`}
             >
               <ArrowUpRight size={18} /> Jo'natish (Savdo)
             </button>
             <button
               onClick={() => setActiveTab('transfer')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'transfer' ? 'skeuo-concave text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'transfer' ? 'skeuo-concave text-indigo-400' : 'hover:bg-white/10 text-slate-300'}`}
             >
               <MoveRight size={18} /> Ichki Ko'chirish
             </button>
             <button
               onClick={() => setActiveTab('damage')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'damage' ? 'skeuo-concave text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'damage' ? 'skeuo-concave text-indigo-400' : 'hover:bg-white/10 text-slate-300'}`}
             >
               <AlertTriangle size={18} /> Zarar/Kamomad
             </button>
             <button
               onClick={() => setActiveTab('history')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'history' ? 'skeuo-concave text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'history' ? 'skeuo-concave text-indigo-400' : 'hover:bg-white/10 text-slate-300'}`}
             >
               <History size={18} /> Hujjatlar tarixi
             </button>
@@ -226,7 +226,7 @@ export default function EmployeeDashboard({ user, onLogout }) {
                 setActiveTab('settings');
                 setSettingsForm({ telegram_id: user.telegram_id || '', full_name: user.full_name || '' });
               }}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'settings' ? 'skeuo-concave text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'settings' ? 'skeuo-concave text-indigo-400' : 'hover:bg-white/10 text-slate-300'}`}
             >
               <Settings size={18} /> Sozlamalar
             </button>
