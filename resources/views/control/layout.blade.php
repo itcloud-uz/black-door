@@ -101,6 +101,11 @@
                         <i class="bi bi-file-earmark-text"></i> Arizalar
                     </a>
                 </li>
+                <li class="{{ request()->routeIs('control.settings.*') ? 'active' : '' }}">
+                    <a href="{{ route('control.settings.index') }}">
+                        <i class="bi bi-gear"></i> Sozlamalar
+                    </a>
+                </li>
                 <li>
                     <a href="{{ route('admin.dashboard') }}">
                         <i class="bi bi-arrow-left-circle"></i> Asosiy Tizim

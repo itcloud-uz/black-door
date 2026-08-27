@@ -7,6 +7,8 @@ import '../../core/widgets/neumorphic_widgets.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/security/security_helpers.dart';
 
+import '../dashboard/webview_screen.dart';
+
 class PinScreen extends ConsumerStatefulWidget {
   final VoidCallback onSuccess;
 
@@ -65,7 +67,25 @@ class _PinScreenState extends ConsumerState<PinScreen> {
   void _verifyPin() async {
     final success = await ref.read(pinProvider.notifier).verifyPin(_pin);
     if (success) {
-      widget.onSuccess();
+      final pinState = ref.read(pinProvider);
+      if (pinState.requireFaceId) {
+        if (!mounted) return;
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => WebViewScreen(
+              token: ref.read(authProvider).token!,
+              redirectPath: '/finance/face',
+            ),
+          ),
+        ).then((_) {
+          if (ref.read(pinProvider).isVerified) {
+            widget.onSuccess();
+          }
+        });
+      } else {
+        widget.onSuccess();
+      }
     } else {
       setState(() {
         _pin = '';

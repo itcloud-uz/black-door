@@ -248,23 +248,62 @@
 </div>
 
 @push('scripts')
+<script src="{{ asset('vendor/face-api/face-api.min.js') }}"></script>
 <script>
     let registerStream = null;
-    let registerInterval = null;
+    let registerLoopActive = false;
+    let faceApiModelsLoaded = false;
 
-    function openRegisterModal() {
+    async function loadRegisterAiModels() {
+        if (faceApiModelsLoaded) return true;
+        const badge = document.getElementById('registerStatusBadge');
+        const instructions = document.getElementById('registerInstructions');
+
+        try {
+            badge.innerText = 'AI MODELLAR YUKLANMOQDA...';
+            badge.style.color = 'var(--text-muted)';
+            const MODEL_URL = '{{ asset("vendor/face-api/models") }}';
+
+            await Promise.all([
+                faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+                faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+            ]);
+
+            faceApiModelsLoaded = true;
+            return true;
+        } catch (err) {
+            console.error('Model load error:', err);
+            badge.innerText = 'AI MODEL XATOLIGI';
+            badge.style.color = 'var(--color-danger)';
+            instructions.innerText = 'Neyron tarmoq fayllarini yuklab bo\'lmadi.';
+            return false;
+        }
+    }
+
+    async function openRegisterModal() {
         document.getElementById('faceRegisterModal').style.display = 'flex';
-        startRegisterCamera();
+        const ready = await loadRegisterAiModels();
+        if (ready) {
+            startRegisterCamera();
+        }
     }
 
     function closeRegisterModal() {
+        registerLoopActive = false;
         document.getElementById('faceRegisterModal').style.display = 'none';
         if (registerStream) {
             registerStream.getTracks().forEach(track => track.stop());
         }
-        if (registerInterval) {
-            clearInterval(registerInterval);
-        }
+    }
+
+    function calculateEar(eye) {
+        const p1 = eye[0], p2 = eye[1], p3 = eye[2], p4 = eye[3], p5 = eye[4], p6 = eye[5];
+        const distV1 = Math.hypot(p2.x - p6.x, p2.y - p6.y);
+        const distV2 = Math.hypot(p3.x - p5.x, p3.y - p5.y);
+        const distH = Math.hypot(p1.x - p4.x, p1.y - p4.y);
+        if (distH === 0) return 0;
+        return (distV1 + distV2) / (2.0 * distH);
     }
 
     async function startRegisterCamera() {
@@ -275,36 +314,17 @@
 
         try {
             registerStream = await navigator.mediaDevices.getUserMedia({
-                video: { width: 300, height: 300, facingMode: 'user' }
+                video: { width: 320, height: 320, facingMode: 'user' }
             });
             video.srcObject = registerStream;
             
             badge.innerText = 'KAMERA FAOL';
             badge.style.color = 'var(--color-primary)';
-            
-            // Run registration stages
-            let progress = 0;
-            const stages = [
-                { p: 25, t: 'Kameraga to\'g\'ri qarab turing', v: 5 },
-                { p: 50, t: 'Ko\'zlaringizni qisib-oching (Tiriklik testi 1)', v: 15 },
-                { p: 75, t: 'Biroz jilmaying (Tiriklik testi 2)', v: 25 },
-                { p: 100, t: 'Yuz profilini saqlash...', v: 35 }
-            ];
+            instructions.innerText = 'Kameraga to\'g\'ri qarang va ko\'zlaringizni qisib-oching';
+            bar.style.width = '25%';
 
-            let stageIdx = 0;
-            instructions.innerText = stages[stageIdx].t;
-            bar.style.width = stages[stageIdx].p + '%';
-
-            registerInterval = setInterval(() => {
-                stageIdx++;
-                if (stageIdx < stages.length) {
-                    instructions.innerText = stages[stageIdx].t;
-                    bar.style.width = stages[stageIdx].p + '%';
-                } else {
-                    clearInterval(registerInterval);
-                    submitRegistration(stages[stages.length - 1].v);
-                }
-            }, 2500);
+            registerLoopActive = true;
+            runRegisterDetectionLoop();
 
         } catch (err) {
             badge.innerText = 'XATOLIK';
@@ -313,16 +333,146 @@
         }
     }
 
-    async function submitRegistration(variance) {
+    async function runRegisterDetectionLoop() {
+        const videoEl = document.getElementById('registerVideo');
+        const badge = document.getElementById('registerStatusBadge');
+        const instructions = document.getElementById('registerInstructions');
+        const bar = document.getElementById('registerProgressBar');
+        const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 });
+
+        let blinkState = 'CALIBRATE';
+        let livenessOk = false;
+        const earHistory = [];
+        let baseEar = 0.25;
+        let closeThreshold = 0.18;
+        let openThreshold = 0.23;
+        const distanceHistory = [];
+        const collectedDescriptors = [];
+
+        while (registerLoopActive) {
+            if (!videoEl || videoEl.paused || videoEl.ended) {
+                await new Promise(r => setTimeout(r, 200));
+                continue;
+            }
+
+            try {
+                const detection = await faceapi.detectSingleFace(videoEl, options)
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
+
+                if (!detection) {
+                    badge.innerText = 'YUZ KUTILMOQDA...';
+                    badge.style.color = 'var(--text-muted)';
+                    await new Promise(r => setTimeout(r, 150));
+                    continue;
+                }
+
+                badge.innerText = 'YUZ TANIQLANDI';
+                badge.style.color = 'var(--color-primary)';
+
+                const landmarks = detection.landmarks;
+                const leftEye = landmarks.getLeftEye();
+                const rightEye = landmarks.getRightEye();
+                const avgEar = (calculateEar(leftEye) + calculateEar(rightEye)) / 2.0;
+
+                // Track scale-invariant relative landmark distances for motion check
+                const noseTip = landmarks.positions[30];
+                const leftEyeCorner = landmarks.positions[36];
+                const rawDist = Math.hypot(noseTip.x - leftEyeCorner.x, noseTip.y - leftEyeCorner.y);
+                const boxWidth = detection.detection.box.width;
+                const relDist = rawDist / (boxWidth || 1);
+                distanceHistory.push(relDist);
+
+                if (distanceHistory.length > 30) {
+                    distanceHistory.shift();
+                }
+
+                // Liveness eye blink verification
+                if (!livenessOk) {
+                    if (blinkState === 'CALIBRATE') {
+                        earHistory.push(avgEar);
+                        instructions.innerText = 'Kameraga to\'g\'ri qarab turing...';
+                        bar.style.width = '30%';
+                        
+                        if (earHistory.length >= 5) {
+                            const sum = earHistory.reduce((a, b) => a + b, 0);
+                            baseEar = sum / earHistory.length;
+                            
+                            if (baseEar < 0.16 || baseEar > 0.40) {
+                                baseEar = 0.25;
+                            }
+                            
+                            closeThreshold = baseEar * 0.80; // 20% drop
+                            openThreshold = baseEar * 0.90;  // 10% drop
+                            blinkState = 'WAITING_BLINK';
+                        }
+                    } else if (blinkState === 'WAITING_BLINK') {
+                        instructions.innerText = 'Tiriklik testi: Ko\'zingizni qising!';
+                        bar.style.width = '45%';
+                        
+                        if (avgEar <= closeThreshold) {
+                            blinkState = 'EYE_CLOSED';
+                        }
+                    } else if (blinkState === 'EYE_CLOSED') {
+                        if (avgEar >= openThreshold) {
+                            livenessOk = true;
+                            blinkState = 'VERIFIED';
+                        }
+                    }
+
+                    // Parallel Organic Micro-Movement Check (OLV)
+                    if (!livenessOk && distanceHistory.length >= 15) {
+                        const mean = distanceHistory.reduce((a, b) => a + b, 0) / distanceHistory.length;
+                        const variance = distanceHistory.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / distanceHistory.length;
+                        const stdDev = Math.sqrt(variance);
+
+                        if (stdDev > 0.0008 && stdDev < 0.05) {
+                            livenessOk = true;
+                            blinkState = 'VERIFIED';
+                        }
+                    }
+
+                    if (livenessOk) {
+                        instructions.innerText = 'Tiriklik testi o\'tdi! Yuz profili olinmoqda...';
+                        bar.style.width = '75%';
+                    }
+                }
+
+                if (livenessOk) {
+                    collectedDescriptors.push(Array.from(detection.descriptor));
+                    if (collectedDescriptors.length >= 3) {
+                        registerLoopActive = false;
+                        bar.style.width = '100%';
+                        
+                        // Compute element-wise averaged 128D master descriptor vector
+                        const finalVector = new Array(128).fill(0);
+                        for (let i = 0; i < 128; i++) {
+                            let sum = 0;
+                            for (let j = 0; j < collectedDescriptors.length; j++) {
+                                sum += collectedDescriptors[j][i];
+                            }
+                            finalVector[i] = parseFloat((sum / collectedDescriptors.length).toFixed(6));
+                        }
+
+                        await submitRegistration(finalVector);
+                        break;
+                    }
+                }
+
+            } catch (e) {
+                console.error('Register detection error:', e);
+            }
+
+            await new Promise(r => setTimeout(r, 100));
+        }
+    }
+
+    async function submitRegistration(finalVector) {
         const instructions = document.getElementById('registerInstructions');
         
-        // Generate mock 128 embedding vector
-        const mockVector = [];
-        for(let i=0; i<128; i++) {
-            mockVector.push(parseFloat((Math.sin(i + variance) * 0.5 + 0.5).toFixed(4)));
-        }
-
         try {
+            instructions.innerText = 'Serverga saqlanmoqda...';
+
             const response = await fetch('{{ route("finance.face.register") }}', {
                 method: 'POST',
                 headers: {
@@ -330,16 +480,19 @@
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 body: JSON.stringify({
-                    embedding: JSON.stringify(mockVector)
+                    embedding: JSON.stringify(finalVector)
                 })
             });
 
             const res = await response.json();
             if (response.ok && res.success) {
                 instructions.innerText = 'Muvaffaqiyatli saqlandi! Sahifa yangilanmoqda...';
+                if (registerStream) {
+                    registerStream.getTracks().forEach(track => track.stop());
+                }
                 setTimeout(() => {
                     window.location.reload();
-                }, 1500);
+                }, 1200);
             } else {
                 throw new Error(res.message || 'Xatolik yuz berdi');
             }

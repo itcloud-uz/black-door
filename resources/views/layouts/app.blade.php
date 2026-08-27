@@ -28,8 +28,25 @@
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
 
     @stack('styles')
+    <style>
+        body.mobile-app-webview .sidebar,
+        body.mobile-app-webview .top-bar,
+        body.mobile-app-webview .sidebar-overlay {
+            display: none !important;
+        }
+        body.mobile-app-webview .main-wrapper {
+            margin-left: 0 !important;
+            padding-top: 0 !important;
+        }
+        body.mobile-app-webview .app-layout {
+            display: block !important;
+        }
+        body.mobile-app-webview .main-content {
+            padding: 12px !important;
+        }
+    </style>
 </head>
-<body x-data="sidebarToggle">
+<body x-data="sidebarToggle" class="{{ str_contains(request()->header('User-Agent', ''), 'BlackDoorMobile') ? 'mobile-app-webview' : '' }}">
 
     {{-- Mobile Sidebar Overlay --}}
     <div class="sidebar-overlay"

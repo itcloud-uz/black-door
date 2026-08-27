@@ -58,6 +58,26 @@
                 <textarea id="notes" name="notes" class="skeuo-input" style="height: 80px;">{{ old('notes', $client->notes) }}</textarea>
             </div>
 
+            <div style="border-top: 1px dashed rgba(0,0,0,0.08); padding-top: 16px; margin-top: 8px;">
+                <h4 style="margin: 0 0 12px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); font-size: 0.85rem;">Tizim Admin Sozlamalari</h4>
+                
+                <div class="form-group mb-md">
+                    <label class="form-label" for="admin_email">Tizim Logini (Email / Username):</label>
+                    <input type="text" id="admin_email" name="admin_email" class="skeuo-input" required value="{{ old('admin_email', $client->admin_email) }}">
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label" for="admin_password">Tizim yangi paroli (Kamida 4 belgi, o'zgartirmaslik uchun bo'sh qoldiring):</label>
+                        <input type="password" id="admin_password" name="admin_password" class="skeuo-input" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="admin_pin_code">Moliya bo'limi yangi pin-kodi (4 ta raqam, o'zgartirmaslik uchun bo'sh qoldiring):</label>
+                        <input type="text" id="admin_pin_code" name="admin_pin_code" class="skeuo-input" placeholder="1234">
+                    </div>
+                </div>
+            </div>
+
             <div style="display: flex; gap: 12px; margin-top: 10px;">
                 <button type="submit" class="skeuo-btn skeuo-btn-primary" style="flex: 1;">Saqlash</button>
                 <a href="{{ route('control.clients.show', $client->id) }}" class="skeuo-btn text-muted" style="text-align: center;">Bekor qilish</a>

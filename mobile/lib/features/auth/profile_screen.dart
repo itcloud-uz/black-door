@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/network/providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/neumorphic_widgets.dart';
+import '../dashboard/webview_screen.dart';
+import '../../models/models.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -47,7 +49,37 @@ class ProfileScreen extends ConsumerWidget {
             const SizedBox(height: 20),
             _buildInfoItem('Rol', user.role.name.toUpperCase(), Icons.badge, textTheme),
 
-            const SizedBox(height: 48),
+            // Face ID / Settings (Only visible for superAdmin and financier)
+            if (user.role == UserRole.superAdmin || user.role == UserRole.financier) ...[
+              NeumorphicButton(
+                onTap: () {
+                  final token = ref.read(authProvider).token;
+                  if (token != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => WebViewScreen(
+                          token: token,
+                          redirectPath: '/finance/settings',
+                        ),
+                      ),
+                    );
+                  }
+                },
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.face, color: AppColors.success),
+                    SizedBox(width: 12),
+                    Text(
+                      'FACE ID SOZLAMALARI',
+                      style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, letterSpacing: 1),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
 
             // Logout Button
             NeumorphicButton(
@@ -68,6 +100,7 @@ class ProfileScreen extends ConsumerWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 32),
           ],
         ),
       ),

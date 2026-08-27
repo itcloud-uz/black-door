@@ -428,21 +428,24 @@ class _FinanceDashboardState extends ConsumerState<FinanceDashboard> {
               ),
             )
           : null,
-      bottomNavigationBar: Container(
-        height: 70,
-        decoration: const InsetBoxDecoration(
-          color: AppColors.background,
-          boxShadow: [
-            InsetBoxShadow(color: AppColors.shadowDark, offset: Offset(0, -6), blurRadius: 10),
-          ],
-        ),
-        child: Row(
-          children: [
-            _buildNavItem(0, Icons.account_balance_outlined, 'Kassa'),
-            _buildNavItem(1, Icons.contact_page_outlined, 'Kontragent'),
-            _buildNavItem(2, Icons.list_alt_outlined, 'Tranzaksiya'),
-            _buildNavItem(3, Icons.analytics_outlined, 'Hisobot'),
-          ],
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Container(
+          height: 70,
+          decoration: const InsetBoxDecoration(
+            color: AppColors.background,
+            boxShadow: [
+              InsetBoxShadow(color: AppColors.shadowDark, offset: Offset(0, -6), blurRadius: 10),
+            ],
+          ),
+          child: Row(
+            children: [
+              _buildNavItem(0, Icons.account_balance_outlined, 'Kassa'),
+              _buildNavItem(1, Icons.contact_page_outlined, 'Kontragent'),
+              _buildNavItem(2, Icons.list_alt_outlined, 'Tranzaksiya'),
+              _buildNavItem(3, Icons.analytics_outlined, 'Hisobot'),
+            ],
+          ),
         ),
       ),
       body: IndexedStack(

@@ -25,11 +25,13 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        $user = User::where('phone', $request->phone)->first();
+        $user = User::where('phone', $request->phone)
+            ->orWhere('email', $request->phone)
+            ->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
-                'phone' => ['Telefon raqami yoki parol noto\'g\'ri.'],
+                'phone' => ['Login, telefon raqami yoki parol noto\'g\'ri.'],
             ]);
         }
 
@@ -107,9 +109,12 @@ class AuthController extends Controller
 
             AuditLogger::log('pin_verify_success', $user, null, ['platform' => 'mobile']);
 
+            $requireFaceId = $user->face_id_enabled && $user->hasFaceId();
+
             return response()->json([
                 'success' => true,
-                'message' => 'PIN kod tasdiqlandi.'
+                'require_face_id' => $requireFaceId,
+                'message' => $requireFaceId ? 'Face ID skanerlash talab qilinadi.' : 'PIN kod tasdiqlandi.'
             ]);
         }
 
@@ -157,6 +162,22 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
         return response()->json([
             'message' => 'Tizimdan muvaffaqiyatli chiqildi.'
+        ]);
+    }
+
+    /**
+     * Get System Branding info
+     */
+    public function branding()
+    {
+        return response()->json([
+            'system_name' => \App\Models\Setting::get('company_name', 'Black Door'),
+            'company_tagline' => \App\Models\Setting::get('company_tagline', 'Moliyaviy Boshqaruv'),
+            'logo_url' => asset(file_exists(public_path('branding/custom_logo_vertical.png')) ? 'branding/custom_logo_vertical.png' : 'branding/logo_vertical.png'),
+            'mark_url' => asset(file_exists(public_path('branding/custom_mark.png')) ? 'branding/custom_mark.png' : 'branding/mark.png'),
+            'support_phone' => \App\Models\Setting::get('support_phone', '+998911873730'),
+            'support_email' => \App\Models\Setting::get('support_email', 'itclouduz@gmail.com'),
+            'support_telegram' => \App\Models\Setting::get('support_telegram', '@ITclouduz_me'),
         ]);
     }
 }

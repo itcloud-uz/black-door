@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\ManagerController;
 
 // --- Public Routes ---
 Route::post('/auth/login', [AuthController::class, 'login']);
+Route::get('/auth/branding', [AuthController::class, 'branding']);
 
 // --- Authenticated Routes ---
 Route::middleware('auth:sanctum')->group(function () {

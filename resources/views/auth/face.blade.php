@@ -39,8 +39,8 @@
         }
 
         .camera-outer {
-            width: 220px;
-            height: 220px;
+            width: 240px;
+            height: 240px;
             margin: 0 auto 24px auto;
             border-radius: 50%;
             padding: 8px;
@@ -76,7 +76,7 @@
         .scanner-line {
             position: absolute;
             width: 100%;
-            height: 2px;
+            height: 3px;
             background: linear-gradient(to right, transparent, var(--color-primary), transparent);
             top: 0;
             animation: scan 2s linear infinite;
@@ -86,10 +86,11 @@
         .face-overlay {
             position: absolute;
             inset: 15px;
-            border: 2px dashed rgba(255,255,255,0.3);
+            border: 2px dashed rgba(255,255,255,0.4);
             border-radius: 50%;
             pointer-events: none;
             z-index: 5;
+            transition: border-color 0.3s;
         }
 
         @keyframes scan {
@@ -143,6 +144,7 @@
         }
     </style>
 
+    <script src="{{ asset('vendor/face-api/face-api.min.js') }}"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body>
@@ -152,7 +154,7 @@
         
         <div class="mb-lg">
             <h2 style="margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Face ID</h2>
-            <p class="text-muted" style="font-size: 0.9rem; margin-top: 4px;">Biometrik tasdiqlash qatlami</p>
+            <p class="text-muted" style="font-size: 0.9rem; margin-top: 4px;">Sun'iy Intellekt Biometrik Tizimi</p>
         </div>
 
         <template x-if="isLocked">
@@ -179,18 +181,18 @@
                 <div class="camera-outer">
                     <div class="camera-inner">
                         <div class="scanner-line" x-show="isScanning"></div>
-                        <div class="face-overlay"></div>
-                        <video x-ref="video" autoplay playsinline></video>
+                        <div class="face-overlay" :style="{ borderColor: overlayColor }"></div>
+                        <video x-ref="video" autoplay playsinline muted></video>
                     </div>
                 </div>
 
                 <div class="liveness-badge" :style="{ color: statusColor }">
                     <i class="bi" :class="statusIcon"></i>
-                    <span x-text="statusText">Yuklanmoqda...</span>
+                    <span x-text="statusText">Model yuklanmoqda...</span>
                 </div>
 
                 <div class="liveness-stage" x-text="currentChallengeText"></div>
-                <div class="liveness-tip" x-text="tipText">Kamera ruxsatini tasdiqlang.</div>
+                <div class="liveness-tip" x-text="tipText">Kamera yuklanmoqda...</div>
 
                 <div x-show="errorMessage" class="skeuo-alert skeuo-alert-danger mb-md" x-text="errorMessage"></div>
 
@@ -211,28 +213,35 @@
             isLocked: {{ $isLocked ? 'true' : 'false' }},
             lockSeconds: {{ $lockTimer ?? 900 }},
             isScanning: false,
-            statusText: 'Kamera yuklanmoqda',
-            statusIcon: 'bi-camera-video',
+            statusText: 'AI Model yuklanmoqda',
+            statusIcon: 'bi-cpu',
             statusColor: 'var(--text-muted)',
+            overlayColor: 'rgba(255,255,255,0.4)',
             currentChallengeText: 'Iltimos, kutib turing...',
-            tipText: 'Kamerani yoqishga ruxsat bering',
+            tipText: 'Neyron tarmoq modellari tayyorlanmoqda',
             errorMessage: '',
             
             stream: null,
-            stages: ['kutilmoqda', 'liveness_blink', 'liveness_smile', 'liveness_wink', 'verify'],
-            currentStageIdx: 0,
+            modelsLoaded: false,
+            detectLoopActive: false,
             
-            // Simulation metric trackers
-            intensityVariance: 0,
-            lastFrameHash: null,
-            verifiedLiveness: false,
+            // Dynamic EAR Liveness parameters
+            blinkState: 'CALIBRATE', // CALIBRATE -> WAITING_BLINK -> EYE_CLOSED -> VERIFIED
+            livenessVerified: false,
+            earHistory: [],
+            baseEar: 0.25,
+            closeThreshold: 0.18,
+            openThreshold: 0.23,
+
+            // Scale-invariant relative landmark distances (OLV movement check)
+            distanceHistory: [],
 
             init() {
                 if (this.isLocked) {
                     this.startLockCountdown();
                     return;
                 }
-                this.startCamera();
+                this.loadAiModels();
             },
 
             formatTime(seconds) {
@@ -246,92 +255,204 @@
                     if (this.lockSeconds <= 1) {
                         clearInterval(timer);
                         this.isLocked = false;
-                        this.startCamera();
+                        this.loadAiModels();
                     } else {
                         this.lockSeconds--;
                     }
                 }, 1000);
             },
 
+            async loadAiModels() {
+                try {
+                    this.statusText = 'AI Modellar yuklanmoqda...';
+                    const MODEL_URL = '{{ asset("vendor/face-api/models") }}';
+
+                    await Promise.all([
+                        faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+                        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+                    ]);
+
+                    this.modelsLoaded = true;
+                    this.startCamera();
+                } catch (err) {
+                    console.error('FaceAPI load error:', err);
+                    this.statusText = 'AI Model Xatoligi';
+                    this.statusColor = 'var(--color-danger)';
+                    this.errorMessage = 'Sun\'iy intellekt modellarini yuklab bo\'lmadi.';
+                }
+            },
+
             async startCamera() {
                 try {
                     this.stream = await navigator.mediaDevices.getUserMedia({
-                        video: { width: 300, height: 300, facingMode: 'user' }
+                        video: { width: 320, height: 320, facingMode: 'user' }
                     });
                     this.$refs.video.srcObject = this.stream;
                     this.isScanning = true;
-                    this.statusText = 'Kamera faol';
+                    this.statusText = 'Kamera faol. Yuzni ko\'rsating.';
                     this.statusColor = 'var(--color-primary)';
-                    this.statusIcon = 'bi-shield-check';
+                    this.statusIcon = 'bi-camera-video';
+                    this.currentChallengeText = 'Kalibratsiya qilinmoqda';
+                    this.tipText = 'Kameraga to\'g\'ri qarab turing.';
                     
-                    // Start challenge sequence after 1.5 seconds
-                    setTimeout(() => {
-                        this.nextChallenge();
-                    }, 1500);
+                    this.detectLoopActive = true;
+                    this.runFaceDetectionLoop();
 
                 } catch (err) {
-                    this.statusText = 'Kamera xatosi';
+                    this.statusText = 'Kamera Xatosi';
                     this.statusColor = 'var(--color-danger)';
                     this.statusIcon = 'bi-exclamation-triangle';
                     this.currentChallengeText = 'Kamera topilmadi';
                     this.tipText = 'Biometrik tekshiruv uchun kameraga kirishga ruxsat bering.';
-                    this.errorMessage = 'Kamera drayverini yoki brauzer ruxsatlarini tekshiring.';
+                    this.errorMessage = 'Kamera ruxsati berilmadi yoki drayver ishlamayapti.';
                 }
             },
 
-            nextChallenge() {
-                this.currentStageIdx++;
-                const stage = this.stages[this.currentStageIdx];
+            calculateEar(eye) {
+                const p1 = eye[0], p2 = eye[1], p3 = eye[2], p4 = eye[3], p5 = eye[4], p6 = eye[5];
+                const distV1 = Math.hypot(p2.x - p6.x, p2.y - p6.y);
+                const distV2 = Math.hypot(p3.x - p5.x, p3.y - p5.y);
+                const distH = Math.hypot(p1.x - p4.x, p1.y - p4.y);
+                if (distH === 0) return 0;
+                return (distV1 + distV2) / (2.0 * distH);
+            },
 
-                if (stage === 'liveness_blink') {
-                    this.currentChallengeText = 'Ko\'zlaringizni qisib-oching';
-                    this.tipText = 'Tiriklik testi boshlandi. Foto yoki video aldovlaridan himoyalanish.';
-                    this.statusText = 'Liveness Bosqichi 1/3';
-                    
-                    // Simulate eye variance analysis
-                    setTimeout(() => {
-                        this.intensityVariance += 15;
-                        this.nextChallenge();
-                    }, 2500);
+            async runFaceDetectionLoop() {
+                const videoEl = this.$refs.video;
+                const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 });
+                const collectedDescriptors = [];
 
-                } else if (stage === 'liveness_smile') {
-                    this.currentChallengeText = 'Kameraga biroz tabassum qiling';
-                    this.tipText = 'Yuz mushaklari harakati tahlil qilinmoqda.';
-                    this.statusText = 'Liveness Bosqichi 2/3';
+                while (this.detectLoopActive) {
+                    if (!videoEl || videoEl.paused || videoEl.ended) {
+                        await new Promise(r => setTimeout(r, 200));
+                        continue;
+                    }
 
-                    setTimeout(() => {
-                        this.intensityVariance += 25;
-                        this.nextChallenge();
-                    }, 2500);
+                    try {
+                        const detection = await faceapi.detectSingleFace(videoEl, options)
+                            .withFaceLandmarks()
+                            .withFaceDescriptor();
 
-                } else if (stage === 'liveness_wink') {
-                    this.currentChallengeText = 'Chap yoki o\'ng ko\'zingizni qising';
-                    this.tipText = 'Tiriklik testining so\'nggi bosqichi.';
-                    this.statusText = 'Liveness Bosqichi 3/3';
+                        if (!detection) {
+                            this.overlayColor = 'rgba(255, 255, 255, 0.4)';
+                            this.statusText = 'Yuz qidirilmoqda...';
+                            this.statusColor = 'var(--text-muted)';
+                            await new Promise(r => setTimeout(r, 150));
+                            continue;
+                        }
 
-                    setTimeout(() => {
-                        this.intensityVariance += 20;
-                        this.verifiedLiveness = true;
-                        this.nextChallenge();
-                    }, 2500);
+                        this.overlayColor = 'var(--color-primary)';
+                        const landmarks = detection.landmarks;
+                        const leftEye = landmarks.getLeftEye();
+                        const rightEye = landmarks.getRightEye();
 
-                } else if (stage === 'verify') {
-                    this.currentChallengeText = 'Yuz skaner qilinmoqda...';
-                    this.tipText = 'Biometrik ma\'lumotlar solishtirilmoqda.';
-                    this.statusText = 'Solishtirish...';
-                    this.submitAuth();
+                        const earLeft = this.calculateEar(leftEye);
+                        const earRight = this.calculateEar(rightEye);
+                        const avgEar = (earLeft + earRight) / 2.0;
+
+                        // Organic micro-movement tracking (scale-invariant relative landmark distances)
+                        const noseTip = landmarks.positions[30];
+                        const leftEyeCorner = landmarks.positions[36];
+                        const rawDist = Math.hypot(noseTip.x - leftEyeCorner.x, noseTip.y - leftEyeCorner.y);
+                        const boxWidth = detection.detection.box.width;
+                        const relDist = rawDist / (boxWidth || 1);
+                        this.distanceHistory.push(relDist);
+
+                        if (this.distanceHistory.length > 30) {
+                            this.distanceHistory.shift();
+                        }
+
+                        // Liveness check logic
+                        if (!this.livenessVerified) {
+                            // Method A: Dynamic Calibrated Eye Blink Detection
+                            if (this.blinkState === 'CALIBRATE') {
+                                this.earHistory.push(avgEar);
+                                this.currentChallengeText = 'Kameraga to\'g\'ri qarab turing...';
+                                this.statusText = `Kalibratsiya qilinmoqda (${this.earHistory.length}/5)`;
+                                
+                                if (this.earHistory.length >= 5) {
+                                    const sum = this.earHistory.reduce((a, b) => a + b, 0);
+                                    this.baseEar = sum / this.earHistory.length;
+                                    
+                                    // Safety fallback bounds
+                                    if (this.baseEar < 0.16 || this.baseEar > 0.40) {
+                                        this.baseEar = 0.25;
+                                    }
+                                    
+                                    this.closeThreshold = this.baseEar * 0.80; // 20% relative drop
+                                    this.openThreshold = this.baseEar * 0.90;  // 10% relative drop
+                                    this.blinkState = 'WAITING_BLINK';
+                                }
+                            } else if (this.blinkState === 'WAITING_BLINK') {
+                                this.currentChallengeText = 'Ko\'zlaringizni qisib-oching!';
+                                this.statusText = 'Tiriklik testi boshlandi...';
+                                this.tipText = 'Ko\'z qisishingiz kutilmoqda.';
+                                
+                                if (avgEar <= this.closeThreshold) {
+                                    this.blinkState = 'EYE_CLOSED';
+                                }
+                            } else if (this.blinkState === 'EYE_CLOSED') {
+                                if (avgEar >= this.openThreshold) {
+                                    this.livenessVerified = true;
+                                    this.blinkState = 'VERIFIED';
+                                }
+                            }
+
+                            // Method B: Parallel Organic Micro-Movement Check (OLV)
+                            // Runs after 15 frames to check standard deviation of relative distances
+                            if (!this.livenessVerified && this.distanceHistory.length >= 15) {
+                                const mean = this.distanceHistory.reduce((a, b) => a + b, 0) / this.distanceHistory.length;
+                                const variance = this.distanceHistory.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / this.distanceHistory.length;
+                                const stdDev = Math.sqrt(variance);
+
+                                // If standard deviation shows healthy human micro-movement/tremor
+                                if (stdDev > 0.0008 && stdDev < 0.05) {
+                                    this.livenessVerified = true;
+                                    this.blinkState = 'VERIFIED';
+                                }
+                            }
+
+                            if (this.livenessVerified) {
+                                this.statusText = 'Tiriklik testi o\'tdi!';
+                                this.statusColor = 'var(--color-primary)';
+                                this.currentChallengeText = 'Solishtirilmoqda...';
+                            }
+                        }
+
+                        // Collect descriptors once liveness is verified
+                        if (this.livenessVerified) {
+                            collectedDescriptors.push(Array.from(detection.descriptor));
+                            if (collectedDescriptors.length >= 2) {
+                                this.detectLoopActive = false;
+                                
+                                const finalDescriptor = new Array(128).fill(0);
+                                for (let i = 0; i < 128; i++) {
+                                    let sum = 0;
+                                    for (let j = 0; j < collectedDescriptors.length; j++) {
+                                        sum += collectedDescriptors[j][i];
+                                    }
+                                    finalDescriptor[i] = parseFloat((sum / collectedDescriptors.length).toFixed(6));
+                                }
+
+                                await this.submitAuth(finalDescriptor);
+                                break;
+                            }
+                        }
+
+                    } catch (e) {
+                        console.error('Detection frame error:', e);
+                    }
+
+                    await new Promise(r => setTimeout(r, 100));
                 }
             },
 
-            async submitAuth() {
-                // Generate a deterministic but secure 128 float array simulating embedding features
-                // In actual deployment, this mimics a lightweight face detector encoding.
-                const mockVector = [];
-                for(let i=0; i<128; i++) {
-                    mockVector.push(parseFloat((Math.sin(i + this.intensityVariance) * 0.5 + 0.5).toFixed(4)));
-                }
-
+            async submitAuth(descriptorVector) {
                 try {
+                    this.statusText = 'Serverda solishtirilmoqda...';
+                    this.statusColor = 'var(--color-primary)';
+
                     const response = await fetch('{{ route("finance.face.verify") }}', {
                         method: 'POST',
                         headers: {
@@ -339,8 +460,8 @@
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
                         body: JSON.stringify({
-                            embedding: JSON.stringify(mockVector),
-                            liveness_verified: this.verifiedLiveness
+                            embedding: JSON.stringify(descriptorVector),
+                            liveness_verified: this.livenessVerified
                         })
                     });
 
@@ -349,39 +470,39 @@
                     if (response.ok && res.success) {
                         this.statusText = 'Muvaffaqiyatli';
                         this.statusColor = 'var(--color-primary)';
-                        this.currentChallengeText = 'Tasdiqlandi!';
-                        this.tipText = 'Xush kelibsiz. Dashboardga yo\'naltirilmoqda...';
+                        this.currentChallengeText = 'Yuz tasdiqlandi!';
+                        this.tipText = `O'xshashlik: ${Math.round(res.similarity * 100)}%. Yo'naltirilmoqda...`;
                         
-                        // Stop camera stream
                         if (this.stream) {
                             this.stream.getTracks().forEach(track => track.stop());
                         }
 
                         setTimeout(() => {
                             window.location.href = res.redirect_url;
-                        }, 1000);
+                        }, 800);
                     } else {
                         throw res;
                     }
 
                 } catch (err) {
-                    this.errorMessage = err.message || 'Face ID verification failed';
-                    this.statusText = 'Mos kelmadi';
+                    this.errorMessage = err.message || 'Face ID tekshiruvi muvaffaqiyatsiz bo\'ldi.';
+                    this.statusText = 'Rad etildi';
                     this.statusColor = 'var(--color-danger)';
-                    this.currentChallengeText = 'Tanish xatoligi';
+                    this.currentChallengeText = 'Tanish Rad Etildi';
                     
                     if (err.lockout) {
                         this.isLocked = true;
                         this.lockSeconds = 900;
                         this.startLockCountdown();
                     } else {
-                        // Reset flow to try again after 3 seconds
                         setTimeout(() => {
                             this.errorMessage = '';
-                            this.currentStageIdx = 0;
-                            this.intensityVariance = 0;
-                            this.verifiedLiveness = false;
-                            this.nextChallenge();
+                            this.livenessVerified = false;
+                            this.blinkState = 'CALIBRATE';
+                            this.earHistory = [];
+                            this.distanceHistory = [];
+                            this.detectLoopActive = true;
+                            this.runFaceDetectionLoop();
                         }, 3000);
                     }
                 }

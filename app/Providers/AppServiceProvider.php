@@ -75,5 +75,10 @@ class AppServiceProvider extends ServiceProvider
                 // Ignore if db is not migrated or ready
             }
         }
+
+        // Force HTTPS URL scheme in production to prevent HTTP redirect blocks
+        if (config('app.env') === 'production' || (config('app.url') && str_starts_with(config('app.url'), 'https://'))) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
     }
 }

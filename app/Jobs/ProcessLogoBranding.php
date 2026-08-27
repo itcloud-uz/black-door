@@ -136,59 +136,29 @@ class ProcessLogoBranding implements ShouldQueue
                 imagedestroy($dstImg);
             }
 
-            // 3. Assemble Vertical/Horizontal Logos
-            $textPath = base_path('branding/text_portion.png');
-            if (file_exists($textPath)) {
-                $textImg = imagecreatefrompng($textPath);
-                $markWidth = imagesx($srcImg);
-                $markHeight = imagesy($srcImg);
-                $textWidth = imagesx($textImg);
-                $textHeight = imagesy($textImg);
-                $bgR = 238; $bgG = 242; $bgB = 247;
+            // 3. Save custom vertical and horizontal logos directly from the uploaded source image preserving transparency
+            $markWidth = imagesx($srcImg);
+            $markHeight = imagesy($srcImg);
 
-                // Vertical logo
-                $vCanvas = imagecreatetruecolor(1024, 1024);
-                imagealphablending($vCanvas, true);
-                $bgColorInt = imagecolorallocate($vCanvas, $bgR, $bgG, $bgB);
-                imagefilledrectangle($vCanvas, 0, 0, 1024, 1024, $bgColorInt);
+            // Vertical logo
+            $vCanvas = imagecreatetruecolor($markWidth, $markHeight);
+            imagealphablending($vCanvas, false);
+            imagesavealpha($vCanvas, true);
+            $transparent = imagecolorallocatealpha($vCanvas, 255, 255, 255, 127);
+            imagefilledrectangle($vCanvas, 0, 0, $markWidth, $markHeight, $transparent);
+            imagecopyresampled($vCanvas, $srcImg, 0, 0, 0, 0, $markWidth, $markHeight, $markWidth, $markHeight);
+            imagepng($vCanvas, $tempDir . '/custom_logo_vertical.png');
+            imagedestroy($vCanvas);
 
-                $vMarkTargetWidth = 600;
-                $vMarkTargetHeight = (int)($markHeight * ($vMarkTargetWidth / $markWidth));
-                $vMarkX = (int)((1024 - $vMarkTargetWidth) / 2);
-                $vMarkY = 150;
-                imagecopyresampled($vCanvas, $srcImg, $vMarkX, $vMarkY, 0, 0, $vMarkTargetWidth, $vMarkTargetHeight, $markWidth, $markHeight);
-
-                $vTextTargetWidth = 640;
-                $vTextTargetHeight = (int)($textHeight * ($vTextTargetWidth / $textWidth));
-                $vTextX = (int)((1024 - $vTextTargetWidth) / 2);
-                $vTextY = $vMarkY + $vMarkTargetHeight + 40;
-                imagecopyresampled($vCanvas, $textImg, $vTextX, $vTextY, 0, 0, $vTextTargetWidth, $vTextTargetHeight, $textWidth, $textHeight);
-                imagepng($vCanvas, $tempDir . '/custom_logo_vertical.png');
-                imagedestroy($vCanvas);
-
-                // Horizontal logo
-                $hWidth = 1200;
-                $hHeight = 600;
-                $horizontalImg = imagecreatetruecolor($hWidth, $hHeight);
-                imagealphablending($horizontalImg, true);
-                $bgColorIntH = imagecolorallocate($horizontalImg, $bgR, $bgG, $bgB);
-                imagefilledrectangle($horizontalImg, 0, 0, $hWidth, $hHeight, $bgColorIntH);
-
-                $markTargetHeight = 400;
-                $markTargetWidth = (int)($markWidth * ($markTargetHeight / $markHeight));
-                $markX = 120;
-                $markY = (int)(($hHeight - $markTargetHeight) / 2);
-                imagecopyresampled($horizontalImg, $srcImg, $markX, $markY, 0, 0, $markTargetWidth, $markTargetHeight, $markWidth, $markHeight);
-
-                $textTargetHeight = (int)($textHeight * 0.95);
-                $textTargetWidth = (int)($textWidth * ($textTargetHeight / $textHeight));
-                $textX = $markX + $markTargetWidth + 60;
-                $textY = (int)(($hHeight - $textTargetHeight) / 2) + 20;
-                imagecopyresampled($horizontalImg, $textImg, $textX, $textY, 0, 0, $textTargetWidth, $textTargetHeight, $textWidth, $textHeight);
-                imagepng($horizontalImg, $tempDir . '/custom_logo_horizontal.png');
-                imagedestroy($horizontalImg);
-                imagedestroy($textImg);
-            }
+            // Horizontal logo
+            $hCanvas = imagecreatetruecolor($markWidth, $markHeight);
+            imagealphablending($hCanvas, false);
+            imagesavealpha($hCanvas, true);
+            $transparentH = imagecolorallocatealpha($hCanvas, 255, 255, 255, 127);
+            imagefilledrectangle($hCanvas, 0, 0, $markWidth, $markHeight, $transparentH);
+            imagecopyresampled($hCanvas, $srcImg, 0, 0, 0, 0, $markWidth, $markHeight, $markWidth, $markHeight);
+            imagepng($hCanvas, $tempDir . '/custom_logo_horizontal.png');
+            imagedestroy($hCanvas);
 
             imagedestroy($srcImg);
 

@@ -498,6 +498,9 @@ class DatabaseSeeder extends Seeder
                 'telegram' => '@ITclouduz_me',
                 'address' => 'Samarqand, Urgut',
                 'is_active' => true,
+                'admin_email' => 'admin@blackdoor.uz',
+                'admin_password' => 'password123',
+                'admin_pin_code' => '1234',
             ]);
 
             $controlLicense = \App\Models\Control\License::create([

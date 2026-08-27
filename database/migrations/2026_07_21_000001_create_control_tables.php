@@ -63,6 +63,9 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->text('notes')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->string('admin_email')->nullable();
+            $table->string('admin_password')->nullable();
+            $table->string('admin_pin_code')->nullable();
             $table->timestamps();
         });
 

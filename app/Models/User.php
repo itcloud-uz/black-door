@@ -58,6 +58,9 @@ class User extends Authenticatable
     {
         static::creating(function ($user) {
             if (env('BLACK_DOOR_MODE', 'client') !== 'control') {
+                if (app()->bound('request') && (request()->is('control') || request()->is('control/*') || request()->is('api/control/*'))) {
+                    return;
+                }
                 $license = \App\Models\ClientLicense::first();
                 if ($license && self::count() >= $license->max_users) {
                     throw new \Exception("Foydalanuvchilar soni litsenziya limitidan oshib ketdi (" . $license->max_users . " ta).");

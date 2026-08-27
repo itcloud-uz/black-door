@@ -109,6 +109,27 @@ class DatabaseBackup extends Command
         // Clean up old backups (older than 7 days)
         $this->cleanupOldBackups($backupDir);
 
+        // Upload to external backup disk if configured
+        $backupDisk = env('BACKUP_DISK');
+        if ($backupDisk) {
+            try {
+                $this->info("Zaxira nusxasini '{$backupDisk}' diskiga yuklash boshlandi...");
+                $fileName = basename($backupFile);
+                $fileStream = fopen($backupFile, 'r');
+                \Illuminate\Support\Facades\Storage::disk($backupDisk)->put("backups/{$fileName}", $fileStream);
+                fclose($fileStream);
+                $this->info("Zaxira nusxasi '{$backupDisk}' diskiga muvaffaqiyatli yuklandi: backups/{$fileName}");
+
+                // Clean up old backups on the backup disk (older than 30 days)
+                $this->cleanupOldDiskBackups($backupDisk);
+            } catch (\Throwable $e) {
+                $this->error("Tashqi diskka yuklashda xatolik: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::error("Tashqi diskka zaxira nusxasini yuklashda xato: " . $e->getMessage(), [
+                    'exception' => $e
+                ]);
+            }
+        }
+
         return 0;
     }
 
@@ -132,5 +153,32 @@ class DatabaseBackup extends Command
         }
 
         $this->info("Tozalash yakunlandi. {$deletedCount} ta eski fayl o'chirildi.");
+    }
+
+    /**
+     * Clean up backups on external disk older than 30 days.
+     */
+    private function cleanupOldDiskBackups(string $disk): void
+    {
+        $this->info("Tashqi '{$disk}' diskidagi 30 kundan eski zaxira fayllarni tozalash...");
+        $diskStorage = \Illuminate\Support\Facades\Storage::disk($disk);
+        $files = $diskStorage->files('backups');
+        $now = time();
+        $retentionSecs = 30 * 24 * 60 * 60; // 30 days
+        $deletedCount = 0;
+
+        foreach ($files as $file) {
+            try {
+                $lastModified = $diskStorage->lastModified($file);
+                if (($now - $lastModified) > $retentionSecs) {
+                    $diskStorage->delete($file);
+                    $deletedCount++;
+                }
+            } catch (\Throwable $e) {
+                $this->warn("Faylni tozalashda xatolik ({$file}): " . $e->getMessage());
+            }
+        }
+
+        $this->info("Tashqi diskni tozalash yakunlandi. {$deletedCount} ta eski fayl o'chirildi.");
     }
 }

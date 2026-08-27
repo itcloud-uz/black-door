@@ -454,21 +454,24 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
               ),
             )
           : null,
-      bottomNavigationBar: Container(
-        height: 70,
-        decoration: const InsetBoxDecoration(
-          color: AppColors.background,
-          boxShadow: [
-            InsetBoxShadow(color: AppColors.shadowDark, offset: Offset(0, -6), blurRadius: 10),
-          ],
-        ),
-        child: Row(
-          children: [
-            _buildNavItem(0, Icons.dashboard_outlined, 'Bosh'),
-            _buildNavItem(1, Icons.people_outline, 'Xodim'),
-            _buildNavItem(2, Icons.warehouse_outlined, 'Ombor'),
-            _buildNavItem(3, Icons.settings_outlined, 'Sozlama'),
-          ],
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Container(
+          height: 70,
+          decoration: const InsetBoxDecoration(
+            color: AppColors.background,
+            boxShadow: [
+              InsetBoxShadow(color: AppColors.shadowDark, offset: Offset(0, -6), blurRadius: 10),
+            ],
+          ),
+          child: Row(
+            children: [
+              _buildNavItem(0, Icons.dashboard_outlined, 'Bosh'),
+              _buildNavItem(1, Icons.people_outline, 'Xodim'),
+              _buildNavItem(2, Icons.warehouse_outlined, 'Ombor'),
+              _buildNavItem(3, Icons.settings_outlined, 'Sozlama'),
+            ],
+          ),
         ),
       ),
       body: IndexedStack(

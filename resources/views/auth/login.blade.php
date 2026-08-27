@@ -131,7 +131,7 @@
         <div class="login-card">
             {{-- Header --}}
             <div class="login-header" style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 24px;">
-                <img src="{{ file_exists(public_path('branding/custom_logo_vertical.png')) ? asset('branding/custom_logo_vertical.png') : asset('branding/logo_vertical.png') }}" alt="Black Door" style="max-width: 180px; height: auto;">
+                <img src="{{ file_exists(public_path('branding/custom_logo_vertical.png')) ? asset('branding/custom_logo_vertical.png') . '?v=' . filemtime(public_path('branding/custom_logo_vertical.png')) : asset('branding/logo_vertical.png') . '?v=' . filemtime(public_path('branding/logo_vertical.png')) }}" alt="Black Door" style="max-width: 180px; height: auto;">
             </div>
 
             <div class="login-divider"></div>
@@ -187,6 +187,20 @@
                     <i class="bi bi-key"></i> Kirish
                 </button>
             </form>
+
+            <div style="margin-top: 24px; border-top: 1px dashed rgba(0,0,0,0.08); padding-top: 20px; text-align: center;">
+                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                    Mobil ilovani yuklab oling
+                </p>
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <a href="/downloads/blackdoor.apk?v={{ file_exists(public_path('downloads/blackdoor.apk')) ? filemtime(public_path('downloads/blackdoor.apk')) : time() }}" class="skeuo-btn skeuo-btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; text-decoration: none;">
+                        <i class="bi bi-android2 text-green" style="font-size: 1.1rem;"></i> Android APK
+                    </a>
+                    <a href="{{ route('downloads.ios-guide') }}" class="skeuo-btn skeuo-btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; text-decoration: none;">
+                        <i class="bi bi-apple text-dark" style="font-size: 1.1rem;"></i> iOS Ilova
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </body>

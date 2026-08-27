@@ -42,6 +42,12 @@
                 <div><span class="text-muted">Manzil:</span> <br><strong>{{ $client->address ?? '—' }}</strong></div>
                 <div><span class="text-muted">Eslatmalar:</span> <br><span class="text-muted">{{ $client->notes ?? '—' }}</span></div>
                 
+                <div style="border-top: 1px dashed rgba(0,0,0,0.08); padding-top: 12px; margin-top: 8px;">
+                    <div style="font-weight: 700; font-size: 0.8rem; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px;">Tizim Admin ma'lumotlari:</div>
+                    <div style="margin-bottom: 6px;"><span class="text-muted">Tizim Logini:</span> <br><strong>{{ $client->admin_email ?? '—' }}</strong></div>
+                    <div style="margin-bottom: 6px;"><span class="text-muted">Moliya Pin-kodi:</span> <br><strong>{{ $client->admin_pin_code ?? '—' }}</strong></div>
+                </div>
+                
                 <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px;">
                     <a href="{{ route('control.clients.edit', $client->id) }}" class="skeuo-btn skeuo-btn-sm skeuo-btn-primary" style="flex: 1; text-align: center;">
                         <i class="bi bi-pencil"></i> Tahrirlash

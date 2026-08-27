@@ -1,8 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter/foundation.dart';
 
 class ApiClient {
-  static const String baseUrlDefault = 'http://10.0.2.2:8000/api'; // Android Emulator default localhost bridge
+  static const String baseUrlDefault = kDebugMode 
+      ? 'http://10.0.2.2:8000/api' 
+      : 'https://blackdoor.uz/api';
   
   final Dio dio;
   final FlutterSecureStorage _storage = const FlutterSecureStorage();

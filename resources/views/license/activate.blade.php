@@ -81,7 +81,7 @@
         <div class="activate-card">
             {{-- Header --}}
             <div class="activate-header" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <img src="{{ file_exists(public_path('branding/custom_logo_vertical.png')) ? asset('branding/custom_logo_vertical.png') : asset('branding/logo_vertical.png') }}" alt="Black Door" style="max-width: 180px; height: auto;">
+                <img src="{{ file_exists(public_path('branding/custom_logo_vertical.png')) ? asset('branding/custom_logo_vertical.png') . '?v=' . filemtime(public_path('branding/custom_logo_vertical.png')) : asset('branding/logo_vertical.png') . '?v=' . filemtime(public_path('branding/logo_vertical.png')) }}" alt="Black Door" style="max-width: 180px; height: auto;">
                 <h2 style="font-size: 1.25rem; font-weight: 800; text-transform: uppercase; color: var(--text-primary); margin-top: 16px;">Tizimni faollashtirish</h2>
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin: 4px 0 0 0;">Ushbu o'rnatma uchun faollashtirish kalitini kiriting</p>
             </div>
@@ -140,9 +140,9 @@
                 <h4 style="margin: 0 0 8px 0; font-size: 0.9rem; font-weight: 800; text-transform: uppercase;"><i class="bi bi-telephone"></i> Biz bilan bog'lanish</h4>
                 <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Litsenziya sotib olish, uzaytirish yoki trial sinov rejimi so'rash uchun biz bilan bog'laning:</p>
                 <div style="display: flex; flex-direction: column; gap: 8px; font-weight: bold; font-size: 0.85rem;">
-                    <div><i class="bi bi-phone"></i> +998 91 187 37 30</div>
-                    <div><i class="bi bi-envelope"></i> <a href="mailto:itclouduz@gmail.com" style="color: var(--text-primary); text-decoration: underline;">itclouduz@gmail.com</a></div>
-                    <div><i class="bi bi-telegram"></i> <a href="https://t.me/ITclouduz_me" target="_blank" style="color: var(--text-primary); text-decoration: underline;">@ITclouduz_me</a></div>
+                    <div><i class="bi bi-phone"></i> {{ \App\Models\Setting::get('support_phone', '+998 91 187 37 30') }}</div>
+                    <div><i class="bi bi-envelope"></i> <a href="mailto:{{ \App\Models\Setting::get('support_email', 'itclouduz@gmail.com') }}" style="color: var(--text-primary); text-decoration: underline;">{{ \App\Models\Setting::get('support_email', 'itclouduz@gmail.com') }}</a></div>
+                    <div><i class="bi bi-telegram"></i> <a href="https://t.me/{{ str_replace('@', '', \App\Models\Setting::get('support_telegram', 'ITclouduz_me')) }}" target="_blank" style="color: var(--text-primary); text-decoration: underline;">{{ \App\Models\Setting::get('support_telegram', '@ITclouduz_me') }}</a></div>
                 </div>
             </div>
         </div>

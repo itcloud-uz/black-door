@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Auth;
 class BiometricController extends Controller
 {
     /**
+     * Minimum Cosine Similarity required for biometric match (Standard 0.85 = high security with flexibility)
+     */
+    public const FACE_SIMILARITY_THRESHOLD = 0.85;
+
+    /**
      * Show biometric authentication screen.
      */
     public function showFaceAuthForm(Request $request)
@@ -47,6 +52,14 @@ class BiometricController extends Controller
         $request->validate([
             'embedding' => 'required|json',
         ]);
+
+        $vector = json_decode($request->input('embedding'), true);
+        if (!is_array($vector) || count($vector) !== 128) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Yuz vektori formati noto\'g\'ri (128 kalitli massiv bo\'lishi shart).'
+            ], 400);
+        }
 
         $user = Auth::user();
         $user->setFaceEmbedding($request->input('embedding'));
@@ -86,6 +99,14 @@ class BiometricController extends Controller
             ], 400);
         }
 
+        $provided = json_decode($request->input('embedding'), true);
+        if (!is_array($provided) || count($provided) !== 128) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Noto\'g\'ri yuz vektori formati.'
+            ], 400);
+        }
+
         $storedEmbeddingJson = $user->getFaceEmbedding();
         if (!$storedEmbeddingJson) {
             return response()->json([
@@ -95,24 +116,58 @@ class BiometricController extends Controller
         }
 
         $stored = json_decode($storedEmbeddingJson, true);
-        $provided = json_decode($request->input('embedding'), true);
+        if (!is_array($stored) || count($stored) !== 128) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Saqlangan yuz shabloni eskirgan. Qaytadan ro\'yxatdan o\'ting.'
+            ], 400);
+        }
 
         $similarity = $this->compareEmbeddings($stored, $provided);
 
-        // Verification threshold (e.g. 0.85 cosine similarity)
-        if ($similarity >= 0.85) {
-            $user->update([
+        // Verification threshold (Standard 0.85 cosine similarity cutoff)
+        if ($similarity >= self::FACE_SIMILARITY_THRESHOLD) {
+            $updateData = [
                 'failed_face_attempts' => 0,
                 'face_locked_until' => null,
-            ]);
+            ];
+
+            // Adaptive Biometric Template Update:
+            // If match is verified, but shows variance (e.g. user shaved beard),
+            // dynamically blend new look with stored template (learning rate 0.20).
+            // Re-normalize to unit vector.
+            if ($similarity < 0.96) {
+                $blended = [];
+                for ($i = 0; $i < 128; $i++) {
+                    $blended[] = $stored[$i] * 0.8 + $provided[$i] * 0.2;
+                }
+
+                $sumSq = 0.0;
+                for ($i = 0; $i < 128; $i++) {
+                    $sumSq += $blended[$i] * $blended[$i];
+                }
+                $norm = sqrt($sumSq);
+                if ($norm > 0) {
+                    for ($i = 0; $i < 128; $i++) {
+                        $blended[$i] = round($blended[$i] / $norm, 6);
+                    }
+                    $updateData['face_embedding'] = json_encode($blended);
+                }
+            }
+
+            $user->update($updateData);
 
             session()->put('finance_pin_verified', true);
             session()->forget('finance_pin_verified_temp');
 
-            AuditLogger::log('biometric_verify_success', $user, null, ['similarity' => $similarity]);
+            AuditLogger::log('biometric_verify_success', $user, null, [
+                'similarity' => round($similarity, 4),
+                'adapted' => isset($updateData['face_embedding'])
+            ]);
 
             return response()->json([
                 'success' => true,
+                'similarity' => round($similarity, 4),
                 'redirect_url' => route('finance.dashboard')
             ]);
         }
@@ -136,11 +191,12 @@ class BiometricController extends Controller
         }
 
         $user->update($updateData);
-        AuditLogger::log('biometric_verify_failed', $user, null, ['attempts' => $attempts, 'similarity' => $similarity]);
+        AuditLogger::log('biometric_verify_failed', $user, null, ['attempts' => $attempts, 'similarity' => round($similarity, 4)]);
 
         return response()->json([
             'success' => false,
-            'message' => 'Yuz mos kelmadi. Qolgan urinishlar: ' . (3 - $attempts)
+            'similarity' => round($similarity, 4),
+            'message' => 'Yuz mos kelmadi (O\'xshashlik: ' . round($similarity * 100, 1) . '%). Qolgan urinishlar: ' . (3 - $attempts)
         ], 401);
     }
 

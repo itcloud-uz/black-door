@@ -341,23 +341,7 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            NeumorphicButton(
-              onTap: _navigateToFinance,
-              gradientColors: AppColors.blueGradient,
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.account_balance_wallet_outlined, color: Colors.white),
-                  SizedBox(width: 12),
-                  Text(
-                    'MOLIYA BO\'LIMIGA O\'TISH',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 8),
             Row(
               children: [
                 Expanded(
@@ -662,6 +646,13 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.background,
+        leading: GestureDetector(
+          onTap: _navigateToFinance,
+          child: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: NeumorphicLogo(size: 32),
+          ),
+        ),
         title: Text(
           _selectedIndex == 0
               ? 'SUPER ADMIN PANEL'
@@ -705,22 +696,25 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
               ),
             )
           : null,
-      bottomNavigationBar: Container(
-        height: 70,
-        decoration: const InsetBoxDecoration(
-          color: AppColors.background,
-          boxShadow: [
-            InsetBoxShadow(color: AppColors.shadowDark, offset: Offset(0, -6), blurRadius: 10),
-          ],
-        ),
-        child: Row(
-          children: [
-            _buildNavItem(0, Icons.dashboard_outlined, 'Bosh'),
-            _buildNavItem(1, Icons.people_outline, 'User'),
-            _buildNavItem(2, Icons.business_outlined, 'Obyekt'),
-            _buildNavItem(3, Icons.inventory_2_outlined, 'Mahsulot'),
-            _buildNavItem(4, Icons.settings_outlined, 'Sozlama'),
-          ],
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Container(
+          height: 70,
+          decoration: const InsetBoxDecoration(
+            color: AppColors.background,
+            boxShadow: [
+              InsetBoxShadow(color: AppColors.shadowDark, offset: Offset(0, -6), blurRadius: 10),
+            ],
+          ),
+          child: Row(
+            children: [
+              _buildNavItem(0, Icons.dashboard_outlined, 'Bosh'),
+              _buildNavItem(1, Icons.people_outline, 'User'),
+              _buildNavItem(2, Icons.business_outlined, 'Obyekt'),
+              _buildNavItem(3, Icons.inventory_2_outlined, 'Mahsulot'),
+              _buildNavItem(4, Icons.settings_outlined, 'Sozlama'),
+            ],
+          ),
         ),
       ),
       body: IndexedStack(

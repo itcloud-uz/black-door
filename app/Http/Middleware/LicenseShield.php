@@ -37,6 +37,8 @@ class LicenseShield
             'admin/license/refresh',
             'up',
             '_reverb',
+            'control',
+            'control/*',
         ];
 
         foreach ($excluded as $path) {

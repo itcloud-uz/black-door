@@ -50,6 +50,9 @@ class Obj extends Model
     {
         static::creating(function ($obj) {
             if (env('BLACK_DOOR_MODE', 'client') !== 'control') {
+                if (app()->bound('request') && (request()->is('control') || request()->is('control/*') || request()->is('api/control/*'))) {
+                    return;
+                }
                 $license = \App\Models\ClientLicense::first();
                 if ($license && self::count() >= $license->max_objects) {
                     throw new \Exception("O'rnatilgan obyektlar soni litsenziya limitidan oshib ketdi (" . $license->max_objects . " ta).");

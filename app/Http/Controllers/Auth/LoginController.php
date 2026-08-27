@@ -104,4 +104,55 @@ class LoginController extends Controller
 
         return redirect()->route('login');
     }
+
+    /**
+     * Auto login via API Sanctum Token
+     */
+    public function autoLogin(Request $request)
+    {
+        $tokenString = $request->query('token');
+        if (!$tokenString) {
+            return redirect()->route('login');
+        }
+
+        if (strpos($tokenString, '|') !== false) {
+            [$id, $plainToken] = explode('|', $tokenString, 2);
+            $tokenHash = hash('sha256', $plainToken);
+        } else {
+            $tokenHash = hash('sha256', $tokenString);
+        }
+
+        $token = \Laravel\Sanctum\PersonalAccessToken::where('token', $tokenHash)->first();
+        if ($token && $token->tokenable) {
+            $user = $token->tokenable;
+            if ($user->is_active) {
+                Auth::login($user, true);
+                
+                $redirectUrl = $request->query('redirect');
+                if ($user->isAdmin() || $user->isFinancier()) {
+                    if ($redirectUrl && strpos($redirectUrl, '/finance/face') !== false) {
+                        session(['finance_pin_verified_temp' => true]);
+                    } else {
+                        session(['finance_pin_verified' => true]);
+                    }
+                }
+                if ($redirectUrl) {
+                    return redirect($redirectUrl);
+                }
+                
+                if ($user->isAdmin()) {
+                    if ($user->email === 'itcloud.uz') {
+                        return redirect()->route('control.dashboard');
+                    }
+                    return redirect()->route('admin.dashboard');
+                }
+                if ($user->isFinancier()) {
+                    return redirect()->route('finance.dashboard');
+                }
+                return redirect()->route('manager.dashboard');
+            }
+        }
+
+        return redirect()->route('login');
+    }
 }

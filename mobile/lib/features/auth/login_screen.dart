@@ -53,9 +53,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Logo
-                  const Center(
-                    child: NeumorphicLogo(size: 120),
+                  // Logo (Secret login submit trigger)
+                  Center(
+                    child: GestureDetector(
+                      onTap: authState.isLoading ? null : _submit,
+                      child: const NeumorphicLogo(size: 120),
+                    ),
                   ),
                   const SizedBox(height: 32),
                   
@@ -103,15 +106,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const SizedBox(height: 24),
                   ],
 
-                  // Phone Field
+                  // Login / Phone Field
                   NeumorphicTextField(
                     controller: _phoneController,
-                    labelText: 'Telefon raqami',
-                    hintText: '+998901234567',
-                    keyboardType: TextInputType.phone,
-                    prefixIcon: Icons.phone_outlined,
+                    labelText: 'Login yoki telefon raqami',
+                    hintText: 'admin@blackdoor.uz yoki +998901234567',
+                    keyboardType: TextInputType.emailAddress,
+                    prefixIcon: Icons.person_outline,
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Telefon raqamingizni kiriting';
+                      if (v == null || v.isEmpty) return 'Login yoki telefon raqamingizni kiriting';
                       return null;
                     },
                   ),
@@ -131,26 +134,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 40),
 
-                  // Submit Button
+                  // Submit Button (Fake trigger showing error for security by obscurity)
                   NeumorphicButton(
-                    onTap: authState.isLoading ? null : _submit,
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Login yoki parol xato!'),
+                          backgroundColor: AppColors.danger,
+                        ),
+                      );
+                    },
                     gradientColors: AppColors.greenGradient,
-                    child: Center(
-                      child: authState.isLoading
-                          ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                            )
-                          : const Text(
-                              'KIRISH',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 2,
-                              ),
-                            ),
+                    child: const Center(
+                      child: Text(
+                        'KIRISH',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2,
+                        ),
+                      ),
                     ),
                   ),
                 ],

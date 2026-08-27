@@ -121,6 +121,7 @@ class PinState {
   final int remainingAttempts;
   final int lockTimer;
   final String? error;
+  final bool requireFaceId;
 
   PinState({
     this.isVerified = false,
@@ -128,6 +129,7 @@ class PinState {
     this.remainingAttempts = 3,
     this.lockTimer = 0,
     this.error,
+    this.requireFaceId = false,
   });
 
   PinState copyWith({
@@ -136,6 +138,7 @@ class PinState {
     int? remainingAttempts,
     int? lockTimer,
     String? error,
+    bool? requireFaceId,
   }) {
     return PinState(
       isVerified: isVerified ?? this.isVerified,
@@ -143,6 +146,7 @@ class PinState {
       remainingAttempts: remainingAttempts ?? this.remainingAttempts,
       lockTimer: lockTimer ?? this.lockTimer,
       error: error,
+      requireFaceId: requireFaceId ?? this.requireFaceId,
     );
   }
 }
@@ -167,9 +171,16 @@ class PinNotifier extends StateNotifier<PinState> {
     try {
       final response = await _client.post('/auth/verify-pin', data: {'pin': pin});
       if (response.statusCode == 200) {
-        await _storage.write(key: 'pin_verified', value: 'true');
-        state = PinState(isVerified: true);
-        return true;
+        final data = response.data;
+        final reqFace = data['require_face_id'] as bool? ?? false;
+        if (reqFace) {
+          state = PinState(isVerified: false, requireFaceId: true);
+          return true;
+        } else {
+          await _storage.write(key: 'pin_verified', value: 'true');
+          state = PinState(isVerified: true);
+          return true;
+        }
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 423) {
@@ -190,6 +201,16 @@ class PinNotifier extends StateNotifier<PinState> {
       state = state.copyWith(error: 'Aloqa xatosi.');
     }
     return false;
+  }
+
+  void setVerified(bool verified) async {
+    if (verified) {
+      await _storage.write(key: 'pin_verified', value: 'true');
+      state = PinState(isVerified: true);
+    } else {
+      await _storage.delete(key: 'pin_verified');
+      state = PinState();
+    }
   }
 
   void resetLock() {

@@ -7,11 +7,12 @@
     $user = auth()->user();
     $role = $user->role->value;
     $currentRoute = request()->route()?->getName() ?? '';
+    $showFinanceByDefault = str_starts_with($currentRoute, 'finance.');
 @endphp
 
 <aside class="sidebar" :class="{ 'open': open }">
     {{-- Brand --}}
-    <div class="sidebar-brand">
+    <div class="sidebar-brand" style="cursor: pointer;" onclick="toggleSidebarFinance()">
         <img src="{{ file_exists(public_path('branding/custom_mark.png')) ? asset('branding/custom_mark.png') : asset('branding/mark.png') }}" alt="Black Door" style="width: 72px; height: 72px; margin-bottom: 8px; object-fit: contain; display: block; margin-left: auto; margin-right: auto;">
         <h1>{{ \App\Models\Setting::get('company_name', 'Black Door') }}</h1>
         <div class="brand-subtitle">{{ \App\Models\Setting::get('company_tagline', 'Moliyaviy Boshqaruv') }}</div>
@@ -72,7 +73,7 @@
         </div>
 
         {{-- Admin Finance Access --}}
-        <div class="sidebar-section">
+        <div class="sidebar-section" id="sidebar-finance-section" style="display: {{ $showFinanceByDefault ? 'block' : 'none' }};">
             <div class="sidebar-section-title"><i class="bi bi-lock"></i> Moliya</div>
             <ul class="sidebar-nav">
                 <li class="sidebar-item {{ str_starts_with($currentRoute, 'finance.dashboard') ? 'active' : '' }}">
@@ -269,5 +270,17 @@
             </ul>
         </form>
     </div>
+    <script>
+    function toggleSidebarFinance() {
+        var section = document.getElementById('sidebar-finance-section');
+        if (section) {
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+            } else {
+                section.style.display = 'none';
+            }
+        }
+    }
+    </script>
 </aside>
 @endauth

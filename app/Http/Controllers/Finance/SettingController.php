@@ -60,7 +60,7 @@ class SettingController extends Controller
                 $file = $request->file('logo');
                 $tempPath = $file->store('temp_branding', 'local');
                 
-                \App\Jobs\ProcessLogoBranding::dispatch($tempPath, Auth::id());
+                \App\Jobs\ProcessLogoBranding::dispatchSync($tempPath, Auth::id());
             }
 
             AuditLogger::log('settings_global_update', $user, null, [

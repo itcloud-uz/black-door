@@ -11,6 +11,8 @@ use App\Models\Control\Product;
 use App\Models\Control\TariffPlan;
 use App\Models\Control\LicensePayment;
 use App\Models\Control\ControlAuditLog;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -37,9 +39,22 @@ class ClientController extends Controller
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string',
             'notes' => 'nullable|string',
+            'admin_email' => 'required|string|max:255|unique:users,email',
+            'admin_password' => 'required|string|min:4',
+            'admin_pin_code' => 'required|string|size:4',
         ]);
 
-        Client::create($request->all());
+        $client = Client::create($request->all());
+
+        User::create([
+            'name' => $request->contact_name,
+            'email' => $request->admin_email,
+            'phone' => $request->phone,
+            'password' => Hash::make($request->admin_password),
+            'role' => \App\Enums\UserRole::SuperAdmin,
+            'pin_code' => Hash::make($request->admin_pin_code),
+            'is_active' => true,
+        ]);
 
         return redirect()->route('control.clients.index')->with('success', 'Mijoz muvaffaqiyatli yaratildi.');
     }
@@ -148,9 +163,39 @@ class ClientController extends Controller
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string',
             'notes' => 'nullable|string',
+            'admin_email' => 'required|string|max:255',
+            'admin_password' => 'nullable|string|min:4',
+            'admin_pin_code' => 'nullable|string|size:4',
         ]);
 
+        $oldAdminEmail = $client->admin_email;
         $client->update($request->all());
+
+        $user = User::where('email', $oldAdminEmail)->first();
+        if ($user) {
+            $userData = [
+                'name' => $request->contact_name,
+                'email' => $request->admin_email,
+                'phone' => $request->phone,
+            ];
+            if ($request->filled('admin_password')) {
+                $userData['password'] = Hash::make($request->admin_password);
+            }
+            if ($request->filled('admin_pin_code')) {
+                $userData['pin_code'] = Hash::make($request->admin_pin_code);
+            }
+            $user->update($userData);
+        } else {
+            User::create([
+                'name' => $request->contact_name,
+                'email' => $request->admin_email,
+                'phone' => $request->phone,
+                'password' => Hash::make($request->admin_password ?? 'password123'),
+                'role' => \App\Enums\UserRole::SuperAdmin,
+                'pin_code' => Hash::make($request->admin_pin_code ?? '1234'),
+                'is_active' => true,
+            ]);
+        }
 
         return redirect()->route('control.clients.show', $client->id)->with('success', 'Mijoz ma\'lumotlari muvaffaqiyatli yangilandi.');
     }

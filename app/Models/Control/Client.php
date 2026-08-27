@@ -20,6 +20,9 @@ class Client extends Model
         'address',
         'notes',
         'is_active',
+        'admin_email',
+        'admin_password',
+        'admin_pin_code',
     ];
 
     protected $casts = [

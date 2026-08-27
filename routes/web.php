@@ -25,6 +25,12 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
 });
 
+Route::get('/auth/autologin', [LoginController::class, 'autoLogin'])->name('auth.autologin');
+
+Route::get('/downloads/ios-guide', function () {
+    return view('auth.ios_guide');
+})->name('downloads.ios-guide');
+
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Redirect root to dashboard based on role
@@ -208,5 +214,10 @@ Route::prefix('control')->name('control.')->group(function () {
         // Requests management
         Route::get('/requests', [\App\Http\Controllers\Control\PortalController::class, 'listRequests'])->name('requests.index');
         Route::post('/requests/{clientRequest}/status', [\App\Http\Controllers\Control\PortalController::class, 'updateRequestStatus'])->name('requests.status.update');
+
+        // Settings management
+        Route::get('/settings', [\App\Http\Controllers\Control\SettingController::class, 'index'])->name('settings.index');
+        Route::post('/settings/update', [\App\Http\Controllers\Control\SettingController::class, 'update'])->name('settings.update');
+        Route::post('/settings/rebuild-apk', [\App\Http\Controllers\Control\SettingController::class, 'rebuildApk'])->name('settings.rebuild-apk');
     });
 });

@@ -11,6 +11,7 @@ import 'features/admin/admin_dashboard.dart';
 import 'features/finance/finance_dashboard.dart';
 import 'features/manager/manager_dashboard.dart';
 import 'features/employee/employee_dashboard.dart';
+import 'features/dashboard/webview_screen.dart';
 import 'models/models.dart';
 
 void main() {
@@ -51,14 +52,13 @@ class BlackDoorApp extends ConsumerWidget {
             )
           : authState.user == null
               ? const LoginScreen()
-              : _buildRoleMainScreen(authState.user!, ref),
+              : _buildRoleMainScreen(authState.user!, authState.token!, ref),
     );
   }
 
-  Widget _buildRoleMainScreen(User user, WidgetRef ref) {
+  Widget _buildRoleMainScreen(User user, String token, WidgetRef ref) {
     switch (user.role) {
       case UserRole.superAdmin:
-        // Admin starts with dashboard but has access to pin-verify to enter finance
         return const AdminDashboard();
       case UserRole.financier:
         // Financier must verify PIN first
