@@ -26,7 +26,7 @@ VALUES
 INSERT INTO products (id, name, description, unit_type, base_price, cost_price, quantity_in_stock, category, manufacturer, is_active, created_by)
 VALUES
 ('p1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c', 'Armatura 12mm', 'Yuqori chidamli qurilish armaturasi', 'ton', 850.00, 680.00, 24.50, 'Temir buyumlar', 'Toshkent Temir Zavodi', true, 'd506d862-4217-48f8-a1be-715a9ffbe60f'),
-('p2b3c4d5-e6f7-8a9b-0c1d-2e3f4a5b6c7d', 'Oyna varag\'i 4mm', 'Binolar uchun shaffof oyna', 'meter', 12.00, 8.50, 450.00, 'Shisha mahsulotlari', 'Samarqand Oyna Zavodi', true, 'd506d862-4217-48f8-a1be-715a9ffbe60f'),
+('p2b3c4d5-e6f7-8a9b-0c1d-2e3f4a5b6c7d', 'Oyna varag''i 4mm', 'Binolar uchun shaffof oyna', 'meter', 12.00, 8.50, 450.00, 'Shisha mahsulotlari', 'Samarqand Oyna Zavodi', true, 'd506d862-4217-48f8-a1be-715a9ffbe60f'),
 ('p3c4d5e6-f7a8-9b0c-1d2e-3f4a5b6c7d8e', 'Sement M500', 'Yuqori sifatli quruq sement qorishmasi', 'box', 6.50, 4.80, 1200.00, 'Qurilish materiallari', 'Qizilqum Sement', true, 'd506d862-4217-48f8-a1be-715a9ffbe60f');
 
 -- Add relationships factory_products
@@ -45,9 +45,9 @@ VALUES
 -- Add transactions
 INSERT INTO transactions (transaction_type, amount, currency, from_account, to_account, description, factory_id, product_id, person_id, status, receipt_number, created_by)
 VALUES
-('factory_rental', 250.00, 'USD', 'Toshkent Temir Zavodi', 'ACC-USD-001', 'Zavod kunlik ijara to\'lovi', 'f1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c', null, null, 'completed', 'REC-2026-0001', 'd506d862-4217-48f8-a1be-715a9ffbe60f'),
+('factory_rental', 250.00, 'USD', 'Toshkent Temir Zavodi', 'ACC-USD-001', 'Zavod kunlik ijara to''lovi', 'f1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c', null, null, 'completed', 'REC-2026-0001', 'd506d862-4217-48f8-a1be-715a9ffbe60f'),
 ('product_sale', 4250.00, 'USD', 'ACC-PR-001', 'ACC-USD-001', '5 tonna Armatura sotilishi', 'f1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c', 'p1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c', 'c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f', 'completed', 'REC-2026-0002', 'd506d862-4217-48f8-a1be-715a9ffbe60f'),
-('domestic_payment', 1500000.00, 'UZS', 'ACC-UZS-001', 'ACC-PR-002', 'Qurilish tovarlari uchun to\'lov', null, null, 'd4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a', 'completed', 'REC-2026-0003', 'd506d862-4217-48f8-a1be-715a9ffbe60f');
+('domestic_payment', 1500000.00, 'UZS', 'ACC-UZS-001', 'ACC-PR-002', 'Qurilish tovarlari uchun to''lov', null, null, 'd4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a', 'completed', 'REC-2026-0003', 'd506d862-4217-48f8-a1be-715a9ffbe60f');
 
 -- Add warehouse operations
 INSERT INTO warehouse_operations (operation_type, product_id, quantity, from_location, to_location, notes, performed_by)
