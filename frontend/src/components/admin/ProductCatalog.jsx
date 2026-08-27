@@ -1,21 +1,75 @@
 import React, { useState } from 'react';
 import api from '../../services/api';
 
-export default function ProductCatalog({ products, prodForm, setProdForm, onCreateProd, onRefresh }) {
+export default function ProductCatalog({ products, onRefresh }) {
   const [editingProd, setEditingProd] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
+  // Local Form State for adding products
+  const [createForm, setCreateForm] = useState({
+    name: '',
+    unit_type: 'kg',
+    base_price: '0',
+    cost_price: '0',
+    category: 'Umumiy',
+    manufacturer: '',
+    quantity_in_stock: '0',
+    currency: 'USD',
+    exchange_rate: '12800'
+  });
+
+  // Local Form State for editing products
+  const [editCurrency, setEditCurrency] = useState('USD');
+  const [editExchangeRate, setEditExchangeRate] = useState('12800');
+
   const handleEditClick = (prod) => {
     setEditingProd({ ...prod });
+    setEditCurrency('USD');
+    setEditExchangeRate('12800');
     setError('');
   };
 
-  const handleCreateSubmit = (e) => {
+  const handleCreateSubmit = async (e) => {
     e.preventDefault();
-    onCreateProd(e);
-    setShowCreateModal(false);
+    setError('');
+    setLoading(true);
+    try {
+      let baseUSD = parseFloat(createForm.base_price) || 0;
+      let costUSD = parseFloat(createForm.cost_price) || 0;
+      if (createForm.currency === 'UZS') {
+        const rate = parseFloat(createForm.exchange_rate) || 12800;
+        baseUSD = baseUSD / rate;
+        costUSD = costUSD / rate;
+      }
+      await api.post('/admin/products', {
+        name: createForm.name,
+        unit_type: createForm.unit_type,
+        base_price: baseUSD,
+        cost_price: costUSD,
+        category: createForm.category,
+        manufacturer: createForm.manufacturer,
+        quantity_in_stock: parseFloat(createForm.quantity_in_stock) || 0
+      });
+      setCreateForm({
+        name: '',
+        unit_type: 'kg',
+        base_price: '0',
+        cost_price: '0',
+        category: 'Umumiy',
+        manufacturer: '',
+        quantity_in_stock: '0',
+        currency: 'USD',
+        exchange_rate: '12800'
+      });
+      setShowCreateModal(false);
+      if (onRefresh) onRefresh();
+    } catch (err) {
+      setError(err.response?.data?.error || 'Mahsulot qo\'shishda xatolik yuz berdi');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleUpdateProd = async (e) => {
@@ -23,11 +77,18 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
     setError('');
     setLoading(true);
     try {
+      let baseUSD = parseFloat(editingProd.base_price) || 0;
+      let costUSD = parseFloat(editingProd.cost_price) || 0;
+      if (editCurrency === 'UZS') {
+        const rate = parseFloat(editExchangeRate) || 12800;
+        baseUSD = baseUSD / rate;
+        costUSD = costUSD / rate;
+      }
       await api.put(`/admin/products/${editingProd.id}`, {
         name: editingProd.name,
         unit_type: editingProd.unit_type,
-        base_price: parseFloat(editingProd.base_price) || 0,
-        cost_price: parseFloat(editingProd.cost_price) || 0,
+        base_price: baseUSD,
+        cost_price: costUSD,
         category: editingProd.category,
         manufacturer: editingProd.manufacturer,
         quantity_in_stock: parseFloat(editingProd.quantity_in_stock) || 0
@@ -70,13 +131,18 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
           <div className="w-full max-w-lg p-8 skeuo-convex border border-white/10 shadow-2xl overflow-y-auto max-h-[90vh]">
             <h3 className="text-lg font-black text-slate-100 mb-6">➕ Yangi mahsulot qo'shish</h3>
+            {error && (
+              <div className="mb-4 p-3 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold">
+                ⚠️ {error}
+              </div>
+            )}
             <form onSubmit={handleCreateSubmit} className="space-y-6">
               <div>
                 <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Mahsulot nomi</label>
                 <input
                   type="text"
-                  value={prodForm.name}
-                  onChange={(e) => setProdForm({ ...prodForm, name: e.target.value })}
+                  value={createForm.name}
+                  onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
                   className="w-full skeuo-input"
                   placeholder="Sement M500, Oyna 4mm..."
                   required
@@ -86,8 +152,8 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
               <div>
                 <label className="block text-xs font-bold text-slate-400 uppercase mb-2">O'lchov birligi</label>
                 <select
-                  value={prodForm.unit_type}
-                  onChange={(e) => setProdForm({ ...prodForm, unit_type: e.target.value })}
+                  value={createForm.unit_type}
+                  onChange={(e) => setCreateForm({ ...createForm, unit_type: e.target.value })}
                   className="w-full skeuo-input bg-[#131b2e]"
                 >
                   <option value="kg">kilogram (kg)</option>
@@ -100,22 +166,56 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Asosiy narxi (Sotuv, USD)</label>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Narx Valyutasi</label>
+                <select
+                  value={createForm.currency}
+                  onChange={(e) => setCreateForm({ ...createForm, currency: e.target.value })}
+                  className="w-full skeuo-input bg-[#131b2e]"
+                >
+                  <option value="USD">USD (AQSH Dollari)</option>
+                  <option value="UZS">UZS (O'zbek So'mi)</option>
+                </select>
+              </div>
+
+              {createForm.currency === 'UZS' && (
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Dollar Kursi (1 USD = ... UZS)</label>
+                  <input
+                    type="number"
+                    value={createForm.exchange_rate}
+                    onChange={(e) => setCreateForm({ ...createForm, exchange_rate: e.target.value })}
+                    className="w-full skeuo-input"
+                    placeholder="12800"
+                    required
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">
+                  Asosiy narxi (Sotuv, {createForm.currency})
+                </label>
                 <input
                   type="number"
-                  value={prodForm.base_price}
-                  onChange={(e) => setProdForm({ ...prodForm, base_price: e.target.value })}
+                  step="0.01"
+                  value={createForm.base_price}
+                  onChange={(e) => setCreateForm({ ...createForm, base_price: e.target.value })}
                   className="w-full skeuo-input"
+                  required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Tannarxi (Xarid, USD)</label>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">
+                  Tannarxi (Xarid, {createForm.currency})
+                </label>
                 <input
                   type="number"
-                  value={prodForm.cost_price}
-                  onChange={(e) => setProdForm({ ...prodForm, cost_price: e.target.value })}
+                  step="0.01"
+                  value={createForm.cost_price}
+                  onChange={(e) => setCreateForm({ ...createForm, cost_price: e.target.value })}
                   className="w-full skeuo-input"
+                  required
                 />
               </div>
 
@@ -123,8 +223,8 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
                 <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Kategoriya</label>
                 <input
                   type="text"
-                  value={prodForm.category}
-                  onChange={(e) => setProdForm({ ...prodForm, category: e.target.value })}
+                  value={createForm.category}
+                  onChange={(e) => setCreateForm({ ...createForm, category: e.target.value })}
                   className="w-full skeuo-input"
                   placeholder="Temir buyumlar, Shisha x.k."
                   required
@@ -135,8 +235,8 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
                 <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Ishlab chiqaruvchi</label>
                 <input
                   type="text"
-                  value={prodForm.manufacturer}
-                  onChange={(e) => setProdForm({ ...prodForm, manufacturer: e.target.value })}
+                  value={createForm.manufacturer}
+                  onChange={(e) => setCreateForm({ ...createForm, manufacturer: e.target.value })}
                   className="w-full skeuo-input"
                   placeholder="Qizilqum Sement..."
                 />
@@ -146,15 +246,15 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
                 <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Ombordagi miqdor</label>
                 <input
                   type="number"
-                  value={prodForm.quantity_in_stock}
-                  onChange={(e) => setProdForm({ ...prodForm, quantity_in_stock: e.target.value })}
+                  value={createForm.quantity_in_stock}
+                  onChange={(e) => setCreateForm({ ...createForm, quantity_in_stock: e.target.value })}
                   className="w-full skeuo-input"
                 />
               </div>
 
               <div className="flex gap-4 pt-4">
-                <button type="submit" className="flex-1 py-3 skeuo-btn text-indigo-400 font-extrabold text-sm active:scale-95 duration-100">
-                  💾 Saqlash
+                <button type="submit" disabled={loading} className="flex-1 py-3 skeuo-btn text-indigo-400 font-extrabold text-sm active:scale-95 duration-100">
+                  {loading ? "Saqlanmoqda..." : "💾 Saqlash"}
                 </button>
                 <button type="button" onClick={() => setShowCreateModal(false)} className="flex-1 py-3 skeuo-btn text-slate-400 font-extrabold text-sm active:scale-95 duration-100">
                   Bekor qilish
@@ -168,7 +268,7 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
       {/* Edit Product Modal */}
       {editingProd && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <div className="w-full max-w-lg p-8 skeuo-convex border border-white/10 shadow-2xl">
+          <div className="w-full max-w-lg p-8 skeuo-convex border border-white/10 shadow-2xl overflow-y-auto max-h-[90vh]">
             <h3 className="text-lg font-black text-slate-100 mb-6">📝 Mahsulot ma'lumotlarini tahrirlash</h3>
             {error && (
               <div className="mb-4 p-3 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold">
@@ -176,7 +276,7 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
               </div>
             )}
             <form onSubmit={handleUpdateProd} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Mahsulot nomi</label>
                 <input
                   type="text"
@@ -204,22 +304,56 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Asosiy narxi ($)</label>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Narx Valyutasi</label>
+                <select
+                  value={editCurrency}
+                  onChange={(e) => setEditCurrency(e.target.value)}
+                  className="w-full skeuo-input bg-[#131b2e]"
+                >
+                  <option value="USD">USD (AQSH Dollari)</option>
+                  <option value="UZS">UZS (O'zbek So'mi)</option>
+                </select>
+              </div>
+
+              {editCurrency === 'UZS' && (
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Dollar Kursi (1 USD = ... UZS)</label>
+                  <input
+                    type="number"
+                    value={editExchangeRate}
+                    onChange={(e) => setEditExchangeRate(e.target.value)}
+                    className="w-full skeuo-input"
+                    placeholder="12800"
+                    required
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">
+                  Asosiy narxi ({editCurrency})
+                </label>
                 <input
                   type="number"
+                  step="0.01"
                   value={editingProd.base_price}
                   onChange={(e) => setEditingProd({ ...editingProd, base_price: e.target.value })}
                   className="w-full skeuo-input"
+                  required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Tannarxi ($)</label>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">
+                  Tannarxi ({editCurrency})
+                </label>
                 <input
                   type="number"
+                  step="0.01"
                   value={editingProd.cost_price}
                   onChange={(e) => setEditingProd({ ...editingProd, cost_price: e.target.value })}
                   className="w-full skeuo-input"
+                  required
                 />
               </div>
 
@@ -244,7 +378,7 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
                 />
               </div>
 
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Ombordagi miqdor</label>
                 <input
                   type="number"
