@@ -210,7 +210,7 @@ exports.telegramVerify = async (req, res) => {
 
     // Audit log successful authentication
     await db.query(
-      "INSERT INTO audit_log (user_id, action, entity_type, entity_id, ip_address) VALUES ($1, 'Login', 'User', $1, $2)",
+      "INSERT INTO audit_log (user_id, action, entity_type, entity_id, ip_address) VALUES ($1::uuid, 'Login', 'User', $1::varchar, $2)",
       [user.id, req.ip]
     );
 
@@ -268,7 +268,7 @@ exports.logout = async (req, res) => {
   if (req.user) {
     try {
       await db.query(
-        "INSERT INTO audit_log (user_id, action, entity_type, entity_id, ip_address) VALUES ($1, 'Logout', 'User', $1, $2)",
+        "INSERT INTO audit_log (user_id, action, entity_type, entity_id, ip_address) VALUES ($1::uuid, 'Logout', 'User', $1::varchar, $2)",
         [req.user.id, req.ip]
       );
     } catch (err) {
