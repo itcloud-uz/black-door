@@ -10,7 +10,8 @@ import {
   ClipboardList, 
   LogOut,
   RefreshCw,
-  Settings
+  Settings,
+  UserCog
 } from 'lucide-react';
 
 // Admin Subcomponents
@@ -21,6 +22,7 @@ import FactoryManager from '../components/admin/FactoryManager';
 import ProductCatalog from '../components/admin/ProductCatalog';
 import WarehouseViewer from '../components/admin/WarehouseViewer';
 import AuditLogViewer from '../components/admin/AuditLogViewer';
+import UserManager from '../components/admin/UserManager';
 
 export default function AdminDashboard({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -331,6 +333,12 @@ export default function AdminDashboard({ user, onLogout }) {
               <ClipboardList size={18} /> Audit Log
             </button>
             <button
+              onClick={() => setActiveTab('users')}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'users' ? 'skeuo-concave text-indigo-400' : 'hover:bg-white/10 text-slate-300'}`}
+            >
+              <UserCog size={18} /> Foydalanuvchilar
+            </button>
+            <button
               onClick={() => {
                 setActiveTab('settings');
                 setSettingsForm({ telegram_id: user.telegram_id || '', full_name: user.full_name || '' });
@@ -440,6 +448,10 @@ export default function AdminDashboard({ user, onLogout }) {
           <AuditLogViewer
             auditLogs={auditLogs}
           />
+        )}
+
+        {activeTab === 'users' && (
+          <UserManager />
         )}
 
         {activeTab === 'settings' && (

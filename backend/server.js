@@ -17,6 +17,7 @@ const productRoutes = require('./routes/products');
 const warehouseRoutes = require('./routes/warehouse');
 const reportRoutes = require('./routes/reports');
 const auditRoutes = require('./routes/audit');
+const userRoutes = require('./routes/users');
 
 const app = express();
 app.set('trust proxy', true);
@@ -59,6 +60,7 @@ app.use('/api/admin/products', productRoutes);
 app.use('/api/warehouse', warehouseRoutes);
 app.use('/api/admin/reports', reportRoutes);
 app.use('/api/admin/audit-log', auditRoutes);
+app.use('/api/admin/users', userRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
