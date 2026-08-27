@@ -2,63 +2,61 @@ const { Telegraf } = require('telegraf');
 const db = require('../db');
 require('dotenv').config();
 
+const token = process.env.TELEGRAM_BOT_TOKEN || '8304799073:AAGOi1nbw29OkKY_YhrP3kOJnRGRVq-qVPY';
 let bot = null;
 
-if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_BOT_TOKEN !== 'mock-telegram-bot-token') {
+if (token && token !== 'mock-telegram-bot-token') {
   try {
-    bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
+    bot = new Telegraf(token);
 
-    // Start command with deep-linking payload
     bot.start(async (ctx) => {
       const payload = ctx.payload;
       const telegramId = ctx.from.id.toString();
       const telegramUsername = ctx.from.username || '';
 
-      if (!payload) {
-        return ctx.reply(
-          "Salom! 2FA faollashtirish uchun tizim web-paneli orqali Telegram ulanish havolasini bosing."
-        );
-      }
-
-      try {
-        const res = await db.query(
-          "SELECT * FROM verification_tokens WHERE token = $1 AND is_used = false AND expires_at > NOW()",
-          [payload]
-        );
-
-        if (res.rows.length === 0) {
-          return ctx.reply("Kechirasiz, ushbu havola eskirgan yoki noto'g'ri.");
-        }
-
-        const tokenRow = res.rows[0];
-        const userId = tokenRow.user_id;
-        
-        let code = tokenRow.telegram_code;
-        if (!code) {
-          code = Math.floor(100000 + Math.random() * 900000).toString();
-          await db.query(
-            "UPDATE verification_tokens SET telegram_code = $1 WHERE id = $2",
-            [code, tokenRow.id]
+      // If user has started bot with token payload, do auto link
+      if (payload) {
+        try {
+          const res = await db.query(
+            "SELECT * FROM verification_tokens WHERE token = $1 AND is_used = false AND expires_at > NOW()",
+            [payload]
           );
+
+          if (res.rows.length > 0) {
+            const tokenRow = res.rows[0];
+            const userId = tokenRow.user_id;
+
+            let code = tokenRow.telegram_code;
+            if (!code) {
+              code = Math.floor(100000 + Math.random() * 900000).toString();
+              await db.query(
+                "UPDATE verification_tokens SET telegram_code = $1 WHERE id = $2",
+                [code, tokenRow.id]
+              );
+            }
+
+            await db.query(
+              "UPDATE users SET telegram_id = $1, telegram_username = $2, is_telegram_verified = true WHERE id = $3",
+              [telegramId, telegramUsername, userId]
+            );
+
+            return ctx.reply(
+              `Salom! Akkauntingiz muvaffaqiyatli bog'landi.\n\nSizning Chat ID: ${telegramId}\n\nTasdiqlash kodi: ${code}`
+            );
+          }
+        } catch (err) {
+          console.error("Error auto-linking Telegram ID:", err);
         }
-
-        await db.query(
-          "UPDATE users SET telegram_id = $1, telegram_username = $2 WHERE id = $3",
-          [telegramId, telegramUsername, userId]
-        );
-
-        ctx.reply(
-          `Salom! Akkauntingiz muvaffaqiyatli bog'landi.\n\nTasdiqlash kodi: ${code}\n\nUshbu kodni web-panelga kiriting.`
-        );
-
-      } catch (err) {
-        console.error("Telegram bot database error:", err);
-        ctx.reply("Tizimda xatolik yuz berdi. Iltimos keyinroq qayta urining.");
       }
+
+      // Default response returning their chat ID so they can paste it manually in Settings!
+      ctx.reply(
+        `Salom, ${ctx.from.first_name || 'Foydalanuvchi'}!\n\nSizning Telegram Chat ID: \`${telegramId}\`\n\n2FA tasdiqlash kodlarini olish uchun ushbu ID-ni veb-ilovaning Sozlamalar bo'limida akkauntingizga kiriting.`
+      );
     });
 
     bot.launch()
-      .then(() => console.log("Telegram Bot successfully launched."))
+      .then(() => console.log("Telegram Bot successfully launched with token:", token.substring(0, 10) + "..."))
       .catch((err) => console.error("Error launching Telegram Bot:", err));
 
   } catch (err) {
@@ -66,6 +64,24 @@ if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_BOT_TOKEN !== 'mock-t
   }
 } else {
   console.log("Using Mock Telegram Bot (Token is missing or mock)");
+}
+
+// Function to send 2FA verification code
+async function send2FACode(telegramId, code) {
+  if (bot) {
+    try {
+      await bot.telegram.sendMessage(
+        telegramId, 
+        `🚪 *Black Door ERP*\n\nTizimga kirish uchun tasdiqlash kodi: *${code}*\n\nUshbu kod faqat 5 daqiqa davomida faol.`,
+        { parse_mode: 'Markdown' }
+      );
+      return true;
+    } catch (err) {
+      console.error(`Error sending message to Telegram ID ${telegramId}:`, err);
+      return false;
+    }
+  }
+  return false;
 }
 
 async function generateMockCodeForUser(userId) {
@@ -83,5 +99,6 @@ async function generateMockCodeForUser(userId) {
 
 module.exports = {
   bot,
+  send2FACode,
   generateMockCodeForUser
 };

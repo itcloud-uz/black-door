@@ -9,7 +9,8 @@ import {
   Warehouse, 
   ClipboardList, 
   LogOut,
-  RefreshCw
+  RefreshCw,
+  Settings
 } from 'lucide-react';
 
 // Admin Subcomponents
@@ -72,6 +73,27 @@ export default function AdminDashboard({ user, onLogout }) {
   
   // Notification / Message state
   const [msg, setMsg] = useState({ text: '', type: '' });
+
+  const [settingsForm, setSettingsForm] = useState({ 
+    telegram_id: user.telegram_id || '', 
+    full_name: user.full_name || '' 
+  });
+
+  const handleSaveSettings = async () => {
+    try {
+      const res = await api.post('/auth/update-settings', settingsForm);
+      setMsg({ text: res.data.message, type: 'success' });
+      setTimeout(() => setMsg({ text: '', type: '' }), 4000);
+      
+      user.telegram_id = res.data.user.telegramId;
+      user.is_telegram_verified = res.data.user.isTelegramVerified;
+      user.full_name = res.data.user.fullName;
+    } catch (err) {
+      console.error("Error saving settings:", err);
+      setMsg({ text: err.response?.data?.error || 'Sozlamalarni saqlashda xatolik', type: 'error' });
+      setTimeout(() => setMsg({ text: '', type: '' }), 4000);
+    }
+  };
 
   useEffect(() => {
     loadAllData();
@@ -308,6 +330,15 @@ export default function AdminDashboard({ user, onLogout }) {
             >
               <ClipboardList size={18} /> Audit Log
             </button>
+            <button
+              onClick={() => {
+                setActiveTab('settings');
+                setSettingsForm({ telegram_id: user.telegram_id || '', full_name: user.full_name || '' });
+              }}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold duration-150 ${activeTab === 'settings' ? 'skeuo-concave text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+            >
+              <Settings size={18} /> Sozlamalar
+            </button>
           </nav>
         </div>
 
@@ -406,6 +437,68 @@ export default function AdminDashboard({ user, onLogout }) {
           <AuditLogViewer
             auditLogs={auditLogs}
           />
+        )}
+
+        {activeTab === 'settings' && (
+          <div className="max-w-xl mx-auto bg-gray-50 rounded-2xl p-6 skeuo-concave border border-gray-200">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+              <Settings className="text-blue-600" /> Tizim Sozlamalari
+            </h2>
+            
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs font-bold text-gray-500 mb-2">Foydalanuvchi ismi</label>
+                <input 
+                  type="text"
+                  value={settingsForm.full_name}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, full_name: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl skeuo-input focus:outline-none"
+                />
+              </div>
+
+              <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
+                <h3 className="text-sm font-bold text-blue-800 mb-2">Telegram 2FA Ulanishi</h3>
+                <p className="text-xs text-blue-600 mb-4 leading-relaxed">
+                  Tizimga xavfsiz kirish uchun Telegram botimizga start bosing, u yerda ko'rsatilgan <strong>Chat ID</strong>-ni pastdagi maydonga kiriting va saqlang.
+                </p>
+                
+                <div className="flex gap-4 items-center mb-4">
+                  <a 
+                    href={`https://t.me/blackdoor_2fa_bot`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 text-xs font-bold text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700 duration-150"
+                  >
+                    Botni ishga tushirish (Start)
+                  </a>
+                  <span className="text-xs text-gray-400">Bot username: @blackdoor_2fa_bot</span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 mb-2">Sizning Telegram Chat ID</label>
+                  <input 
+                    type="text"
+                    placeholder="Masalan: 1412501744"
+                    value={settingsForm.telegram_id || ''}
+                    onChange={(e) => setSettingsForm({ ...settingsForm, telegram_id: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl skeuo-input focus:outline-none font-mono"
+                  />
+                  {user.is_telegram_verified ? (
+                    <span className="inline-block mt-2 text-xs font-bold text-green-600">✓ Telegram 2FA tasdiqlangan va faol</span>
+                  ) : (
+                    <span className="inline-block mt-2 text-xs font-bold text-amber-600">⚠ Telegram 2FA tasdiqlanmagan</span>
+                  )}
+                </div>
+              </div>
+
+              <button 
+                onClick={handleSaveSettings}
+                className="w-full py-3.5 rounded-xl text-sm font-bold text-white bg-green-600 active:scale-95 duration-150 hover:bg-green-700 shadow-lg"
+              >
+                Sozlamalarni saqlash
+              </button>
+            </div>
+          </div>
         )}
       </main>
     </div>

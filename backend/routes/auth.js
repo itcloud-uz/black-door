@@ -9,6 +9,7 @@ router.post('/telegram-verify', authenticateToken, authController.telegramVerify
 router.post('/refresh-token', authController.refreshToken);
 router.post('/logout', authenticateToken, authController.logout);
 router.get('/verify-session', authenticateToken, authController.verifySession);
+router.post('/update-settings', authenticateToken, authController.updateSettings);
 
 // Mock Helper to bypass Telegram Bot locally
 router.post('/telegram-mock', authenticateToken, async (req, res) => {
