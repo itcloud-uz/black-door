@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #EEF2F7;
+    color: #2D3748;
+    font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+  }
+}
+
+/* Custom Soft UI (Neumorphism) Helpers */
+@layer utilities {
+  .skeuo-flat {
+    background: #EEF2F7;
+    box-shadow: 4px 4px 8px #D1D9E6, -4px -4px 8px #FFFFFF;
+  }
+
+  .skeuo-convex {
+    background: #EEF2F7;
+    box-shadow: 6px 6px 12px #C5D0E6, -6px -6px 12px #FFFFFF;
+    border-radius: 12px;
+  }
+
+  .skeuo-concave {
+    background: #EEF2F7;
+    box-shadow: inset 4px 4px 8px #C5D0E6, inset -4px -4px 8px #FFFFFF;
+    border-radius: 8px;
+  }
+
+  .skeuo-btn {
+    background: #EEF2F7;
+    box-shadow: 3px 3px 6px #C5D0E6, -3px -3px 6px #FFFFFF;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .skeuo-btn:active {
+    box-shadow: inset 2px 2px 5px #C5D0E6, inset -2px -2px 5px #FFFFFF;
+  }
+
+  .skeuo-btn-active {
+    box-shadow: inset 2px 2px 5px #C5D0E6, inset -2px -2px 5px #FFFFFF;
+  }
+
+  .skeuo-input {
+    background: #EEF2F7;
+    box-shadow: inset 2px 2px 5px #C5D0E6, inset -2px -2px 5px #FFFFFF;
+    border: none;
+    outline: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    color: #2D3748;
+    transition: all 0.2s;
+  }
+
+  .skeuo-input:focus {
+    box-shadow: inset 3px 3px 6px #B0BED4, inset -3px -3px 6px #FFFFFF;
+  }
+}

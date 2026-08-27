@@ -1,164 +1,99 @@
-# Black Door — Enterprise Financial Management System
+# Black Door ERP — Moliyaviy Buxgalteriya & Zavod Boshqaruvi Tizimi
 
-**Black Door** — bu ko'p obyektli korxonalar (zavodlar, qurilish maydonlari, omborlar) uchun mo'ljallangan moliyaviy buxgalteriya va operatsion boshqaruv tizimi (ERP). Tizim interfeysi zamonaviy **Neumorphism (Soft UI / yumshoq skeuomorfizm)** uslubiga ega.
-
----
-
-## 🎨 Yangi Dizayn: Neumorphism (Soft UI)
-
-Tizimning barcha sahifalari och rangli, silikon/plastik yuzadan bo'rtib chiqqan yoki unga botirilgan elementlar uslubida qayta ishlandi:
-* **Yagona Fon:** Tizim bo'ylab sovuq oq-kulrang fon (`#EEF2F7`) ishlatilgan.
-* **Soyalar orqali Ajratish:** Elementlar fondan faqat yumshoq ikki tomonlama soyalar (chap-yuqoridan oq va o'ng-pastdan kulrang) yordamida ajralib turadi.
-* **Tugmalar:** Bo'rtgan (extruded) tugmalar bosilganda silliq animatsiya bilan botgan (pressed/inset) holatga o'tadi.
-* **Inputlar:** Barcha matn kiritish maydonlari va select menyulari botgan (inset) shaklga keltirilgan.
-* **Aksentlar:** Ortiqcha ranglar butunlay olib tashlanib, ijobiy balans va summalar uchun **yumshoq yashil**, salbiy/xavfli amallar uchun **marjon-qizil** ranglar tanlangan.
-* **Shrift:** Tizimdagi yagona shrift sifatida zamonaviy va doiraviy shaklga ega **Nunito** shrifti o'rnatildi.
+**Black Door** — bu ko'p obyektli korxonalar (zavodlar, omborxonalar, shaxslar) uchun maxsus ishlab chiqilgan, ikki valyutada (UZS va USD) moliyaviy buxgalteriya, materiallar hisobi va operatsiyalar logini yurituvchi veb-tizim. Tizim interfeysi zamonaviy **Neumorphic (Soft UI / yumshoq skeuomorfizm)** uslubiga ega.
 
 ---
 
-## 📸 Dastur Interfeysidan Namunalar (UI Mockups)
+## 🎨 Texnologik Stack (Tech Stack)
 
-Quyida tizimning yangilangan Neumorphic sahifalaridan namunalar va ularning afzalliklari keltirilgan:
-
-### 1. Tizimga Kirish Sahifasi (Login Page)
-Yumshoq fonga ega bo'lgan sodda va minimalistik kirish sahifasi. Karta yuza ustida suzib turgandek ko'rinadi, inputlar esa botgan holatda bo'lib foydalanuvchiga e'tiborni qaratishda yordam beradi.
-![Kirish Sahifasi](public/images/mockups/login.jpg)
-
-### 2. Moliyaviy Boshqaruv Paneli (Financial Dashboard)
-Hisobot kartalari, yon menyu (sidebar) va valyuta kursini aks ettiruvchi inset capsule displey. Har bir element ranglar orqali emas, yumshoq soyalar yordamida nafis ajratilgan.
-![Boshqaruv Paneli](public/images/mockups/dashboard.jpg)
-
-### 3. PIN-kod Himoya Oynasi (PIN Lockscreen)
-Seyf metaforasi o'rniga doiraviy tugmachalardan iborat Neumorphic klaviatura va botgan PIN-kod indikatorlari o'rnatildi. PIN xato kiritilganda klaviatura qizil tus oladi va titraydi.
-![PIN Tasdiqlash](public/images/mockups/pin.jpg)
+- **Backend:** Node.js (v18+) / Express.js
+- **Frontend:** React (Vite, Tailwind CSS, Lucide Icons, Axios)
+- **Database:** PostgreSQL (v14+)
+- **Integration:** Telegram Bot API (Telegraf) & Google OAuth 2.0
+- **Orchestration:** Docker & Docker Compose
 
 ---
 
-## ⚙️ Demo / Test Rejimida Ishlatish (Demo Credentials)
+## ⚙️ Tizimni Ishga Tushirish (Quick Start via Docker)
 
-Tizimda sinovdan o'tkazish (testing/demo) uchun tayyor foydalanuvchi ma'lumotlari mavjud. Dasturni ishga tushirganingizdan so'ng, quyidagi rollar orqali kirib test qilishingiz mumkin.
+Tizim to'liq dockerizatsiya qilingan. Uni birgina buyruq bilan ishga tushirishingiz mumkin.
 
-> [!IMPORTANT]
-> Barcha foydalanuvchilar uchun umumiy parol: **`password123`**
-> 
-> Moliya (Qora daftar) bo'limini blokdan chiqarish uchun umumiy PIN kod: **`1234`**
+### Prerevizitlar:
+- Docker va Docker Compose o'rnatilgan bo'lishi kerak.
 
-| Rol | F.I.Sh | Kirish Emaili | Parol | Moliya PIN kodi |
-| :--- | :--- | :--- | :--- | :--- |
-| **Super Admin** | Abdullayev Sardor | `admin@blackdoor.uz` | `password123` | `1234` |
-| **Finansist (Moliya)** | Karimova Nilufar | `moliyachi@blackdoor.uz` | `password123` | `1234` |
-| **Obyekt Menejeri (Zavod)** | Toshmatov Jamshid | `zavod.menejer@blackdoor.uz` | `password123` | *Mavjud emas* |
-| **Obyekt Menejeri (Ombor)** | Rahimov Bekzod | `ombor.menejer@blackdoor.uz` | `password123` | *Mavjud emas* |
-| **Xodim 1** | Aliyev Oybek | `oybek@blackdoor.uz` | `password123` | *Mavjud emas* |
-| **Xodim 2** | Saidova Mohira | `mohira@blackdoor.uz` | `password123` | *Mavjud emas* |
+### Ishga tushirish qadamlari:
 
----
+1. Loyiha papkasiga o'ting:
+   ```bash
+   cd D:\Loyihalar\Black-door
+   ```
 
-## 🚀 Tizim Imkoniyatlari va Funksionallik
+2. Docker konteynerlarni quring va ishga tushiring:
+   ```bash
+   docker-compose up --build
+   ```
 
-Tizimda 4 ta asosiy foydalanuvchi roli mavjud va har bir rol uchun alohida boshqaruv panellari (Dashboard) va ruxsatnomalar ajratilgan:
+3. Portlar taqsimoti:
+   - **React Frontend:** `http://localhost:3000`
+   - **Express API Backend:** `http://localhost:5000`
+   - **PostgreSQL Database:** `http://localhost:5432`
 
-### 1. Foydalanuvchilar va Obyektlar Boshqaruvi (Super Admin)
-* **Xodimlar boshqaruvi:** Yangi foydalanuvchilar yaratish, ularni faollashtirish/bloklash va rollarini belgilash.
-* **Obyektlar reyestri:** Korxonaga qarashli ishlab chiqarish obyekti, qurilish yoki omborlarni qo'shish va ularga menejerlarni biriktirish.
-* **Valyuta Kursi:** Markazlashtirilgan joriy kursni boshqarish (1 USD = ? UZS).
-* **Audit Jurnali:** Tizimdagi har bir muhim amalni (tranzaksiyalar, o'zgarishlar, o'chirishlar) vaqt va foydalanuvchi kesimida jurnalga qayd etish.
-
-### 2. Moliya va Xazina moduli (Finansist & Admin)
-* **Kassalar:** USD va UZS balanslariga ega bo'lgan bir nechta xazina va kassa hisobvaraqlarini yuritish.
-* **Kirim-Chiqim Tranzaksiyalari:** Tranzaksiya toifalarini belgilash, turlarini (kirim, chiqim, o'tkazma, valyuta ayirboshlash) ko'rsatgan holda hisob-kitob qilish.
-* **Kontragentlar va Qarzlar:** Hamkorlar (kontragentlar) bilan hisob-kitoblar tarixi hamda qarzlar reyestri (outstanding debt).
-* **Moliya PIN verification:** Maxfiy "Qora daftar" (moliya bo'limi)ga kirish uchun maxsus 4 xonali PIN kodli himoya tizimi o'rnatilgan.
-
-### 3. Obyekt va Xodimlar Boshqaruvi (Menejer)
-* **Mini-Kassa:** Menejer o'ziga biriktirilgan obyekt uchun ajratilgan kassa balansini boshqaradi.
-* **Xodimlar ro'yxati:** Obyektda faoliyat yurituvchi ishchilar ro'yxati va ularning faollik holati.
-* **Ish haqi to'lovlari:** Ishchilarga tizim orqali maosh to'lash va ularni kassa balansidan ayirish.
-
-### 4. Ombor va Materiallar Nazorati (Omborchi / Menejer)
-* **Mahsulotlar:** Ombor zaxirasidagi tovarlar va materiallar ro'yxati.
-* **Ombor Harakatlari (Movements):** Obyektlararo tovarlarni qabul qilish yoki boshqa obyektga jo'natish tranzaksiyalari.
-* **Inventarizatsiya (Stock Check):** Tizimdagi qoldiqlar bilan amaldagi tovarlarni solishtirish va tafovutlarni to'g'rilash.
-
-### 5. Tahliliy Hisobotlar (Reports)
-* Davriy filtrlar yordamida quyidagi hisobotlarni generatsiya qilish:
-  - Kirim-chiqim hisoboti (balans o'zgarishlari);
-  - Kassalar qoldiqlari balansi;
-  - Qarzlar va kontragentlar balansi;
-  - Kategoriyalar bo'yicha moliyaviy tahlil.
-* Natijalarni **Excel** yoki **PDF** formatlarida eksport qilish imkoniyati.
+*Eslatma: PostgreSQL ishga tushganda `database/schema.sql` va `database/seed.sql` fayllari yordamida bazani avtomatik qurib, namunaviy demo ma'lumotlar bilan to'ldiradi.*
 
 ---
 
-## 🛠️ Texnologiyalar (Tech Stack)
+## 🔑 Demo / Test Rejimida Ishlatish (Demo Credentials)
 
-* **Backend:** PHP 8.2+ / Laravel 11
-* **Frontend:** HTML5, Vanilla CSS3 (Neumorphic Custom Design), Alpine.js (interaktiv komponentlar uchun)
-* **Database:** SQLite (lokal/test jarayonida) yoki PostgreSQL/MySQL (production uchun)
-* **Reporting Service:** Python 3.10+ (PDF/Excel hisobot generatori mikroxizmati sifatida)
+Tizimda sinovdan o'tkazish uchun tayyor foydalanuvchilar mavjud. Tizimga kirishda Google login o'rniga demo tugmalarni bosishingiz yoki mock tokenlardan foydalanishingiz mumkin:
+
+| Rol | Kirish Emaili | Demo Google Token | Telegram 2FA |
+| :--- | :--- | :--- | :--- |
+| **Super Admin** | `admin@blackdoor.uz` | `mock-google-token-admin` | Telegram kod yuboriladi yoki mock kod |
+| **Xodim / Omborchi** | `employee@blackdoor.uz` | `mock-google-token-employee` | Telegram kod yuboriladi yoki mock kod |
+
+*Hamma foydalanuvchilar uchun mock 2FA kodi avtomatik to'ldirish yoki ekranda ko'rsatilgan mock kodi yordamida taqdim etiladi.*
 
 ---
 
-## 💻 Loyihani O'rnatish va Ishga Tushirish
+## 📂 Loyiha Tuzilishi (Directory Structure)
 
-### 1. Tizim talablari:
-* PHP >= 8.2
-* Composer
-* SQLite3
-* Python >= 3.10 (PDF/Excel hisobotlari ishlashi uchun)
-
-### 2. Loyihani yuklab olish va paketlarni o'rnatish:
-```bash
-# Composer orqali PHP kutubxonalarini yuklash
-composer install
-
-# Environment konfiguratsiyasini sozlash
-copy .env.example .env
-
-# App key generatsiya qilish
-php artisan key:generate
+```text
+/Black-door
+│
+├── /backend                 # Node.js Express server
+│   ├── /controllers         # Controller biznes logikasi
+│   ├── /middleware          # JWT va ruxsatnomalar middleware
+│   ├── /routes              # Marshrutlar (auth, transactions, reports ...)
+│   ├── /services            # telegramBot.js 2FA xizmati
+│   ├── db.js                # PostgreSQL pool wrapper
+│   ├── Dockerfile
+│   ├── package.json
+│   └── server.js
+│
+├── /frontend                # React SPA client
+│   ├── /src
+│   │   ├── /components      # Admin va Employee modular subcomponents
+│   │   ├── /pages           # Login, AdminDashboard, EmployeeDashboard
+│   │   ├── /services        # api.js (Axios)
+│   │   ├── App.jsx          # Yo'naltirish (Router)
+│   │   ├── index.css        # Soft UI (Neumorphic) stillari
+│   │   └── main.jsx
+│   ├── Dockerfile
+│   ├── package.json
+│   └── vite.config.js
+│
+├── /database                # Baza fayllari
+│   ├── schema.sql           # PostgreSQL DDL
+│   └── seed.sql             # Namunaviy seederlar
+│
+├── docker-compose.yml       # Konteynerlar orkestratsiyasi
+├── ARCHITECTURE.md          # Tizim arxitekturasi bayoni
+└── API_DOCUMENTATION.md     # Barcha REST API kontraktlari
 ```
 
-### 3. Ma'lumotlar bazasini sozlash va migratsiyalarni yuritish:
-`.env` faylida SQLite bazasi yo'lini ko'rsating yoki sukut bo'yicha SQLite bazasini yarating:
-```bash
-# Bo'sh SQLite faylini yaratish (Windows PowerShell)
-New-Item -Path database/database.sqlite -ItemType File -Force
-
-# Migratsiyalar va demo ma'lumotlarni yozish
-php artisan migrate:fresh --seed
-```
-
-### 4. Hisobot berish xizmatini yoqish (Python):
-```bash
-cd services/reports
-pip install -r requirements.txt
-python main.py
-```
-*Bu xizmat sukut bo'yicha `http://127.0.0.1:8000` portida ishga tushadi.*
-
-### 5. Web-serverni ishga tushirish:
-```bash
-# Laravel serverini yoqish
-php artisan serve
-```
-Tizimga brauzer orqali `http://127.0.0.1:8000` manzilida kiring.
-
-### 6. Testlarni ishga tushirish:
-Tizimda testlarni yurgizishning ikkita rejimi mavjud:
-
-#### A. Tezkor Lokal Testlar (SQLite - xotirada)
-Ishlab chiqish jarayonida testlarni tezkorlik bilan yurgizib ko'rish uchun SQLite :memory: ishlatiladi:
-```bash
-php artisan test
-```
-
-#### B. Ishlab Chiqarishdan Oldingi Majburiy Testlar (PostgreSQL)
-Loyiha ishlab chiqarishga (production) topshirilishidan oldin, PostgreSQL muhiti bilan mosligini to'liq tekshirish uchun alohida test bazasi va konfiguratsiyasidan foydalaniladi:
-```bash
-php artisan test --configuration phpunit.pgsql.xml
-```
-*Eslatma: Ushbu testlarni yurgizishdan oldin PostgreSQL test bazasi (sukut bo'yicha: `blackdoor_test`) yaratilgan va ishga tushirilgan bo'lishi lozim.*
-
 ---
-*Loyihaning Neumorphic (Soft UI) dizayni to'liq yakunlandi va foydalanishga tayyor.*
+
+## 📄 Hujjatlar (Documentation Links)
+
+1. [Tizim Arxitekturasi (ARCHITECTURE.md)](file:///d:/Loyihalar/Black-door/ARCHITECTURE.md)
+2. [REST API Hujjatlari (API_DOCUMENTATION.md)](file:///d:/Loyihalar/Black-door/API_DOCUMENTATION.md)

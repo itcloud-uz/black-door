@@ -1,9 +1,0 @@
-- [x] Super Admin: Foydalanuvchilarni boshqarish (Yaratish/Tahrirlash/Bloklash)
-- [x] Super Admin: Obyektlarni boshqarish (Yaratish/Tahrirlash)
-- [x] Super Admin: Valyuta kursi va Audit jurnali mukammallashtirish
-- [x] Moliya: Kontragentlarni boshqarish va Storno amali
-- [x] Moliya: Hisobotlarni eksport qilish va grafiklar
-- [x] Menejer: Oylik/Avans to'lovlari implementatsiyasi
-- [x] Menejer: Ombor harakatlari va Inventarizatsiya
-- [x] Xodim: Ish vaqtini qayd etish va Avans so'rovi
-- [x] Umumiy: Barcha o'zgarishlarni GitHubga yuklash
