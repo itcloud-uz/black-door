@@ -6,6 +6,7 @@ export default function UserManager() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [editingUser, setEditingUser] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Create User Form State
   const [form, setForm] = useState({
@@ -44,6 +45,7 @@ export default function UserManager() {
         role: 'employee',
         telegram_id: ''
       });
+      setShowCreateModal(false);
       fetchUsers();
     } catch (err) {
       setError(err.response?.data?.error || 'Foydalanuvchini qo\'shishda xatolik yuz berdi');
@@ -92,71 +94,97 @@ export default function UserManager() {
 
   return (
     <div>
-      <h2 className="text-2xl font-black text-slate-100 mb-8">Foydalanuvchilar Boshqaruvi</h2>
-
-      {/* Create User Form */}
-      <div className="p-6 skeuo-convex mb-8 border border-white/5 shadow-lg">
-        <h3 className="font-bold text-slate-200 text-sm mb-6">➕ Yangi foydalanuvchi qo'shish</h3>
-        {error && !editingUser && (
-          <div className="mb-4 p-3 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold">
-            ⚠️ {error}
-          </div>
-        )}
-        <form onSubmit={handleCreateUser} className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Google Gmail adresi</label>
-            <input
-              type="email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full skeuo-input"
-              placeholder="user@gmail.com"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Foydalanuvchi ismi</label>
-            <input
-              type="text"
-              value={form.full_name}
-              onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-              className="w-full skeuo-input"
-              placeholder="Ali Valiyev"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Tizimdagi roli</label>
-            <select
-              value={form.role}
-              onChange={(e) => setForm({ ...form, role: e.target.value })}
-              className="w-full skeuo-input bg-[#131b2e]"
-            >
-              <option value="employee">Employee (Xodim/Omborchi)</option>
-              <option value="admin">Admin (Tizim boshqaruvchisi)</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Telegram Chat ID (Ixtiyoriy)</label>
-            <input
-              type="text"
-              value={form.telegram_id}
-              onChange={(e) => setForm({ ...form, telegram_id: e.target.value })}
-              className="w-full skeuo-input"
-              placeholder="Masalan: 1412501744"
-            />
-          </div>
-
-          <div className="md:col-span-4 flex justify-end">
-            <button type="submit" disabled={loading} className="py-3 px-8 skeuo-btn text-indigo-400 font-extrabold text-sm active:scale-95 duration-100">
-              💾 Foydalanuvchini Saqlash
-            </button>
-          </div>
-        </form>
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-2xl font-black text-slate-100">Foydalanuvchilar Boshqaruvi</h2>
+        <button
+          onClick={() => {
+            setShowCreateModal(true);
+            setError('');
+          }}
+          className="flex items-center gap-2 py-2.5 px-6 skeuo-btn text-xs font-bold text-indigo-400 hover:text-indigo-300"
+        >
+          ➕ Yangi foydalanuvchi qo'shish
+        </button>
       </div>
+
+      {/* Create User Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-lg p-8 skeuo-convex border border-white/10 shadow-2xl">
+            <h3 className="text-lg font-black text-slate-100 mb-6">➕ Yangi foydalanuvchi qo'shish</h3>
+            {error && !editingUser && (
+              <div className="mb-4 p-3 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold">
+                ⚠️ {error}
+              </div>
+            )}
+            <form onSubmit={handleCreateUser} className="space-y-6">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Google Gmail adresi</label>
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  className="w-full skeuo-input"
+                  placeholder="user@gmail.com"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Foydalanuvchi ismi</label>
+                <input
+                  type="text"
+                  value={form.full_name}
+                  onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+                  className="w-full skeuo-input"
+                  placeholder="Ali Valiyev"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Tizimdagi roli</label>
+                <select
+                  value={form.role}
+                  onChange={(e) => setForm({ ...form, role: e.target.value })}
+                  className="w-full skeuo-input bg-[#131b2e]"
+                >
+                  <option value="employee">Employee (Xodim/Omborchi)</option>
+                  <option value="admin">Admin (Tizim boshqaruvchisi)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Telegram Chat ID (Ixtiyoriy)</label>
+                <input
+                  type="text"
+                  value={form.telegram_id}
+                  onChange={(e) => setForm({ ...form, telegram_id: e.target.value })}
+                  className="w-full skeuo-input"
+                  placeholder="Masalan: 1412501744"
+                />
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 py-3 skeuo-btn text-indigo-400 font-bold active:scale-95 duration-100"
+                >
+                  {loading ? "Saqlanmoqda..." : "💾 Saqlash"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  className="flex-1 py-3 skeuo-btn text-slate-400 font-bold active:scale-95 duration-100"
+                >
+                  Bekor qilish
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Edit User Modal */}
       {editingUser && (

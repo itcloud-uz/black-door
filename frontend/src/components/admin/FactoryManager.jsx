@@ -5,10 +5,17 @@ export default function FactoryManager({ factories, facForm, setFacForm, onCreat
   const [editingFac, setEditingFac] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const handleEditClick = (fac) => {
     setEditingFac({ ...fac });
     setError('');
+  };
+
+  const handleCreateSubmit = (e) => {
+    e.preventDefault();
+    onCreateFac(e);
+    setShowCreateModal(false);
   };
 
   const handleUpdateFac = async (e) => {
@@ -49,105 +56,120 @@ export default function FactoryManager({ factories, facForm, setFacForm, onCreat
 
   return (
     <div>
-      <h2 className="text-2xl font-black text-slate-100 mb-8">Zavodlar va Ishlab Chiqarish Boshqaruvi</h2>
-
-      {/* Create Factory Form */}
-      <div className="p-6 skeuo-convex mb-8 border border-white/5 shadow-lg">
-        <h3 className="font-bold text-slate-200 text-sm mb-6">➕ Yangi zavod qo'shish</h3>
-        <form onSubmit={onCreateFac} className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Zavod nomi</label>
-            <input
-              type="text"
-              value={facForm.name}
-              onChange={(e) => setFacForm({ ...facForm, name: e.target.value })}
-              className="w-full skeuo-input"
-              placeholder="Toshkent Armatura Zavodi"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Manzil</label>
-            <input
-              type="text"
-              value={facForm.address}
-              onChange={(e) => setFacForm({ ...facForm, address: e.target.value })}
-              className="w-full skeuo-input"
-              placeholder="Sergeli 4-mavze"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Telefon</label>
-            <input
-              type="text"
-              value={facForm.phone}
-              onChange={(e) => setFacForm({ ...facForm, phone: e.target.value })}
-              className="w-full skeuo-input"
-              placeholder="+998712345678"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Menejer (F.I.Sh)</label>
-            <input
-              type="text"
-              value={facForm.manager_name}
-              onChange={(e) => setFacForm({ ...facForm, manager_name: e.target.value })}
-              className="w-full skeuo-input"
-              placeholder="Temur Olimov"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Jihoz/Uskunalar turi</label>
-            <input
-              type="text"
-              value={facForm.equipment_type}
-              onChange={(e) => setFacForm({ ...facForm, equipment_type: e.target.value })}
-              className="w-full skeuo-input"
-              placeholder="Qoliplash uskunalari"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Ijara stavkasi (Kunlik, USD)</label>
-            <input
-              type="number"
-              value={facForm.rental_rate_per_day}
-              onChange={(e) => setFacForm({ ...facForm, rental_rate_per_day: e.target.value })}
-              className="w-full skeuo-input"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Komissiya foizi (%)</label>
-            <input
-              type="number"
-              step="0.01"
-              value={facForm.production_commission_percent}
-              onChange={(e) => setFacForm({ ...facForm, production_commission_percent: e.target.value })}
-              className="w-full skeuo-input"
-            />
-          </div>
-
-          <div className="flex items-end justify-end">
-            <button type="submit" className="py-3 px-8 skeuo-btn text-indigo-400 font-extrabold text-sm active:scale-95 duration-100 w-full">
-              💾 Zavodni Saqlash
-            </button>
-          </div>
-        </form>
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-2xl font-black text-slate-100">Zavodlar Boshqaruvi</h2>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="flex items-center gap-2 py-2.5 px-6 skeuo-btn text-xs font-bold text-indigo-400 hover:text-indigo-300"
+        >
+          ➕ Yangi zavod qo'shish
+        </button>
       </div>
+
+      {/* Create Factory Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-lg p-8 skeuo-convex border border-white/10 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <h3 className="text-lg font-black text-slate-100 mb-6">➕ Yangi zavod qo'shish</h3>
+            <form onSubmit={handleCreateSubmit} className="space-y-6">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Zavod nomi</label>
+                <input
+                  type="text"
+                  value={facForm.name}
+                  onChange={(e) => setFacForm({ ...facForm, name: e.target.value })}
+                  className="w-full skeuo-input"
+                  placeholder="Toshkent Armatura Zavodi"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Manzil</label>
+                <input
+                  type="text"
+                  value={facForm.address}
+                  onChange={(e) => setFacForm({ ...facForm, address: e.target.value })}
+                  className="w-full skeuo-input"
+                  placeholder="Sergeli 4-mavze"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Telefon</label>
+                <input
+                  type="text"
+                  value={facForm.phone}
+                  onChange={(e) => setFacForm({ ...facForm, phone: e.target.value })}
+                  className="w-full skeuo-input"
+                  placeholder="+998712345678"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Menejer (F.I.Sh)</label>
+                <input
+                  type="text"
+                  value={facForm.manager_name}
+                  onChange={(e) => setFacForm({ ...facForm, manager_name: e.target.value })}
+                  className="w-full skeuo-input"
+                  placeholder="Temur Olimov"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Jihoz/Uskunalar turi</label>
+                <input
+                  type="text"
+                  value={facForm.equipment_type}
+                  onChange={(e) => setFacForm({ ...facForm, equipment_type: e.target.value })}
+                  className="w-full skeuo-input"
+                  placeholder="Qoliplash uskunalari"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Ijara stavkasi (Kunlik, USD)</label>
+                <input
+                  type="number"
+                  value={facForm.rental_rate_per_day}
+                  onChange={(e) => setFacForm({ ...facForm, rental_rate_per_day: e.target.value })}
+                  className="w-full skeuo-input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Komissiya foizi (%)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={facForm.production_commission_percent}
+                  onChange={(e) => setFacForm({ ...facForm, production_commission_percent: e.target.value })}
+                  className="w-full skeuo-input"
+                />
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <button type="submit" className="flex-1 py-3 skeuo-btn text-indigo-400 font-extrabold text-sm active:scale-95 duration-100">
+                  💾 Saqlash
+                </button>
+                <button type="button" onClick={() => setShowCreateModal(false)} className="flex-1 py-3 skeuo-btn text-slate-400 font-extrabold text-sm active:scale-95 duration-100">
+                  Bekor qilish
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Edit Factory Modal */}
       {editingFac && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <div className="w-full max-w-lg p-8 skeuo-convex border border-white/10 shadow-2xl">
+          <div className="w-full max-w-lg p-8 skeuo-convex border border-white/10 shadow-2xl overflow-y-auto max-h-[90vh]">
             <h3 className="text-lg font-black text-slate-100 mb-6">📝 Zavod ma'lumotlarini tahrirlash</h3>
             {error && (
               <div className="mb-4 p-3 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold">

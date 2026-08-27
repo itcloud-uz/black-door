@@ -5,10 +5,17 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
   const [editingProd, setEditingProd] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const handleEditClick = (prod) => {
     setEditingProd({ ...prod });
     setError('');
+  };
+
+  const handleCreateSubmit = (e) => {
+    e.preventDefault();
+    onCreateProd(e);
+    setShowCreateModal(false);
   };
 
   const handleUpdateProd = async (e) => {
@@ -48,100 +55,115 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
 
   return (
     <div>
-      <h2 className="text-2xl font-black text-slate-100 mb-8">Mahsulotlar Katalogi</h2>
-
-      {/* Create Product Form */}
-      <div className="p-6 skeuo-convex mb-8 border border-white/5 shadow-lg">
-        <h3 className="font-bold text-slate-200 text-sm mb-6">➕ Yangi mahsulot qo'shish</h3>
-        <form onSubmit={onCreateProd} className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Mahsulot nomi</label>
-            <input
-              type="text"
-              value={prodForm.name}
-              onChange={(e) => setProdForm({ ...prodForm, name: e.target.value })}
-              className="w-full skeuo-input"
-              placeholder="Sement M500, Oyna 4mm..."
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">O'lchov birligi</label>
-            <select
-              value={prodForm.unit_type}
-              onChange={(e) => setProdForm({ ...prodForm, unit_type: e.target.value })}
-              className="w-full skeuo-input bg-[#131b2e]"
-            >
-              <option value="kg">kilogram (kg)</option>
-              <option value="dona">dona (piece)</option>
-              <option value="meter">metr (meter)</option>
-              <option value="liter">litr (liter)</option>
-              <option value="box">quti (box)</option>
-              <option value="ton">tonna (ton)</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Asosiy narxi (Sotuv, USD)</label>
-            <input
-              type="number"
-              value={prodForm.base_price}
-              onChange={(e) => setProdForm({ ...prodForm, base_price: e.target.value })}
-              className="w-full skeuo-input"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Tannarxi (Xarid, USD)</label>
-            <input
-              type="number"
-              value={prodForm.cost_price}
-              onChange={(e) => setProdForm({ ...prodForm, cost_price: e.target.value })}
-              className="w-full skeuo-input"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Kategoriya</label>
-            <input
-              type="text"
-              value={prodForm.category}
-              onChange={(e) => setProdForm({ ...prodForm, category: e.target.value })}
-              className="w-full skeuo-input"
-              placeholder="Temir buyumlar, Shisha x.k."
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Ishlab chiqaruvchi</label>
-            <input
-              type="text"
-              value={prodForm.manufacturer}
-              onChange={(e) => setProdForm({ ...prodForm, manufacturer: e.target.value })}
-              className="w-full skeuo-input"
-              placeholder="Qizilqum Sement..."
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Ombordagi miqdor</label>
-            <input
-              type="number"
-              value={prodForm.quantity_in_stock}
-              onChange={(e) => setProdForm({ ...prodForm, quantity_in_stock: e.target.value })}
-              className="w-full skeuo-input"
-            />
-          </div>
-
-          <div className="flex items-end justify-end">
-            <button type="submit" className="py-3 px-8 skeuo-btn text-indigo-400 font-extrabold text-sm active:scale-95 duration-100 w-full">
-              💾 Mahsulotni Saqlash
-            </button>
-          </div>
-        </form>
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-2xl font-black text-slate-100">Mahsulotlar Katalogi</h2>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="flex items-center gap-2 py-2.5 px-6 skeuo-btn text-xs font-bold text-indigo-400 hover:text-indigo-300"
+        >
+          ➕ Yangi mahsulot qo'shish
+        </button>
       </div>
+
+      {/* Create Product Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-lg p-8 skeuo-convex border border-white/10 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <h3 className="text-lg font-black text-slate-100 mb-6">➕ Yangi mahsulot qo'shish</h3>
+            <form onSubmit={handleCreateSubmit} className="space-y-6">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Mahsulot nomi</label>
+                <input
+                  type="text"
+                  value={prodForm.name}
+                  onChange={(e) => setProdForm({ ...prodForm, name: e.target.value })}
+                  className="w-full skeuo-input"
+                  placeholder="Sement M500, Oyna 4mm..."
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">O'lchov birligi</label>
+                <select
+                  value={prodForm.unit_type}
+                  onChange={(e) => setProdForm({ ...prodForm, unit_type: e.target.value })}
+                  className="w-full skeuo-input bg-[#131b2e]"
+                >
+                  <option value="kg">kilogram (kg)</option>
+                  <option value="dona">dona (piece)</option>
+                  <option value="meter">metr (meter)</option>
+                  <option value="liter">litr (liter)</option>
+                  <option value="box">quti (box)</option>
+                  <option value="ton">tonna (ton)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Asosiy narxi (Sotuv, USD)</label>
+                <input
+                  type="number"
+                  value={prodForm.base_price}
+                  onChange={(e) => setProdForm({ ...prodForm, base_price: e.target.value })}
+                  className="w-full skeuo-input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Tannarxi (Xarid, USD)</label>
+                <input
+                  type="number"
+                  value={prodForm.cost_price}
+                  onChange={(e) => setProdForm({ ...prodForm, cost_price: e.target.value })}
+                  className="w-full skeuo-input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Kategoriya</label>
+                <input
+                  type="text"
+                  value={prodForm.category}
+                  onChange={(e) => setProdForm({ ...prodForm, category: e.target.value })}
+                  className="w-full skeuo-input"
+                  placeholder="Temir buyumlar, Shisha x.k."
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Ishlab chiqaruvchi</label>
+                <input
+                  type="text"
+                  value={prodForm.manufacturer}
+                  onChange={(e) => setProdForm({ ...prodForm, manufacturer: e.target.value })}
+                  className="w-full skeuo-input"
+                  placeholder="Qizilqum Sement..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Ombordagi miqdor</label>
+                <input
+                  type="number"
+                  value={prodForm.quantity_in_stock}
+                  onChange={(e) => setProdForm({ ...prodForm, quantity_in_stock: e.target.value })}
+                  className="w-full skeuo-input"
+                />
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <button type="submit" className="flex-1 py-3 skeuo-btn text-indigo-400 font-extrabold text-sm active:scale-95 duration-100">
+                  💾 Saqlash
+                </button>
+                <button type="button" onClick={() => setShowCreateModal(false)} className="flex-1 py-3 skeuo-btn text-slate-400 font-extrabold text-sm active:scale-95 duration-100">
+                  Bekor qilish
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Edit Product Modal */}
       {editingProd && (
@@ -182,7 +204,7 @@ export default function ProductCatalog({ products, prodForm, setProdForm, onCrea
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Sotuv narxi ($)</label>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Asosiy narxi ($)</label>
                 <input
                   type="number"
                   value={editingProd.base_price}

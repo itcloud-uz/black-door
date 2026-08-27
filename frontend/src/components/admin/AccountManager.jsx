@@ -9,10 +9,17 @@ export default function AccountManager({
   const [editingAcc, setEditingAcc] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const handleEditClick = (acc) => {
     setEditingAcc({ ...acc });
     setError('');
+  };
+
+  const handleCreateSubmit = (e) => {
+    e.preventDefault();
+    onCreateAcc(e);
+    setShowCreateModal(false);
   };
 
   const handleUpdateAcc = async (e) => {
@@ -52,100 +59,115 @@ export default function AccountManager({
 
   return (
     <div>
-      <h2 className="text-2xl font-black text-slate-100 mb-8">Shaxslar va Kassalar Boshqaruvi</h2>
-
-      {/* Create Account Form */}
-      <div className="p-6 skeuo-convex mb-8 border border-white/5 shadow-lg">
-        <h3 className="font-bold text-slate-200 text-sm mb-6">➕ Yangi hisob varaq qo'shish</h3>
-        <form onSubmit={onCreateAcc} className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Hisob turi</label>
-            <select
-              value={accForm.account_type}
-              onChange={(e) => setAccForm({ ...accForm, account_type: e.target.value })}
-              className="w-full skeuo-input bg-[#131b2e]"
-            >
-              <option value="person">Hamkor / Shaxs (Person)</option>
-              <option value="company">Tizim Kassasi (Company)</option>
-              <option value="factory">Zavod Balansi (Factory)</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Nom (Eshmatov, Kassa x.k.)</label>
-            <input
-              type="text"
-              value={accForm.account_holder_name}
-              onChange={(e) => setAccForm({ ...accForm, account_holder_name: e.target.value })}
-              className="w-full skeuo-input"
-              placeholder="FIO yoki kassa nomi"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Hisob Raqam (Noyob)</label>
-            <input
-              type="text"
-              value={accForm.account_number}
-              onChange={(e) => setAccForm({ ...accForm, account_number: e.target.value })}
-              className="w-full skeuo-input"
-              placeholder="ACC-UZS-100"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Valyuta</label>
-            <select
-              value={accForm.currency}
-              onChange={(e) => setAccForm({ ...accForm, currency: e.target.value })}
-              className="w-full skeuo-input bg-[#131b2e]"
-            >
-              <option value="UZS">UZS</option>
-              <option value="USD">USD</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Telefon</label>
-            <input
-              type="text"
-              value={accForm.phone}
-              onChange={(e) => setAccForm({ ...accForm, phone: e.target.value })}
-              className="w-full skeuo-input"
-              placeholder="+998901234567"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Email</label>
-            <input
-              type="email"
-              value={accForm.email}
-              onChange={(e) => setAccForm({ ...accForm, email: e.target.value })}
-              className="w-full skeuo-input"
-              placeholder="user@example.com"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Boshlang'ich Balans</label>
-            <input
-              type="number"
-              value={accForm.current_balance}
-              onChange={(e) => setAccForm({ ...accForm, current_balance: e.target.value })}
-              className="w-full skeuo-input"
-            />
-          </div>
-
-          <div className="flex items-end justify-end">
-            <button type="submit" className="py-3 px-8 skeuo-btn text-indigo-400 font-extrabold text-sm active:scale-95 duration-100 w-full">
-              💾 Hisobni Saqlash
-            </button>
-          </div>
-        </form>
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-2xl font-black text-slate-100">Shaxslar va Kassalar Boshqaruvi</h2>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="flex items-center gap-2 py-2.5 px-6 skeuo-btn text-xs font-bold text-indigo-400 hover:text-indigo-300"
+        >
+          ➕ Yangi hisob varaq qo'shish
+        </button>
       </div>
+
+      {/* Create Account Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-lg p-8 skeuo-convex border border-white/10 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <h3 className="text-lg font-black text-slate-100 mb-6">➕ Yangi hisob varaq qo'shish</h3>
+            <form onSubmit={handleCreateSubmit} className="space-y-6">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Hisob turi</label>
+                <select
+                  value={accForm.account_type}
+                  onChange={(e) => setAccForm({ ...accForm, account_type: e.target.value })}
+                  className="w-full skeuo-input bg-[#131b2e]"
+                >
+                  <option value="person">Hamkor / Shaxs (Person)</option>
+                  <option value="company">Tizim Kassasi (Company)</option>
+                  <option value="factory">Zavod Balansi (Factory)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Nom (Eshmatov, Kassa x.k.)</label>
+                <input
+                  type="text"
+                  value={accForm.account_holder_name}
+                  onChange={(e) => setAccForm({ ...accForm, account_holder_name: e.target.value })}
+                  className="w-full skeuo-input"
+                  placeholder="FIO yoki kassa nomi"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Hisob Raqam (Noyob)</label>
+                <input
+                  type="text"
+                  value={accForm.account_number}
+                  onChange={(e) => setAccForm({ ...accForm, account_number: e.target.value })}
+                  className="w-full skeuo-input"
+                  placeholder="ACC-UZS-100"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Valyuta</label>
+                <select
+                  value={accForm.currency}
+                  onChange={(e) => setAccForm({ ...accForm, currency: e.target.value })}
+                  className="w-full skeuo-input bg-[#131b2e]"
+                >
+                  <option value="UZS">UZS</option>
+                  <option value="USD">USD</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Telefon</label>
+                <input
+                  type="text"
+                  value={accForm.phone}
+                  onChange={(e) => setAccForm({ ...accForm, phone: e.target.value })}
+                  className="w-full skeuo-input"
+                  placeholder="+998901234567"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Email</label>
+                <input
+                  type="email"
+                  value={accForm.email}
+                  onChange={(e) => setAccForm({ ...accForm, email: e.target.value })}
+                  className="w-full skeuo-input"
+                  placeholder="user@example.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Boshlang'ich Balans</label>
+                <input
+                  type="number"
+                  value={accForm.current_balance}
+                  onChange={(e) => setAccForm({ ...accForm, current_balance: e.target.value })}
+                  className="w-full skeuo-input"
+                />
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <button type="submit" className="flex-1 py-3 skeuo-btn text-indigo-400 font-extrabold text-sm active:scale-95 duration-100">
+                  💾 Saqlash
+                </button>
+                <button type="button" onClick={() => setShowCreateModal(false)} className="flex-1 py-3 skeuo-btn text-slate-400 font-extrabold text-sm active:scale-95 duration-100">
+                  Bekor qilish
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Edit Account Modal */}
       {editingAcc && (
