@@ -464,14 +464,14 @@ export default function AdminDashboard({ user, onLogout }) {
                 
                 <div className="flex gap-4 items-center mb-4">
                   <a 
-                    href={`https://t.me/blackdoor_2fa_bot`}
+                    href={`https://t.me/Itcloudvertifikatsiya_bot`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-4 py-2 text-xs font-bold text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700 duration-150"
                   >
                     Botni ishga tushirish (Start)
                   </a>
-                  <span className="text-xs text-gray-400">Bot username: @blackdoor_2fa_bot</span>
+                  <span className="text-xs text-gray-400">Bot username: @Itcloudvertifikatsiya_bot</span>
                 </div>
 
                 <div>
