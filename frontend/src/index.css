@@ -92,6 +92,11 @@
     border-color: rgba(99, 102, 241, 0.5);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
   }
+
+  .skeuo-input option {
+    background-color: #0f172a;
+    color: #f8fafc;
+  }
 }
 
 /* Scrollbar Styling for Dark Theme */

@@ -7,27 +7,27 @@ export default function TransactionManager({
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-black text-[#2D3748]">Moliyaviy Buxgalteriya</h2>
+        <h2 className="text-2xl font-black text-slate-100">Moliyaviy Buxgalteriya</h2>
         <div className="flex gap-3">
-          <button onClick={() => onExport('excel')} className="flex items-center gap-2 py-2 px-4 skeuo-btn text-xs font-bold text-green-700">
+          <button onClick={() => onExport('excel')} className="flex items-center gap-2 py-2 px-4 skeuo-btn text-xs font-bold text-emerald-400 hover:text-emerald-300">
             <FileSpreadsheet size={16} /> Excel
           </button>
-          <button onClick={() => onExport('pdf')} className="flex items-center gap-2 py-2 px-4 skeuo-btn text-xs font-bold text-red-700">
+          <button onClick={() => onExport('pdf')} className="flex items-center gap-2 py-2 px-4 skeuo-btn text-xs font-bold text-rose-400 hover:text-rose-300">
             <FileText size={16} /> PDF
           </button>
         </div>
       </div>
 
       {/* Create Transaction Form */}
-      <div className="p-6 skeuo-convex mb-8">
-        <h3 className="font-bold text-[#2D3748] text-sm mb-6">➕ Yangi tranzaksiya kiritish</h3>
+      <div className="p-6 skeuo-convex mb-8 border border-white/5 shadow-lg">
+        <h3 className="font-bold text-slate-200 text-sm mb-6">➕ Yangi tranzaksiya kiritish</h3>
         <form onSubmit={onCreateTx} className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Tranzaksiya turi</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Tranzaksiya turi</label>
             <select
               value={txForm.transaction_type}
               onChange={(e) => setTxForm({ ...txForm, transaction_type: e.target.value })}
-              className="w-full skeuo-input"
+              className="w-full skeuo-input bg-[#131b2e]"
             >
               <option value="cash_deposit">Kassa Balans Ko'paytirish (Deposit)</option>
               <option value="personal_withdrawal">Shaxs pul yechishi (Withdrawal)</option>
@@ -41,7 +41,7 @@ export default function TransactionManager({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Summa</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Summa</label>
             <input
               type="number"
               step="0.01"
@@ -54,11 +54,11 @@ export default function TransactionManager({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Valyuta</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Valyuta</label>
             <select
               value={txForm.currency}
               onChange={(e) => setTxForm({ ...txForm, currency: e.target.value })}
-              className="w-full skeuo-input"
+              className="w-full skeuo-input bg-[#131b2e]"
             >
               <option value="UZS">UZS</option>
               <option value="USD">USD</option>
@@ -68,7 +68,7 @@ export default function TransactionManager({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Kassadan/Kimdan (From)</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Kassadan/Kimdan (From)</label>
             <input
               type="text"
               value={txForm.from_account}
@@ -79,7 +79,7 @@ export default function TransactionManager({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Kassaga/Kimga (To)</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Kassaga/Kimga (To)</label>
             <input
               type="text"
               value={txForm.to_account}
@@ -90,11 +90,11 @@ export default function TransactionManager({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Bog'liq Shaxs/Hisob</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Bog'liq Shaxs/Hisob</label>
             <select
               value={txForm.person_id}
               onChange={(e) => setTxForm({ ...txForm, person_id: e.target.value })}
-              className="w-full skeuo-input"
+              className="w-full skeuo-input bg-[#131b2e]"
             >
               <option value="">Hamkor tanlang (ixtiyoriy)</option>
               {accounts.map(acc => (
@@ -104,11 +104,11 @@ export default function TransactionManager({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Zavod (Ixtiyoriy)</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Zavod (Ixtiyoriy)</label>
             <select
               value={txForm.factory_id}
               onChange={(e) => setTxForm({ ...txForm, factory_id: e.target.value })}
-              className="w-full skeuo-input"
+              className="w-full skeuo-input bg-[#131b2e]"
             >
               <option value="">Zavod tanlang</option>
               {factories.map(f => (
@@ -118,11 +118,11 @@ export default function TransactionManager({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Mahsulot (Ixtiyoriy)</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Mahsulot (Ixtiyoriy)</label>
             <select
               value={txForm.product_id}
               onChange={(e) => setTxForm({ ...txForm, product_id: e.target.value })}
-              className="w-full skeuo-input"
+              className="w-full skeuo-input bg-[#131b2e]"
             >
               <option value="">Mahsulot tanlang</option>
               {products.map(p => (
@@ -132,7 +132,7 @@ export default function TransactionManager({
           </div>
 
           <div className="md:col-span-3">
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Tranzaksiya Tavsifi</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Tranzaksiya Tavsifi</label>
             <input
               type="text"
               value={txForm.description}
@@ -144,7 +144,7 @@ export default function TransactionManager({
           </div>
 
           <div className="md:col-span-3 flex justify-end">
-            <button type="submit" className="py-3 px-8 skeuo-btn text-blue-600 font-extrabold text-sm active:scale-95 duration-100">
+            <button type="submit" className="py-3 px-8 skeuo-btn text-indigo-400 font-extrabold text-sm active:scale-95 duration-100">
               💾 Tranzaksiyani Saqlash
             </button>
           </div>
@@ -152,12 +152,12 @@ export default function TransactionManager({
       </div>
 
       {/* List Table */}
-      <div className="skeuo-convex p-6">
-        <h3 className="font-bold text-gray-800 text-sm mb-4">Barcha Tranzaksiyalar</h3>
+      <div className="skeuo-convex p-6 border border-white/5 shadow-lg">
+        <h3 className="font-bold text-slate-200 text-sm mb-4">Barcha Tranzaksiyalar</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-gray-300 text-gray-500 uppercase font-extrabold tracking-wider">
+              <tr className="border-b border-white/10 text-slate-400 uppercase font-extrabold tracking-wider">
                 <th className="py-3 px-4">Kvitansiya #</th>
                 <th className="py-3 px-4">Turi</th>
                 <th className="py-3 px-4">Summa</th>
@@ -169,26 +169,27 @@ export default function TransactionManager({
             </thead>
             <tbody>
               {transactions.map(t => (
-                <tr key={t.id} className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="py-3 px-4 font-mono font-bold text-gray-700">{t.receipt_number}</td>
+                <tr key={t.id} className="border-b border-white/5 hover:bg-white/5">
+                  <td className="py-3 px-4 font-mono font-bold text-slate-300">{t.receipt_number}</td>
                   <td className="py-3 px-4">
-                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
                       ['cash_deposit', 'product_sale', 'factory_rental'].includes(t.transaction_type)
-                        ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                        : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
                     }`}>
                       {t.transaction_type}
                     </span>
                   </td>
-                  <td className="py-3 px-4 font-black">
+                  <td className="py-3 px-4 font-black text-slate-100">
                     {parseFloat(t.amount).toLocaleString()} {t.currency}
                   </td>
-                  <td className="py-3 px-4">{t.person_name || '—'}</td>
-                  <td className="py-3 px-4 text-gray-500">{t.description}</td>
-                  <td className="py-3 px-4">{new Date(t.created_at).toLocaleDateString('uz-UZ')}</td>
+                  <td className="py-3 px-4 text-slate-300">{t.person_name || '—'}</td>
+                  <td className="py-3 px-4 text-slate-400">{t.description}</td>
+                  <td className="py-3 px-4 text-slate-300">{new Date(t.created_at).toLocaleDateString('uz-UZ')}</td>
                   <td className="py-3 px-4">
                     <button
                       onClick={() => onDeleteTx(t.id)}
-                      className="p-2 skeuo-btn text-red-600 hover:bg-red-50"
+                      className="p-2 skeuo-btn text-rose-400 hover:text-rose-300"
                     >
                       <Trash2 size={14} />
                     </button>
